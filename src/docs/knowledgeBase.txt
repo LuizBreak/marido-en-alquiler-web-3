@@ -1,0 +1,3 @@
+202301120: Debuging Vue app
+           We have to use console.log and check results on Developer  
+           Tool on the browser

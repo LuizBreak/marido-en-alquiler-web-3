@@ -1,0 +1,17 @@
+Facebook Login
+
+Client App Id: 1s48008e1au3e62plvvmr6h1cn
+App Domain: https://marido-en-alquiler.auth.us-east-1.amazoncognito.com/oauth2/idpresponse
+
+                          <div class="default-style mb-2">
+                            <img
+                              class="aspect-ratio"
+                              style="max-width: 100%"
+                              src="../../assets/img/gallery/marido.baner.png"
+                              alt=""
+                            />
+                          </div>
+
+
+
+<i class="fi-homne expand text-primary" aria-hidden="true" />

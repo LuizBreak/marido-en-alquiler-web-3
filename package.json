@@ -1,0 +1,103 @@
+{
+  "name": "Marido-en-Alquiler",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --open",
+    "serve:ssl": "vue-cli-service serve --https --open --public localhost:8080",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@aws-amplify/ui-vue": "^2.2.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.36",
+    "@fortawesome/free-solid-svg-icons": "^5.15.4",
+    "@fortawesome/vue-fontawesome": "^3.0.0-5",
+    "@lottiefiles/lottie-player": "^1.5.4",
+    "@popperjs/core": "^2.11.2",
+    "@vuelidate/core": "^2.0.0-alpha.34",
+    "@vuelidate/validators": "^2.0.0-alpha.26",
+    "@vuepic/vue-datepicker": "^3.0.0",
+    "aws-amplify": "^4.3.15",
+    "aws-amplify-vue": "^2.1.5",
+    "aws-sdk": "^2.1100.0",
+    "axios": "^0.25.0",
+    "bootstrap": "^5.1.3",
+    "cleave.js": "^1.6.0",
+    "core-js": "^3.6.5",
+    "filepond": "^4.30.3",
+    "filepond-plugin-file-validate-size": "^2.2.5",
+    "filepond-plugin-file-validate-type": "^1.2.6",
+    "filepond-plugin-image-crop": "^2.0.6",
+    "filepond-plugin-image-preview": "^4.6.10",
+    "filepond-plugin-image-resize": "^2.0.10",
+    "filepond-plugin-image-transform": "^3.8.7",
+    "flag-icons": "^6.2.0",
+    "gulp": "^4.0.2",
+    "jarallax": "^1.12.8",
+    "jquery": "^3.6.0",
+    "leaflet": "^1.7.1",
+    "lg-fullscreen.js": "^1.2.0",
+    "lg-thumbnail.js": "^1.2.0",
+    "lg-video.js": "^1.3.0",
+    "lg-zoom.js": "^1.3.0",
+    "lightgallery.js": "^1.4.0",
+    "linkifyjs": "^2.1.9",
+    "luxon": "^1.21.3",
+    "moment": "^2.29.1",
+    "nouislider": "^15.5.0",
+    "parallax-js": "^3.1.0",
+    "popper.js": "^1.16.1",
+    "prismjs": "^1.26.0",
+    "simplebar": "^5.3.6",
+    "smooth-scroll": "^16.1.3",
+    "socket.io-client": "^4.5.1",
+    "tiny-slider": "^2.9.4",
+    "vue": "^3.0.0",
+    "vue-authenticate": "^1.5.0",
+    "vue-carousel": "^0.18.0",
+    "vue-cleave-component": "^3.0.1",
+    "vue-filepond": "^7.0.2",
+    "vue-head": "^2.2.0",
+    "vue-material-design-icons": "5.3.1",
+    "vue-quick-chat": "^1.2.8",
+    "vue-router": "^4.0.12",
+    "vue-social-sharing": "^4.0.0-alpha4",
+    "vue-star-rating": "^2.1.0",
+    "vue-tiny-slider": "^0.1.39",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^7.0.0",
+    "less": "^4.1.2",
+    "less-loader": "^5.0.0",
+    "sass": "^1.85.1",
+    "sass-loader": "^7.0.1",
+    "vue-template-compiler": "^2.5.17"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

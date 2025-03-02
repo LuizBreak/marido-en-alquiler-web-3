@@ -1,0 +1,179 @@
+// logged / loggedoff management
+  // created() {
+  //   this.findUser();
+
+  //   AmplifyEventBus.$on("authState", (info) => {
+  //     if (info === "signedIn") {
+  //       this.findUser();
+  //     } else {
+  //       this.$store.state.signedIn = false;
+  //       // this.signedIn = false;
+  //       this.$store.state.user = null;
+  //     }
+  //   });
+  // },
+  
+  // use of data.data???
+commit("setProductDetail", res.data.data);
+
+
+document.body.scrollTop = document.documentElement.scrollTop = 0
+
+// if user of mapAction not need for dispatch methods: {
+  ...mapActions(["updateProduct",
+  onSubmit() {
+    const { title, price, description } = this.product;
+    // return false;
+    this.updateProduct({
+
+// lazy router form loading
+component: () => import('../views/products/ProductList.vue')
+
+
+// set ops state flags
+commit("setProductIsCreating", true)
+
+
+
+// Checking for multiple entities present
+v-if="Object.keys(reviews).length > 0
+
+// Scroll to top feature
+window.scroll(0, 0) 
+
+// implement config.js (how does it work?)
+
+Usage: import VueResource from 'vue-resource'
+export const UserResource = Vue.resource(API_ROOT + 'users{/id}')
+
+
+
+
+// Auth using axios?
+// Add a request interceptor
+axios.interceptors.request.use(
+    config => {
+        const token = 'localStorageService.getAccessToken()';
+        if (token) {
+            config.headers['Authorization'] = 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTYxMzk5MDE5MiwiZXhwIjoxNjE2NTgyMTkyLCJuYmYiOjE2MTM5OTAxOTIsImp0aSI6IkNvMGU4emtMTnE3Q2hIcWciLCJzdWIiOjEsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.ssafhxfR5bhTrnX5Wph2feMkHGCLOtJ_4TiEZwrJ1i8';
+        }
+        return config;
+    },
+    error => {
+        Promise.reject(error)
+    });
+
+
+
+
+// implement Input element addition
+setProductDetailInput: (state, e) => {
+    let product = state.product;
+    product[e.target.name] = e.target.value;
+    state.product = product
+  },
+  
+
+// Implement delele element removal
+setDeleteProduct: (state, id) => {
+  state.productsPaginatedData.data.filter((x) => x.id !== id);
+},
+
+
+// Scroll To Top
+// Beginners very often find themselves struggling with scrolling elements into view properly. The easiest way to scroll elements is to use the scrollIntoView method. Add behavior: "smooth" for a smooth scrolling animation.
+const scrollToTop = (element) =>
+  element.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  //   we’ve added another flag in the meta field named onlyWhenLoggedOut
+  path: '/login',
+  name: 'login',
+  component: LoginView,
+  meta: {
+    public: true,  // Allow access to even if not logged in
+    onlyWhenLoggedOut: true
+  }
+},
+
+router.beforeEach((to, from, next) => {
+  const isPublic = to.matched.some(record => record.meta.public)
+  const onlyWhenLoggedOut = to.matched.some(record => record.meta.onlyWhenLoggedOut)
+  const loggedIn = !!TokenService.getToken();
+
+  if (!isPublic && !loggedIn) {
+    return next({
+      path:'/login',
+      query: {redirect: to.fullPath}  // Store the full path to redirect the user to after login
+    });
+  }
+
+  // Do not allow user to visit login page or register page if they are logged in
+  if (loggedIn && onlyWhenLoggedOut) {
+    return next('/')
+  }
+
+  next();
+})
+
+// implement token service & api.service.js
+// https://medium.com/@zitko/structuring-a-vue-project-authentication-87032e5bfe16
+storage.service.js
+
+
+// Implementing page redicred to history
+// Redirect the user to the page he first tried to visit or to the home view
+router.push(router.history.current.query.redirect || '/');
+
+
+// Good implmetation of user logged in check
+
+router.beforeResolve((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    let user;
+    Vue.prototype.$Amplify.Auth.currentAuthenticatedUser().then((data) => {
+      if (data && data.signInUserSession) {
+        user = data;
+      next()
+      } 
+    }).catch((e) => {
+      console.log(e)
+    });
+    if (!user) {
+      next({path:'/'});
+    }else {
+      next()
+    }
+  } else {
+  next()
+  }
+})
+
+const router = new Router({
+  mode: 'history',
+  linkExactActiveClass: 'active',
+  base: process.env.BASE_URL,
+  routes: baseRoutes
+})
+router.beforeEach((to, from, next) => {
+  // redirect to login page if not logged in and trying to access a restricted page
+  const publicPages = ['/login', '/signup']
+  const authRequired = !publicPages.includes(to.path)
+  const loggedIn = localStorage.getItem('user')
+  if (authRequired && !loggedIn) {
+    return next('/login')
+  }
+  next()
+})
+
+
+<div v-if="this.$store.state.loginUser.loginType == 'fb'">
+<div class="center">
+  <p>Welcome {{this.$store.state.loginUser.fb.user && this.$store.state.loginUser.fb.user.name}} !</p>
+  <!-- <img :src="this.$store.state.loginUser.fb.user.name" /> -->
+  <p><b>Facebook Access Token- </b>{{this.$store.state.loginUser.fb && this.$store.state.loginUser.fb.auth.accessToken}}</p>
+</div>
+</div>
+
+
+// use of @ sign for fixed path
+import SocialLogin from '@/components/SocialLogin'

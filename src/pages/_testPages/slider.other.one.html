@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Finder | Real Estate | 404 Not Found</title>
+
+    <style>
+        .tns-brands .tns-outer [data-action],.tns-brands .tns-nav{display:none}
+        .tns-brands .tns-outer{margin-top:28px}
+        .tns-brands .tns-outer [aria-controls]{background-color:transparent;border:none;box-shadow:none;color:transparent;width:15px;height:15px;padding:10px;box-sizing:border-box;border-top:2px solid #FF8000;border-right:2px solid #FF8000;cursor:pointer;margin:0 20px;z-index: 2;}
+        .tns-brands .tns-outer [aria-controls]:nth-child(1){transform:rotate(-135deg)}
+        .tns-brands .tns-outer [aria-controls]:nth-child(1):active{transform:rotate(-135deg) scale(0.9)}
+        .tns-brands .tns-outer [aria-controls]:nth-last-child(1){transform:rotate(45deg)}
+        .tns-brands .tns-outer [aria-controls]:nth-last-child(1):active{transform:rotate(45deg) scale(0.9)}
+        .tns-brands .tns-controls{display:flex;justify-content:space-between;margin-bottom:-48px}
+        .tns-brands .tns-item{text-align:center;transition:opacity 150ms linear;}
+        .tns-brands .tns-item:hover{opacity:.5}
+        @media (max-width:992px){
+          .tns-brands .tns-item{transform:scale(0.6)}
+        }      
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.2/min/tiny-slider.js"></script>
+
+    <script type="module">
+      var slider = tns({
+        container: '#brands-home',
+        items: 2,
+        speed: 800,
+        slideBy: 'page',
+        autoplay: true,
+        autoplayHoverPause: true,
+        autoplayTimeout: 2500,
+        responsive:{
+          490: {
+            items: 3
+          }, 992: {
+            items: 4
+          }
+        }
+      });
+      </script>
+
+      <script>
+        (function () {
+          window.onload = function () {
+            var preloader = document.querySelector(".page-loading");
+            try {
+              preloader.classList.remove("active");
+            } catch (error) {
+              console.log(error);
+            }
+            setTimeout(function () {
+              try {
+                preloader.remove();
+              } catch (error) {
+                console.log(error);
+              }
+            }, 2000);
+          };
+        })();
+      </script>
+
+    <!-- Vendor Styles-->
+    <!-- <link rel="stylesheet" media="screen" href="vendor/simplebar/dist/simplebar.min.css"/> -->
+    <!-- Main Theme Styles + Bootstrap-->
+    <!-- <link rel="stylesheet" media="screen" href="css/theme.min.css"> -->
+  </head>
+  <!-- Body-->
+  <body>
+    <!-- Page loading spinner-->
+
+    <div class="page-loading active">
+      <div class="page-loading-inner">
+        <div class="page-spinner"></div>
+        <span>2. Loading...</span>
+        <img
+          src="../../assets/img/gallery/marido-logo-no-bg.png"
+          width="116"
+          alt="logo"
+        />
+      </div>
+    </div>
+    <main class="page-wrapper">
+      <div class="tns-brands">
+        <div id="brands-home" class="autoplay  tns-slider tns-carousel tns-subpixel tns-calc tns-horizontal">
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-01.jpg" title="Ekoline" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-02.jpg" title="MJM" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-03.jpg" title="Aparelec BCN" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-04.jpg" title="bticino" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-05.jpg" title="Whirlpower" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-07.jpg" title="3M" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-08.jpg" title="VS" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-06.jpg" title="Eaton" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-06.jpg" title="Schneider Electric" /></div>
+          <div class="item tns-item"><img src="https://www.gobantes.cl/pub/media/wysiwyg/brands/Carrusel-06.jpg" title="Legrand" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas7.png" title="General Cable" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas8.png" title="Philips" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas9.png" title="Nexans" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas10.png" title="GE Capital" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas11.png" title="RCT Cable" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas12.png" title="Sinthesi" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas13.png" title="Efapel" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas14.png" title="Kölff" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas15.png" title="Saime" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas16.png" title="ppe" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas17.png" title="Apolo" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas18.png" title="ide" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas19.png" title="alfaPlas" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas20.png" title="ABL" /></div>
+          <div class="item tns-item"><img src="http://gobantesdesa.enexum.cl/pub/media/wysiwyg/GobantesRecursos-LogoMarcas21.png" title="Dong a electric device" /></div>
+        </div>
+      </div>
+    
+    
+  </body>
+
+  </html>

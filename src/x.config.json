@@ -1,0 +1,11 @@
+{
+  "production": {
+    "apiPath": "aws"
+  },
+  "development": {
+    "apiPath": "json"
+  },
+  "test": {
+    "apiPath": "servelessOffline"
+  }
+}

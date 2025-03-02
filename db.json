@@ -1,0 +1,182 @@
+{
+  "accounts": [
+    {
+      "Id": "10",
+      "localId": "10",
+      "firstName": "Ramon",
+      "lastName": "Perez",
+      "email": "ramon.perez@hotmail.com",
+      "password": "letmein",
+      "userType": "contractor",
+      "expiresIn": "5000",
+      "idToken": "ABC-123",
+      "expirationDate": "10000",
+      "imgPath": "pic6.png",
+      "phone": "647-534-2034"
+    },
+    {
+      "Id": "30",
+      "localId": "30",
+      "firstName": "Ramon2",
+      "lastName": "Perez2",
+      "email": "ramon2.perez@hotmail.com",
+      "password": "letmein2",
+      "userType": "contractor",
+      "expiresIn": "5000",
+      "idToken": "ABC-123",
+      "expirationDate": "10000",
+      "imgPath": "pic6.png",
+      "phone": "647-534-2034"
+    },
+    {
+      "Id": "20",
+      "localId": "20",
+      "firstName": "Florange",
+      "lastName": "Campusano",
+      "email": "campusano@hotmail.com",
+      "password": "letmein01",
+      "userType": "client",
+      "idToken": "XYZ-123",
+      "expiresIn": "10000",
+      "expirationDate": "6000",
+      "imgPath": "pic5.png",
+      "phone": "416-534-2034"
+    },
+    {
+      "Id": "40",
+      "localId": "40",
+      "firstName": "Ramiro",
+      "lastName": "de Freitas",
+      "email": "ramiro@hotmail.com",
+      "password": "letmein2000",
+      "userType": "client",
+      "idToken": "XYZ-123",
+      "expiresIn": "10000",
+      "expirationDate": "6000",
+      "imgPath": "pic5.png",
+      "phone": "416-534-0001"
+    },
+    {
+      "Id": "50",
+      "localId": "50",
+      "firstName": "Ramiro",
+      "lastName": "de Freitas",
+      "email": "ramiro@yahoo.com",
+      "password": "letmein@2000",
+      "userType": "client",
+      "idToken": "XYZ-123",
+      "expiresIn": "10000",
+      "expirationDate": "6000",
+      "imgPath": "pic5.png",
+      "phone": "416-534-0001"
+    }
+  ],
+  "clients": [
+    {
+      "id": "20",
+      "localId": "20",
+      "firstName": "Florange",
+      "lastName": "Campusano ",
+      "email": "campusano@hotmail.com",
+      "phone": "809-889-0103",
+      "address": "Avenida Independencia, 409",
+      "comments": "Mi negra linda y querida.",
+      "imgPath": "pic5.png",
+      "facebook": "myface-20",
+      "instagram": "myInsta-20",
+      "linkedin": "myLinkedin-20"
+    },
+    {
+      "id": "50",
+      "localId": "50",
+      "firstName": "Ramiro",
+      "lastName": "De Freitas ",
+      "email": "ramiro@yahoo.com",
+      "phone": "416-534-0001",
+      "address": "Avenida Djalma Pinheiro Franco, 471",
+      "comments": "Mi hermano querido.",
+      "userType": "client",
+      "imgPath": "pic5.png",
+      "facebook": "myface",
+      "instagram": "myInsta",
+      "linkedin": "myLinkedin"
+    }
+  ],
+  "contractors": [
+    {
+      "id": "10",
+      "localId": "10",
+      "firstName": "Ramon Diaz",
+      "lastName": "Perez da Silva",
+      "email": "ramon.perez@hotmail.com",
+      "phone": "416-534-2035",
+      "address": "Calle San Critoban, 102",
+      "postalCode": "M6H 3X1",
+      "country": "Dominican Republic",
+      "city": "Santiago",
+      "userType": "contractor",
+      "description": "damos la luz a tu vida",
+      "imgPath": "pic5.png",
+      "driversLicense": "417-808-44",
+      "serviceTypes": "Plomeria",
+      "companyName": "Express Plumbing s.a.",
+      "bank": "Banco do Brazil",
+      "accountNumber": "122-452-210",
+      "accountType": "Corriente",
+      "createdAt": "01-Feb-22",
+      "services": ["Plomeria", "Aire"]
+    }
+  ],
+  "reviews": [
+    {
+      "name": "Mickey Mouse",
+      "email": "mm@gmail.com",
+      "Comment": "Estevo",
+      "rating": 4,
+      "id": 3
+    }
+  ],
+  "projects": [
+    {
+      "id": 6
+    },
+    {
+      "id": 7
+    },
+    {
+      "id": 8
+    },
+    {
+      "id": 9
+    },
+    {
+      "id": 10
+    },
+    {
+      "id": 11
+    },
+    {
+      "id": 12
+    },
+    {
+      "id": 13
+    },
+    {
+      "id": 14
+    },
+    {
+      "title": "title",
+      "propertyType": "Commercial",
+      "description": "descr",
+      "startDate": "22-feb-22",
+      "id": 15
+    },
+    {
+      "title": "Pintura Completa",
+      "propertyType": "House",
+      "description": "vamos pintar tudo!",
+      "startDate": "23-feb-22",
+      "id": 16
+    }
+  ]
+}
