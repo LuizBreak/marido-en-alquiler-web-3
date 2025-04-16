@@ -1,3 +1,7 @@
-202301120: Debuging Vue app
+20250415: Deploying vueApp to aws s3
+          npm run build
+          aws s3 sync dist/ s3://www.marido-en-alquiler.com
+
+20230112: Debuging Vue app
            We have to use console.log and check results on Developer  
            Tool on the browser
