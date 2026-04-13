@@ -1,3 +1,7 @@
+20260412: Users are authenticate using cognito (not the system accounts table). To restablish the access in case it was lost, we need to reestate it 
+          using aws cli with the following command: aws cognito-idp admin-set-user-password --user-pool-id us-east-1_aClJIY05r --username f47884f8-d061-70cf-b38d-524b975b721a --password "NewStrongPassword123!" --permanent
+          Remember to update the username
+          
 20250415: Deploying vueApp to aws s3
           npm run build
           aws s3 sync dist/ s3://www.marido-en-alquiler.com
