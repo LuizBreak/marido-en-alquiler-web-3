@@ -53,7 +53,7 @@ const router = createRouter({
     {
       path: "/testpad",
       name: "TestPage",
-      component: () => import("./pages/_testPages/vTestPad.carousel.vue"),
+      component: () => import("./pages/_testPages/vTextLocalApi.vue"),
     },
 
     // general routes

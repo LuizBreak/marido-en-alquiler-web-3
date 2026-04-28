@@ -1,17 +1,17 @@
 <template>
-  <base-dialog :show="isLoading" title="Cargango..." fixed>
-    <base-spinner></base-spinner>
-  </base-dialog>
-
   <div class="col-lg-8 col-md-7 mb-5">
+    <base-dialog :show="isLoading" title="Cargando..." fixed>
+      <base-spinner></base-spinner>
+    </base-dialog>
+
     <div class="d-flex align-items-center justify-content-between mb-4 pb-2">
       <h2 class="h2 mb-0">
-        <i class="fi-home expand text-primary" aria-hidden="true" />
+        <i class="fi-home expand text-primary" aria-hidden="true"></i>
         Mis Proyectos
       </h2>
     </div>
+
     <div v-if="hasProjects && !isLoading">
-      <!-- Item-->
       <ProjectTile
         v-for="project in projects"
         :key="project.projectId"
@@ -24,16 +24,16 @@
         :startDate="project.startDate"
         :services="project.services"
         :ShowProvideReview="true"
-      ></ProjectTile>
+      />
     </div>
-    <h3 v-else>No hay proyectos registrados.</h3>
+
+    <h3 v-else-if="!isLoading">No hay proyectos registrados.</h3>
   </div>
 </template>
 
 <script>
-import * as types from "../../utils/types.js";
 import { mapGetters } from "vuex";
-
+import * as types from "../../utils/types.js";
 import ProjectTile from "../../components/ui/BaseProjectTile.vue";
 
 export default {
@@ -47,13 +47,13 @@ export default {
       urls: [
         { url: "/", caption: "Inicio", isActive: false, aria: "" },
         {
-          url: this.isClient ? "/perfil" : "/profile",
+          url: this.IsClient ? "/perfil" : "/profile",
           caption: "Cuenta",
           isActive: false,
           aria: "",
         },
         {
-          url: "/proyectos",
+          url: "/perfil/proyectos",
           caption: "Mis Proyectos",
           isActive: true,
           aria: "page",
@@ -79,19 +79,19 @@ export default {
       return this.$store.getters["userId"];
     },
   },
-
   methods: {
     async refreshProjectList() {
       this.isLoading = true;
-      // console.log("myProjects.userId", this.userId);
-      await this.$store
-        .dispatch("projects/getProjectsByClient", {
+
+      try {
+        await this.$store.dispatch("projects/getProjectsByClient", {
           clientId: this.userId,
-        })
-        .catch(() => {
-          console.log("Error refreshing project list");
         });
-      this.isLoading = false;
+      } catch (error) {
+        console.log("Error refreshing project list", error);
+      } finally {
+        this.isLoading = false;
+      }
     },
   },
   async created() {
@@ -100,4 +100,5 @@ export default {
   },
 };
 </script>
+
 <style scoped></style>

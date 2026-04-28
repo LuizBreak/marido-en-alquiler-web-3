@@ -428,10 +428,10 @@ export default {
         password: this.user.password,
         userType: this.user.userType,
       };
-      // console.log("actionPayload", actionPayload);
+      console.log("actionPayload", actionPayload);
 
       try {
-        // console.log("about to signup");
+        console.log("about to signup");
         await this.$store.dispatch("signup", actionPayload);
         this.logIt(
           this?.loggedUser?.id || "",
@@ -454,7 +454,7 @@ export default {
         username: this.email,
         code: this.code,
       };
-      // console.log("confirmSignUpCode Payload", actionPayload);
+      console.log("confirmSignUpCode Payload", actionPayload);
 
       try {
         await this.$store.dispatch("confirmSignUp", actionPayload);
