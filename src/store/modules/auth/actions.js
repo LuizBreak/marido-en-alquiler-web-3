@@ -59,12 +59,7 @@ export default {
         }).then(() => {
           // db client/contractor creation
           payload.id = lastUserId;
-          this.dispatch("createDbClientInfo", payload, data.user).then(() => {
-            // now let's get the user just created, logged into the system
-            context.dispatch(types.AUTH, {
-              ...payload,
-            });
-          });
+          return this.dispatch("createDbClientInfo", payload, data.user);
         });
       })
       .catch((err) => {
@@ -203,6 +198,9 @@ export default {
 
     clearTimeout(timer);
 
+    context.commit("clients/RESET_CLIENT", null, { root: true });
+    context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
+
     context.commit(types.SET_USER, {
       token: null,
       userId: null,
@@ -214,31 +212,44 @@ export default {
     context.commit(types.SET_AUTO_LOGOUT);
   },
   async setUserTypeInfo(context, payload) {
+    const resolvedUserType =
+      payload.userType || payload.loggedUserInfo?.userType || null;
+
     // Setting initial login information about this user
+    context.commit("clients/RESET_CLIENT", null, { root: true });
+    context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
+
     await context.commit(types.SET_USER, {
       token: payload.token,
       userId: payload.userId,
-      loggedUser: payload.loggedUserInfo,
+      loggedUser: {
+        ...(payload.loggedUserInfo || {}),
+        userType: resolvedUserType,
+      },
     });
 
     // Setting the userType (client or Contractor) information about this user
-    switch (payload.loggedUserInfo.userType) {
+    switch (resolvedUserType) {
       case "client":
         await this.dispatch(types.FETCH_CLIENT, { id: payload.userId });
 
         // eslint-disable-next-line no-case-declarations
         let client = store.getters["clients/client"];
-        context.commit("updateUserAttributes", {
-          ClientOrContractorInfo: client,
-        });
+        if (client && String(client.id) === String(payload.userId)) {
+          context.commit("updateUserAttributes", {
+            ClientOrContractorInfo: client,
+          });
+        }
         break;
       case "contractor":
         await this.dispatch(types.FETCH_CONTRACTOR, { id: payload.userId });
         // eslint-disable-next-line no-case-declarations
         let contractor = store.getters["contractors/contractor"];
-        context.commit("updateUserAttributes", {
-          ClientOrContractorInfo: contractor,
-        });
+        if (contractor && String(contractor.id) === String(payload.userId)) {
+          context.commit("updateUserAttributes", {
+            ClientOrContractorInfo: contractor,
+          });
+        }
         break;
       default:
     }
@@ -305,12 +316,13 @@ export default {
 
     switch (payload.userType) {
       case "client":
-        await this.dispatch("clients/createClient", client);
+        return await this.dispatch("clients/createClient", client);
         break;
       case "contractor":
-        await this.dispatch("contractors/createContractor", client);
+        return await this.dispatch("contractors/createContractor", client);
         break;
       default:
+        return false;
     }
   },
   async createDbAccountInfo(context, payload) {

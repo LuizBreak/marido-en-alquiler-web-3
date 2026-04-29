@@ -138,7 +138,11 @@ export default {
     ...mapGetters([types.LOGGED_USER, types.IS_LOGGED_IN]),
   },
   created() {},
-  mounted() {},
+  mounted() {
+    if (this.$store.getters.isClient) {
+      this.$router.replace("/perfil/info");
+    }
+  },
 };
 </script>
 

@@ -22,4 +22,7 @@ export default {
     state.contractors[contractor.id] = contractor;
     state.contractor = contractor;
   },
+  RESET_CONTRACTOR(state) {
+    state.contractor = {};
+  },
 };

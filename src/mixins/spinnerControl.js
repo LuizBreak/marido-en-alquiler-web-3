@@ -1,12 +1,17 @@
 export function spinnerLoader() {
-  var preloader = document.querySelector(".page-loading");
-  try {
-    preloader.classList.remove("active");
-  } catch (error) {
-    console.log(error);
+  const preloader = document.querySelector(".page-loading");
+
+  if (!preloader) {
+    return;
   }
+
+  preloader.classList.remove("active");
+
   setTimeout(function () {
     try {
+      if (!preloader || !preloader.isConnected) {
+        return;
+      }
       preloader.remove();
     } catch (error) {
       console.log(error);

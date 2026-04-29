@@ -212,11 +212,11 @@ export default {
           this.user?.signInUserSession?.idToken?.jwtToken,
           true
         );
-        const redirectUrl =
-          "/" +
-          (this.$route.query.redirect || this.loggedUser.userType === "client"
-            ? "perfil/info"
-            : "profile/info");
+        const redirectUrl = this.$route.query.redirect
+          ? `/${this.$route.query.redirect}`
+          : this.$store.getters.loggedUser.userType === "client"
+            ? "/perfil/info"
+            : "/profile/info";
         this.$router.replace(redirectUrl);
         this.isLoading = false;
       } catch (error) {

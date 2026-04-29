@@ -37,13 +37,6 @@ import { spinnerLoader } from "./mixins/spinnerControl.js";
 // import store from "./store/index.js";
 
 /*
- *  triggers loading spinner while page is loading
- */
-window.onload = function () {
-  spinnerLoader();
-};
-
-/*
  *  When the user scrolls down 250px from the top of the document, show the button
  */
 window.onscroll = function () {
@@ -77,6 +70,11 @@ export default {
   },
   created() {
     // SocketioService.setupSocketConnection();
+  },
+  mounted() {
+    this.$nextTick(() => {
+      spinnerLoader();
+    });
   },
   beforeUnmount() {
     // SocketioService.disconnect();

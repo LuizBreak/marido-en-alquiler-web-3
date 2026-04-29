@@ -1,7 +1,4 @@
 <template>
-  <head>
-    <link href="filepond.css" rel="stylesheet" />
-  </head>
   <file-pond
     class="file-uploader file-uploader-grid"
     name="fileUploader"

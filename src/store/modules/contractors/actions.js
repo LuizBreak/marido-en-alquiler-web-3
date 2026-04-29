@@ -39,15 +39,17 @@ export default {
   },
   async createContractor({ commit }, contractor) {
     console.log("creating a contractor");
-    await apiSvc
+    return await apiSvc
       .post(resource, contractor)
       .then(() => {
         commit("ADD_NEW_CONTRACTOR", contractor);
+        return true;
       })
       .catch((error) => {
         console.log(
           "There was a problem creating contractor: " + error.message
         );
+        throw error;
       });
   },
   async deleteContractor({ commit }, contractor) {
@@ -57,13 +59,15 @@ export default {
   },
   async updateContractor({ commit }, contractor) {
     console.log(contractor);
-    await apiSvc
+    return await apiSvc
       .update(resource, contractor)
       .then(() => {
         commit("UPDATE_CONTRACTOR", contractor);
+        return true;
       })
       .catch((error) => {
         console.log("there was an error updating contractor: " + error.message);
+        throw error;
       });
   },
 };

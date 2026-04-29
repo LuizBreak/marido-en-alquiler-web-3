@@ -146,7 +146,11 @@ export default {
     ...mapGetters([types.LOGGED_USER, types.IS_LOGGED_IN, "nrOfNewMessages"]),
   },
   created() {},
-  mounted() {},
+  mounted() {
+    if (this.$store.getters.isContractor) {
+      this.$router.replace("/profile/info");
+    }
+  },
 };
 </script>
 

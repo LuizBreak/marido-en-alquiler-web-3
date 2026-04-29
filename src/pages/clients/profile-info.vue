@@ -378,14 +378,21 @@ export default {
         this.setUserAvatar(this.user.id, this.selectedFile.name);
       }
 
-      if (!this.user.id) {
-        this.$store.dispatch("clients/createClient", this.user);
-        this.user = this.getUserCopy();
-        console.log("prof-info.msgbox issued");
-        this.triggerMsgBox(true, "Registro realizado con éxito.");
-      } else {
-        this.$store.dispatch("clients/updateClient", this.user);
-        this.triggerMsgBox(true, "Registro actualizado con éxito.");
+      try {
+        if (!this.user.id) {
+          await this.$store.dispatch("clients/createClient", this.user);
+          this.user = this.getUserCopy();
+          console.log("prof-info.msgbox issued");
+          this.triggerMsgBox(true, "Registro realizado con éxito.");
+        } else {
+          await this.$store.dispatch("clients/updateClient", this.user);
+          this.triggerMsgBox(true, "Registro actualizado con éxito.");
+        }
+      } catch (error) {
+        this.triggerMsgBox(
+          true,
+          "No se pudo grabar el registro. Verifica la conexión e inténtalo de nuevo."
+        );
       }
     },
     async onDelete() {
@@ -470,7 +477,30 @@ export default {
       return this.$store.getters["loggedUser"];
     },
   },
+  watch: {
+    client: {
+      immediate: false,
+      deep: true,
+      async handler() {
+        this.user = await this.getUserCopy();
+        this.user.email = this.loggedUser.email;
+      },
+    },
+    loggedUser: {
+      immediate: false,
+      deep: true,
+      async handler() {
+        this.user = await this.getUserCopy();
+        this.user.email = this.loggedUser.email;
+      },
+    },
+  },
   async mounted() {
+    if (this.$store.getters.isContractor) {
+      this.$router.replace("/profile/info");
+      return;
+    }
+
     this.$emit("child-breadcrumbs-urls", this.urls);
 
     // Why Get Copy that internally uses Getters work?? :()

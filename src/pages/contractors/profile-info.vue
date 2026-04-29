@@ -559,13 +559,20 @@ export default {
       // this.setServiceList(this.newProject.services),
       this.user.serviceTypes = this.setServiceList(this.user.serviceTypes);
 
-      if (!this.user.id) {
-        this.$store.dispatch("contractors/createContractor", this.user);
-        this.triggerMsgBox(true, "Registro realizado con éxito.");
-      } else {
-        console.log("onSubmit", this.user);
-        this.$store.dispatch("contractors/updateContractor", this.user);
-        this.triggerMsgBox(true, "Registro actualizado con éxito.");
+      try {
+        if (!this.user.id) {
+          await this.$store.dispatch("contractors/createContractor", this.user);
+          this.triggerMsgBox(true, "Registro realizado con éxito.");
+        } else {
+          console.log("onSubmit", this.user);
+          await this.$store.dispatch("contractors/updateContractor", this.user);
+          this.triggerMsgBox(true, "Registro actualizado con éxito.");
+        }
+      } catch (error) {
+        this.triggerMsgBox(
+          true,
+          "No se pudo grabar el registro. Verifica la conexión e inténtalo de nuevo."
+        );
       }
     },
     setServiceList(services) {
@@ -661,8 +668,23 @@ export default {
       return new Intl.NumberFormat().format(percentage);
     },
   },
+  watch: {
+    contractor: {
+      immediate: false,
+      deep: true,
+      handler() {
+        this.user = this.getUserCopy();
+        this.user.serviceTypes = this.parseServiceTypes(this.user.serviceTypes);
+      },
+    },
+  },
   created() {},
   mounted() {
+    if (this.$store.getters.isClient) {
+      this.$router.replace("/perfil/info");
+      return;
+    }
+
     this.$emit("child-breadcrumbs-urls", this.urls);
 
     this.user = this.getUserCopy();

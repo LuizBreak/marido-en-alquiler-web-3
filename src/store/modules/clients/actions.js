@@ -37,14 +37,16 @@ export default {
       });
   },
   createClient({ commit }, client) {
-    apiSvc
+    return apiSvc
       .post(resource, client)
       .then(() => {
         console.log("createClient", client);
         commit("ADD_NEW_CLIENT", client);
+        return true;
       })
       .catch((error) => {
         console.log("There was a problem creating client: " + error.message);
+        throw error;
       });
   },
   deleteClient({ commit }, client) {
@@ -54,13 +56,15 @@ export default {
   },
   updateClient({ commit }, client) {
     console.log(client);
-    apiSvc
+    return apiSvc
       .update(resource, client)
       .then(() => {
         commit("UPDATE_CLIENT", client);
+        return true;
       })
       .catch((error) => {
         console.log("there was an error updating client: " + error.message);
+        throw error;
       });
   },
   async getClientInfoByProjectId({ commit }, data) {

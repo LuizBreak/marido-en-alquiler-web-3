@@ -295,8 +295,15 @@
                     />
                   </div>
                   <div class="mb-4">
+                    <label
+                      class="form-label"
+                      for="signup-confirmation-code"
+                    >
+                      Código de confirmación
+                    </label>
                     <input
                       class="form-control"
+                      id="signup-confirmation-code"
                       v-model="code"
                       type="text"
                       placeholder="Entra el código"
@@ -310,7 +317,7 @@
                       {{ confirmationErrorMessage }} <br />
                     </p>
                     <button class="btn btn-primary btn-lg w-100">
-                      Submeter
+                      Confirmar registro
                     </button>
                   </div>
                 </form>
@@ -441,6 +448,7 @@ export default {
       try {
         console.log("about to signup");
         await this.$store.dispatch("signup", actionPayload);
+        this.email = this.user.email;
         this.logIt(
           this?.loggedUser?.id || "",
           "signup for: " + this.actionPayload,
@@ -465,7 +473,17 @@ export default {
       try {
         await this.$store.dispatch("confirmSignUp", actionPayload);
         await this.$store.dispatch("logout");
-        await this.openSigninModal();
+        await this.$store.dispatch("login", {
+          email: this.email,
+          password: this.user.password,
+        });
+        this.isSignedUp = false;
+        await this.dismissModal("#signup-modal");
+        const redirectUrl =
+          this.user.userType === "contractor"
+            ? "/profile/info"
+            : "/perfil/info";
+        this.$router.replace(redirectUrl);
       } catch (error) {
         this.isSignedUp = true;
         this.confirmationErrorMessage = error.message;

@@ -8,6 +8,24 @@ function cleanupModalArtifacts() {
   document.body.style.removeProperty("padding-right");
 }
 
+function moveFocusOutsideModal(modalElement) {
+  const activeElement = document.activeElement;
+
+  if (!activeElement || !modalElement.contains(activeElement)) {
+    return;
+  }
+
+  if (typeof activeElement.blur === "function") {
+    activeElement.blur();
+  }
+
+  const appRoot = document.getElementById("app");
+  if (appRoot) {
+    appRoot.setAttribute("tabindex", "-1");
+    appRoot.focus({ preventScroll: true });
+  }
+}
+
 export default {
   methods: {
     dismissModal(modalId) {
@@ -18,11 +36,7 @@ export default {
       }
 
       const modalInstance = Modal.getOrCreateInstance(modalElement);
-      const activeElement = document.activeElement;
-
-      if (activeElement && modalElement.contains(activeElement)) {
-        activeElement.blur();
-      }
+      moveFocusOutsideModal(modalElement);
 
       return new Promise((resolve) => {
         let resolved = false;
@@ -31,6 +45,7 @@ export default {
             return;
           }
           resolved = true;
+          moveFocusOutsideModal(modalElement);
           cleanupModalArtifacts();
           resolve();
         };

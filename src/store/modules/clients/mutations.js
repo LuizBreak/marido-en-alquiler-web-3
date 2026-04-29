@@ -22,4 +22,7 @@ export default {
     state.clients[client.id] = client;
     state.client = client;
   },
+  RESET_CLIENT(state) {
+    state.client = {};
+  },
 };
