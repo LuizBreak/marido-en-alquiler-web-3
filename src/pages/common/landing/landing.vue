@@ -2,12 +2,11 @@
   <!-- <NavAppBar /> -->
   <SiteHome />
   <why-us />
-  <!-- <ProRegistration @trigger-msg-box="triggerMsgBox" /> -->
+  <!-- <ProRegistration /> -->
   <Services />
   <Reviews />
-  <!-- <Booking @trigger-msg-box="triggerMsgBox"/> -->
-  <AcercaDe @trigger-msg-box="triggerMsgBox" />
-  <MsgBoxModal />
+  <!-- <Booking /> -->
+  <AcercaDe />
   <!-- <Footer / -->
 </template>
 
@@ -23,7 +22,7 @@ import AcercaDe from "./acercaDe";
 import WhyUs from "./whyus.vue";
 
 export default {
-  emits: ["trigger-msg-box"],
+  emits: ["child-breadcrumbs-urls"],
   data() {
     return {};
   },
@@ -36,13 +35,9 @@ export default {
     AcercaDe,
     WhyUs,
   },
-  methods: {
-    triggerMsgBox: function (showIt, message) {
-      console.log("landing issue the msg: " + message);
-      this.$emit("trigger-msg-box", showIt, message);
-    },
+  mounted() {
+    this.$emit("child-breadcrumbs-urls", []);
   },
-  mounted() {},
 };
 </script>
 

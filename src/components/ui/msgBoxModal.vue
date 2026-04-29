@@ -3,20 +3,22 @@
   <!--    MsgBox (Modal)                               -->
   <!-- =============================================== -->
 
-  <!-- Article Reference: https://www.htmlgoodies.com/javascript/customizing-bootstrap-modals/ -->
-
   <div class="container">
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" role="dialog">
+    <div
+      class="modal fade"
+      id="myModal"
+      ref="modal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
       <div class="modal-dialog">
-        <!-- Modal content-->
         <div class="modal-content">
           <div class="modal-header">
             <button
               type="button"
               class="close"
-              v-on:click="HideDialog()"
-              data-dismiss="modal"
+              @click="hideDialog"
+              aria-label="Close"
             >
               <i class="fas fa-times"></i>
             </button>
@@ -31,8 +33,7 @@
             <button
               type="button"
               class="btn btn-outline-primary"
-              v-on:click="HideDialog()"
-              data-dismiss="modal"
+              @click="hideDialog"
             >
               Close
             </button>
@@ -44,38 +45,15 @@
 </template>
 
 <script>
-import store from "../../store/index.js";
-
-// Loading jquery into the app
-global.jQuery = require("jquery");
-var $ = global.jQuery;
-
-window.$ = document.addEventListener("DOMContentLoaded", function () {
-  $("#myModal").on("show.bs.modal", function () {
-    // hide it after 3 seconds
-    let myModalTimeout = setTimeout(function () {
-      $("#myModal").modal("hide");
-      store.dispatch("resetShowIt", {
-        showIt: false,
-      });
-    }, 3000);
-    "ModalTimeout", myModalTimeout;
-  });
-});
+import Modal from "bootstrap/js/dist/modal";
 
 export default {
   name: "msg-box-modal",
   data() {
-    return {};
-  },
-  props: {},
-  methods: {
-    HideDialog() {
-      $("#myModal").modal("hide");
-    },
-    showDialog() {
-      $("#myModal").modal("show");
-    },
+    return {
+      autoHideTimeout: null,
+      modalInstance: null,
+    };
   },
   computed: {
     showIt() {
@@ -85,14 +63,53 @@ export default {
       return this.$store.getters.modalMessage;
     },
   },
-  watch: {
-    showIt() {
-      if (this.showIt) {
-        this.showDialog();
-      } else {
-        this.HideDialog();
+  methods: {
+    clearAutoHideTimeout() {
+      if (this.autoHideTimeout) {
+        clearTimeout(this.autoHideTimeout);
+        this.autoHideTimeout = null;
       }
     },
+    scheduleAutoHide() {
+      this.clearAutoHideTimeout();
+      this.autoHideTimeout = setTimeout(() => {
+        this.hideDialog();
+      }, 3000);
+    },
+    resetShowIt() {
+      if (this.$store.getters.showIt) {
+        this.$store.dispatch("resetShowIt");
+      }
+    },
+    hideDialog() {
+      this.clearAutoHideTimeout();
+      this.modalInstance?.hide();
+      this.resetShowIt();
+    },
+    showDialog() {
+      this.modalInstance?.show();
+      this.scheduleAutoHide();
+    },
+  },
+  watch: {
+    showIt(value) {
+      if (value) {
+        this.showDialog();
+        return;
+      }
+
+      this.clearAutoHideTimeout();
+      this.modalInstance?.hide();
+    },
+  },
+  mounted() {
+    this.modalInstance = Modal.getOrCreateInstance(this.$refs.modal);
+    this.$refs.modal.addEventListener("hidden.bs.modal", this.resetShowIt);
+  },
+  beforeUnmount() {
+    this.clearAutoHideTimeout();
+    this.$refs.modal?.removeEventListener("hidden.bs.modal", this.resetShowIt);
+    this.modalInstance?.dispose();
   },
 };
 </script>

@@ -103,6 +103,7 @@ import { mapGetters } from "vuex";
 export default {
   name: "how-it-works-client",
   components: {},
+  emits: ["child-breadcrumbs-urls"],
   data() {
     return {
       urls: [

@@ -479,7 +479,7 @@ import getUserAvatar from "../../mixins/getUserAvatar";
 const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
 export default {
-  emits: ["trigger-msg-box", "child-breadcrumbs-urls"],
+  emits: ["child-breadcrumbs-urls"],
   setup() {
     return { v$: useVuelidate() };
   },
@@ -561,11 +561,11 @@ export default {
 
       if (!this.user.id) {
         this.$store.dispatch("contractors/createContractor", this.user);
-        this.$emit("trigger-msg-box", true, "Registro realizado con éxito.");
+        this.triggerMsgBox(true, "Registro realizado con éxito.");
       } else {
         console.log("onSubmit", this.user);
         this.$store.dispatch("contractors/updateContractor", this.user);
-        this.$emit("trigger-msg-box", true, "Registro actualizado con éxito.");
+        this.triggerMsgBox(true, "Registro actualizado con éxito.");
       }
     },
     setServiceList(services) {
@@ -609,7 +609,7 @@ export default {
           this.resetFormData();
           this.$router.replace("/signout");
           document.body.scrollTop = document.documentElement.scrollTop = 0;
-          this.$emit("trigger-msg-box", true, "Cuenta eliminada con éxito.");
+          this.triggerMsgBox(true, "Cuenta eliminada con éxito.");
         }
       }
     },

@@ -130,25 +130,20 @@
       </div>
     </div>
   </form>
-  <MsgBoxModal />
 </template>
 
 <script>
 // Article Reference: https://vuelidate-next.netlify.app/#getting-started-1
 import useVuelidate from "@vuelidate/core";
 import { required, email, helpers } from "@vuelidate/validators";
-import MsgBoxModal from "../ui/msgBoxModal";
 import { EmailService } from "../../services/email.services";
+import msgBoxDialog from "../../mixins/msgBoxDialog.js";
 import * as types from "../../utils/types.js";
-
-// Loading jquery into the app
-global.jQuery = require("jquery");
-let $ = global.jQuery;
-window.$ = $;
 
 const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
 export default {
+  mixins: [msgBoxDialog],
   setup() {
     return { v$: useVuelidate() };
   },
@@ -164,9 +159,6 @@ export default {
       tipoDeContacto: "Cliente",
       message: "Gracias por registrarte. Pronto entramos en contacto contigo.",
     };
-  },
-  components: {
-    MsgBoxModal,
   },
   validations() {
     const requiedMsg = "Campo obligatorio.";
@@ -231,8 +223,6 @@ export default {
         // this.$parent.triggerMsgBox(true, this.message);
 
         // Approach #2: @emit (worked)
-        // this.$emit('trigger-msg-box', true, this.message);
-
         this.triggerMsgBox(true, this.message);
 
         // Article to try: https://github.com/vuejs/core/issues/2540
@@ -247,22 +237,6 @@ export default {
       this.tipoDeServicios = null;
       this.comentarios = "";
       this.tipoDeContacto = "Cliente";
-    },
-    triggerMsgBox: function (showIt, message) {
-      // console.log("BaseBooking issued msgBox -> " + showIt + " - " + message);
-
-      $("#myModal").modal({
-        show: "false",
-      });
-
-      var modalMessage = document.getElementById("modalContent");
-      modalMessage.innerHTML = message;
-
-      if (showIt) {
-        $("#myModal").modal("show");
-      } else {
-        $("#myModal").modal("hide");
-      }
     },
     notify() {
       try {

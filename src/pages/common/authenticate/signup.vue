@@ -10,11 +10,9 @@
           <button
             class="btn-close position-absolute top-0 end-0 mt-3 me-3"
             type="button"
-            data-bs-dismiss="modal"
+            @click="closeSignupModal"
           ></button>
           <div class="row mx-0 align-items-center">
-            <!-- Welcome Side Bar -->
-
             <div class="col-md-6 border-end-md p-4 p-sm-5">
               <div id="benefitsForClients" v-show="forClient">
                 <h2 class="h3 mb-4 mb-sm-5">
@@ -31,7 +29,7 @@
                   </li>
                   <li class="d-flex mb-0">
                     <i class="fi-check-circle text-primary mt-1 me-2"></i
-                    ><span>Evalue los contratistas</span>
+                    ><span>Evalúe los contratistas</span>
                   </li>
                   <li class="d-flex mb-0">
                     <i class="fi-check-circle text-primary mt-1 me-2"></i
@@ -58,7 +56,7 @@
                   </li>
                   <li class="d-flex mb-2">
                     <i class="fi-check-circle text-primary mt-1 me-2"></i
-                    ><span>Promove tu trabajo con fotos y videos</span>
+                    ><span>Promueve tu trabajo con fotos y videos</span>
                   </li>
                 </ul>
               </div>
@@ -66,22 +64,16 @@
                 class="d-block mx-auto"
                 src="../../../img/signin-modal/signup.svg"
                 width="344"
-                alt="Illustartion"
+                alt="Illustration"
               />
               <div class="mt-sm-4 pt-md-3">
-                Ya tines un cuenta?
-                <a
-                  href="#signin-modal"
-                  data-bs-toggle="modal"
-                  data-bs-dismiss="modal"
-                  >Iniciar Sesión</a
-                >
+                Ya tienes una cuenta?
+                <a href="#" @click.prevent="openSigninModal">Iniciar sesión</a>
               </div>
             </div>
 
             <div class="col-md-6 px-4 pt-2 pb-4 px-sm-5 pb-sm-5 pt-md-5">
               <div v-if="!isSignedUp">
-                <!-- Social Buttons -->
                 <div v-if="false">
                   <a class="btn btn-outline-info w-100 mb-3" href="#"
                     ><i class="fi-google fs-lg me-1"></i>Continuar con Google</a
@@ -96,7 +88,6 @@
                   </div>
                 </div>
 
-                <!-- Signup Form-->
                 <form @submit.prevent="submitForm" novalidate>
                   <h4 class="h4">Regístrate ahora como</h4>
                   <div class="mb-2 text-center">
@@ -104,7 +95,6 @@
                       class="form-control pb-1"
                       :class="v$.user.userType.$error ? 'is-invalid' : ''"
                     >
-                      <!-- Inline radios -->
                       <div class="form-check form-check-inline">
                         <input
                           class="form-check-input"
@@ -192,7 +182,7 @@
                         class="form-control"
                         type="password"
                         id="signup-password"
-                        placeholder="Entra tu Contraseña"
+                        placeholder="Entra tu contraseña"
                         minlength="8"
                         required
                         v-model.trim="user.password"
@@ -213,14 +203,14 @@
                   </div>
                   <div class="mb-4">
                     <label class="form-label" for="signup-password-confirm"
-                      >Confirmar Contraseña</label
+                      >Confirmar contraseña</label
                     >
                     <div class="password-toggle">
                       <input
                         class="form-control"
                         type="password"
                         id="signup-password-confirm"
-                        placeholder="Confirma tu Contraseña"
+                        placeholder="Confirma tu contraseña"
                         minlength="8"
                         required
                         v-model.trim="user.confirmPassword"
@@ -261,7 +251,7 @@
                       >
                         Términos de Servicio
                       </router-link>
-                      y de la
+                      y la
                       <router-link
                         to="/privacidad"
                         @click="dismissModal('#signup-modal')"
@@ -287,7 +277,6 @@
                 </form>
               </div>
 
-              <!-- Signup Confirmation Code Form-->
               <div v-if="isSignedUp">
                 <form
                   class="needs-validation"
@@ -342,7 +331,7 @@ import { showdModal } from "../../../mixins/showModal";
 import useVuelidate from "@vuelidate/core";
 import { required, email, minLength, helpers } from "@vuelidate/validators";
 
-const selectionRequired = (value) => value; // if no selected value will be null therefore true
+const selectionRequired = (value) => value;
 
 export default {
   setup() {
@@ -373,9 +362,9 @@ export default {
   },
   validations() {
     const requiedMsg = "Campo obligatorio.";
-    const selectionRequiredMsg = "Seleccione una opcion valida.";
-    const invalidEmailMsg = "Correo invalido";
-    const notAcceptedMsg = "Debes acceptar los terminos de uso.";
+    const selectionRequiredMsg = "Seleccione una opción válida.";
+    const invalidEmailMsg = "Correo inválido";
+    const notAcceptedMsg = "Debes aceptar los términos de uso.";
     const pwdsDontMatch = "Contraseña y confirmar contraseña no coinciden.";
     const minLengthMsg = "Contraseña debe tener al menos 6 caracteres.";
 
@@ -413,7 +402,26 @@ export default {
       },
     };
   },
+  computed: {
+    forClient() {
+      return this.user.userType !== "contractor";
+    },
+  },
   methods: {
+    cleanupModalState() {
+      document
+        .querySelectorAll(".modal-backdrop")
+        .forEach((backdrop) => backdrop.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("padding-right");
+    },
+    async closeSignupModal() {
+      await this.dismissModal("#signup-modal");
+    },
+    async openSigninModal() {
+      await this.dismissModal("#signup-modal");
+      showdModal("#signin-modal");
+    },
     async submitForm() {
       this.errorMessage = "";
       const result = await this.v$.$validate();
@@ -441,8 +449,6 @@ export default {
           true
         );
         this.isSignedUp = true;
-        // const redirectUrl = "/" + (this.$route.query.redirect || "perfil/info");
-        // this.$router.replace(redirectUrl);
       } catch (error) {
         this.isSignedUp = false;
         this.errorMessage = error.message;
@@ -459,22 +465,21 @@ export default {
       try {
         await this.$store.dispatch("confirmSignUp", actionPayload);
         await this.$store.dispatch("logout");
-
-        this.dismissModal("#signup-modal");
-        showdModal("#signin-modal");
+        await this.openSigninModal();
       } catch (error) {
         this.isSignedUp = true;
         this.confirmationErrorMessage = error.message;
       }
     },
   },
-  computed: {
-    forClient() {
-      return this.user.userType !== "contractor";
-    },
-  },
   mounted() {
     this.$emit("child-breadcrumbs-urls", this.urls);
+    const modal = document.querySelector("#signup-modal");
+    modal?.addEventListener("hidden.bs.modal", this.cleanupModalState);
+  },
+  beforeUnmount() {
+    const modal = document.querySelector("#signup-modal");
+    modal?.removeEventListener("hidden.bs.modal", this.cleanupModalState);
   },
 };
 </script>

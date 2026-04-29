@@ -20,7 +20,7 @@
           />
         </div>
         <div class="col-md-6 col-lg-5 col-xl-4">
-          <base-booking @trigger-msg-box="triggerMsgBox" />
+          <base-booking />
         </div>
       </div>
     </div>
@@ -35,7 +35,6 @@ import { required, email, helpers } from "@vuelidate/validators";
 const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
 export default {
-  emits: ["trigger-msg-box"],
   setup() {
     return { v$: useVuelidate() };
   },
@@ -107,7 +106,7 @@ export default {
 
         // Approach #2: @emit (worked)
         console.log("Booking receiced msg");
-        this.$emit("trigger-msg-box", true, this.message);
+        this.triggerMsgBox(true, this.message);
       });
     },
     resetFormData: function () {

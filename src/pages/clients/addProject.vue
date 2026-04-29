@@ -440,7 +440,7 @@ export default {
     };
     return { v$: useVuelidate(), dt, format };
   },
-  emits: ["trigger-msg-box", "child-breadcrumbs-urls"],
+  emits: ["child-breadcrumbs-urls"],
   mixins: [DateFormatter],
   components: {
     Datepicker,

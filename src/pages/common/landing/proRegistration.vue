@@ -192,7 +192,6 @@ import * as types from "../../../utils/types.js";
 const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
 export default {
-  emits: ["trigger-msg-box"],
   setup() {
     return { v$: useVuelidate() };
   },
@@ -266,7 +265,7 @@ export default {
     InvokeApi: function (dataElements) {
       import("/src/assets/js/contactUsEngine.js").then((mod) => {
         mod.postContactUsData(dataElements);
-        this.$emit("trigger-msg-box", true, this.message);
+        this.triggerMsgBox(true, this.message);
       });
     },
     resetFormData: function () {

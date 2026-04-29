@@ -143,6 +143,16 @@ export default {
       // let's mark the user as signedIn then
     }
 
+    if (!token || !userId || !expirationDate) {
+      return false;
+    }
+
+    const expiresIn = +expirationDate - new Date().getTime();
+    if (expiresIn < 0) {
+      context.dispatch(types.LOGOUT);
+      return false;
+    }
+
     // go get all the user Info to fill loggedUser
     const response = await apiSvc.get(`accounts/${userId}`);
     const { body } = response.data;
@@ -150,12 +160,6 @@ export default {
       loggedUserInfo = JSON.parse(body);
     } catch (e) {
       loggedUserInfo == {};
-    }
-
-    const expiresIn = +expirationDate - new Date().getTime();
-    if (expiresIn < 0) {
-      // console.log("ATTENTION: one has to log back in since token has expired");
-      return;
     }
 
     context.dispatch("showExpiresIn", {
@@ -173,7 +177,10 @@ export default {
         userId: userId,
         loggedUserInfo: loggedUserInfo,
       });
+      return true;
     }
+
+    return false;
   },
   showExpiresIn(context, payload) {
     var now = new Date();

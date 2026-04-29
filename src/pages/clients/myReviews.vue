@@ -4,7 +4,7 @@
       <base-spinner></base-spinner>
     </base-dialog>
 
-    <BaseReviewMsg @trigger-msg-box="triggerMsgBox" />
+    <BaseReviewMsg />
 
     <h2 class="h2 mb-0">
       <i class="fi-chat-circle expand text-primary" aria-hidden="true"></i>
@@ -150,7 +150,6 @@ import ReviewTileAboutYou from "../../components/ui/BaseReviewTileAboutYou.vue";
 const selectionRequired = (value) => value;
 
 export default {
-  emits: ["trigger-msg-box"],
   name: "Reviews",
   components: {
     BaseReviewMsg,
@@ -240,10 +239,6 @@ export default {
     },
   },
   methods: {
-    triggerMsgBox(showIt, message) {
-      this.$emit("trigger-msg-box", showIt, message);
-    },
-
     async refreshReviewList() {
       this.isLoading = true;
 

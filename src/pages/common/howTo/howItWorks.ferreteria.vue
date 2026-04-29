@@ -165,6 +165,7 @@ import TellAFriend from "../../../components/email/tellaFriend.vue";
 export default {
   name: "how-it-works-ferreteria",
   components: { TellAFriend },
+  emits: ["child-breadcrumbs-urls"],
   data() {
     return {
       name: "",

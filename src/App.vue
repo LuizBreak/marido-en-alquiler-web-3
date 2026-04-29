@@ -16,11 +16,7 @@
     <PageLoadingSpinner />
     <Navbar />
 
-    <router-view
-      @trigger-msg-box="triggerMsgBoxCaller"
-      @child-breadcrumbs-urls="setBreadcrumbs"
-    >
-    </router-view>
+    <router-view @child-breadcrumbs-urls="setBreadcrumbs"> </router-view>
 
     <Footer />
     <MsgBoxModal />
@@ -71,11 +67,6 @@ export default {
   methods: {
     setBreadcrumbs: function (childUrls) {
       this.urls = childUrls;
-    },
-    triggerMsgBoxCaller: function (showItFlag, message) {
-      // TODO: We need to remove all the msgbox emits in the entire
-      //       project and replace with the store.msgBox approach
-      this.triggerMsgBox(showItFlag, message);
     },
   },
   computed: {

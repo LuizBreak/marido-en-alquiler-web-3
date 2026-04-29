@@ -2,7 +2,7 @@ import { createApp, h } from "vue";
 import App from "./App.vue";
 
 import router from "./router.js";
-import store from "./store/index.js";
+import store, { authBootstrap } from "./store/index.js";
 // import { socket } from "./services/simpleSocket.service.js";
 
 import sysLogger from "./mixins/sysLogger.js";
@@ -84,4 +84,6 @@ app.mixin(DateFormatter);
 app.mixin(DismissModal);
 app.mixin(msgBoxDialog);
 
-app.mount("#app");
+authBootstrap.finally(() => {
+  app.mount("#app");
+});

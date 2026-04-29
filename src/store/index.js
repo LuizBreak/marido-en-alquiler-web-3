@@ -129,4 +129,7 @@ if (process.env.VUE_APP_ENV === "development") {
 }
 
 console.log("Trying logging in from StoreInit using cached user info.");
-store.dispatch("tryLogin");
+export const authBootstrap = store.dispatch("tryLogin").catch((error) => {
+  console.log("Cached login restore skipped.", error);
+  return false;
+});

@@ -182,9 +182,11 @@
 export default {
   name: "why-us",
   components: {},
-  data() {},
+  data() {
+    return {};
+  },
   methods: {},
-  computed: {},
+  computed: {}
 };
 </script>
 

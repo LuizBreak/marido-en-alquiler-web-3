@@ -289,7 +289,7 @@ export default {
     };
     return { v$: useVuelidate(), dt, format };
   },
-  emits: ["trigger-msg-box", "child-breadcrumbs-urls"],
+  emits: ["child-breadcrumbs-urls"],
   name: "register-pay-method",
   mixins: [DateFormatter, msgBoxDialog],
   components: { Cleave },

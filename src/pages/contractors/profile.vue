@@ -108,11 +108,7 @@
           </aside>
 
           <!-- Content-->
-          <router-view
-            @trigger-msg-box="triggerMsgBox"
-            @child-breadcrumbs-urls="setBreadcrumbs"
-          >
-          </router-view>
+          <router-view @child-breadcrumbs-urls="setBreadcrumbs"> </router-view>
         </div>
       </main>
     </div>
@@ -126,7 +122,6 @@ import getUserAvatar from "../../mixins/getUserAvatar";
 import StarRating from "vue-star-rating";
 
 export default {
-  emits: ["trigger-msg-box"],
   name: "contractor-my-profile",
   mixins: [getUserAvatar],
   components: { StarRating },
@@ -134,9 +129,6 @@ export default {
   methods: {
     setBreadcrumbs: function (urls) {
       this.$emit("child-breadcrumbs-urls", urls);
-    },
-    triggerMsgBox: function (showIt, message) {
-      this.$emit("trigger-msg-box", showIt, message);
     },
     ratings() {
       return this.loggedUser.rating ? this.loggedUser.rating : 0;

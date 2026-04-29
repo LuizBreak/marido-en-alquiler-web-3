@@ -13,28 +13,25 @@
             <button
               class="btn-close position-absolute top-0 end-0 mt-3 me-3"
               type="button"
-              data-bs-dismiss="modal"
+              @click="closeSigninModal"
               aria-label="Close"
               id="close"
             ></button>
             <div class="row mx-0 align-items-center">
               <div class="col-md-6 border-end-md p-4 p-sm-5">
                 <h2 class="h3 mb-4 mb-sm-5">
-                  !Hola!<br />Te damos la bienvenida.
+                  ¡Hola!<br />Te damos la bienvenida.
                 </h2>
                 <img
                   class="d-block mx-auto"
                   src="../../../img/signin-modal/signin.svg"
                   width="344"
-                  alt="Illustartion"
+                  alt="Illustration"
                 />
                 <div class="mt-4 mt-sm-5">
                   No tienes una cuenta?
-                  <a
-                    href="#signup-modal"
-                    data-bs-toggle="modal"
-                    data-bs-dismiss="modal"
-                    >Regístrate aqui</a
+                  <a href="#" @click.prevent="openSignupModal"
+                    >Regístrate aquí</a
                   >
                 </div>
               </div>
@@ -67,7 +64,6 @@
                   </div>
                 </div>
 
-                <!-- Signup Form-->
                 <form class="needs-validation" @submit.prevent="submitForm">
                   <div class="mb-4">
                     <label class="form-label mb-2" for="signin-email"
@@ -121,7 +117,7 @@
                   <div>
                     <button class="btn btn-primary btn-lg w-100" type="submit">
                       <span v-if="!isLoading">Ingresar</span>
-                      <span v-if="isLoading" class="px-2">Ingressando...</span>
+                      <span v-if="isLoading" class="px-2">Ingresando...</span>
                       <div
                         v-if="isLoading"
                         class="spinner-border spinner-border-sm"
@@ -134,7 +130,7 @@
                       style="color: red; text-decoration: blink"
                       v-if="!formIsValid"
                     >
-                      Por favor, entrar un correo y contraseña valida.<br />
+                      Por favor, entra un correo y contraseña válida.<br />
                     </p>
                   </div>
                 </form>
@@ -152,6 +148,7 @@ import { mapGetters } from "vuex";
 import Signup from "./signup.vue";
 import PwdVisibility from "../../../mixins/passwordVisibility.js";
 import SocialLogin from "./SocialLogin.vue";
+import { showdModal } from "../../../mixins/showModal";
 
 export default {
   name: "Login",
@@ -174,6 +171,20 @@ export default {
     ...mapGetters(["loggedUser", "user"]),
   },
   methods: {
+    cleanupModalState() {
+      document
+        .querySelectorAll(".modal-backdrop")
+        .forEach((backdrop) => backdrop.remove());
+      document.body.classList.remove("modal-open");
+      document.body.style.removeProperty("padding-right");
+    },
+    async closeSigninModal() {
+      await this.dismissModal("#signin-modal");
+    },
+    async openSignupModal() {
+      await this.dismissModal("#signin-modal");
+      showdModal("#signup-modal");
+    },
     async submitForm() {
       this.formIsValid = true;
       if (
@@ -193,7 +204,7 @@ export default {
 
       try {
         await this.$store.dispatch("login", credentials);
-        this.dismissModal("#signin-modal");
+        await this.dismissModal("#signin-modal");
         this.logIt(
           this?.loggedUser?.id,
           "login for: " + this?.user?.attributes?.email,
@@ -201,7 +212,6 @@ export default {
           this.user?.signInUserSession?.idToken?.jwtToken,
           true
         );
-        // console.log("this.login.userType", this.loggedUser);
         const redirectUrl =
           "/" +
           (this.$route.query.redirect || this.loggedUser.userType === "client"
@@ -214,6 +224,14 @@ export default {
         this.isLoading = false;
       }
     },
+  },
+  mounted() {
+    const modal = document.querySelector("#signin-modal");
+    modal?.addEventListener("hidden.bs.modal", this.cleanupModalState);
+  },
+  beforeUnmount() {
+    const modal = document.querySelector("#signin-modal");
+    modal?.removeEventListener("hidden.bs.modal", this.cleanupModalState);
   },
 };
 </script>

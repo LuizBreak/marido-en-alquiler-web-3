@@ -2,7 +2,7 @@
   <div>
     <h1 class="h2">Resetear Contraseña</h1>
     <p class="pt-1">
-      Entra el código recibido por correo y eliga una nueva contraseña
+      Entra el código recibido por correo y elige una nueva contraseña
     </p>
     <!-- <h2 class="h5">Password</h2> -->
     <form class="needs-validation pb-4 quick-contact-form">
@@ -16,7 +16,7 @@
               id="code"
               v-model="code"
               required
-              placeholder="Entrar el código recebido por correo"
+              placeholder="Entrar el código recibido por correo"
             />
             <label class="password-toggle-btn" aria-label="Show/hide password">
               <input
@@ -103,7 +103,6 @@ import { mapGetters } from "vuex";
 import PwdVisibility from "../../../mixins/passwordVisibility.js";
 
 export default {
-  emits: ["trigger-msg-box"],
   name: "Password-reset-with-code",
   props: ["email"],
   mixins: [PwdVisibility],
@@ -153,11 +152,7 @@ export default {
       };
       try {
         await this.$store.dispatch("resetPasswordWithCode", actionPayload);
-        this.$emit(
-          "trigger-msg-box",
-          true,
-          "Contraseña actualizada con éxito."
-        );
+        this.triggerMsgBox(true, "Contraseña actualizada con éxito.");
         this.isLoading = true;
         this.resetForm();
         const redirectUrl = "/" + (this.$route.query.redirect || "/");

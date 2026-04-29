@@ -41,7 +41,7 @@ import Aprendamas from "./pages/common/guides/aprendamas.vue";
 import Comenta from "./pages/common/guides/comenta.vue";
 import Helper from "./pages/common/chat/ChatApp.vue";
 
-import store from "./store/index.js";
+import store, { authBootstrap } from "./store/index.js";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -125,7 +125,9 @@ const router = createRouter({
   },
 });
 
-router.beforeEach(function (to, from, next) {
+router.beforeEach(async function (to, from, next) {
+  await authBootstrap;
+
   // console.log("to.meta.requiresAuth", to.meta.requiresAuth);
   // console.log("isAuthenticated", store.getters.isAuthenticated);
   // console.log("from", from.name);

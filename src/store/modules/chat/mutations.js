@@ -17,18 +17,40 @@ export default {
   setMyself: (state, myself) => {
     state.myself = myself;
   },
-  setMessages: (state, messages) => {
-    state.messages = messages.map((message) => {
-      if (message.timestamp)
-        typeof message.timestamp == "object" &&
-          (message.timestamp = DateTime.fromObject(message.timestamp).toISO());
-      else message.timestamp = DateTime.local().toISO();
+setMessages: (state, messages) => {
+  state.messages = messages.map((message) => {
 
-      if (!("myself" in message))
-        message.myself = message.participantId === state.myself.id;
-      return message;
-    });
-  },
+    // Normalize timestamp
+    if (message.timestamp) {
+
+      if (typeof message.timestamp === "object" && message.timestamp.ts) {
+        // Firestore / custom object with ts
+        message.timestamp = DateTime.fromMillis(message.timestamp.ts).toISO();
+
+      } else if (typeof message.timestamp === "string") {
+        // ISO string
+        message.timestamp = DateTime.fromISO(message.timestamp).toISO();
+
+      } else if (typeof message.timestamp === "number") {
+        // timestamp in millis
+        message.timestamp = DateTime.fromMillis(message.timestamp).toISO();
+
+      } else {
+        message.timestamp = DateTime.local().toISO();
+      }
+
+    } else {
+      message.timestamp = DateTime.local().toISO();
+    }
+
+    // Set myself flag
+    if (!("myself" in message)) {
+      message.myself = message.participantId === state.myself.id;
+    }
+
+    return message;
+  });
+},
   setChatTitle: (state, title) => {
     state.chatTitle = title;
   },

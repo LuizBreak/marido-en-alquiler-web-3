@@ -178,6 +178,7 @@ export default {
   name: "contact-us",
   components: { ErrorList, ContactUsEmail },
   mixins: [DateFormatter],
+  emits: ["child-breadcrumbs-urls"],
   data() {
     return {
       id: null,

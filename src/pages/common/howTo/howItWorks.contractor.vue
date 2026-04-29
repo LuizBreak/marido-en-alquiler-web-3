@@ -100,6 +100,7 @@ export default {
   name: "how-it-works-contractor",
   props: ["name"],
   components: {},
+  emits: ["child-breadcrumbs-urls"],
   data() {
     return {
       urls: [

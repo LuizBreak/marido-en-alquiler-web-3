@@ -32,7 +32,6 @@
               :class="v$.user.firstName.$error ? 'is-invalid' : ''"
               placeholder="Nombre"
               v-model="v$.user.firstName.$model"
-              onfocus="updated()"
               autofocus
             />
             <div
@@ -311,7 +310,7 @@ import getUserAvatar from "../../mixins/getUserAvatar";
 // const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
 export default {
-  emits: ["trigger-msg-box", "child-breadcrumbs-urls"],
+  emits: ["child-breadcrumbs-urls"],
   setup() {
     return { v$: useVuelidate() };
   },
@@ -383,10 +382,10 @@ export default {
         this.$store.dispatch("clients/createClient", this.user);
         this.user = this.getUserCopy();
         console.log("prof-info.msgbox issued");
-        this.$emit("trigger-msg-box", true, "Registro realizado con éxito.");
+        this.triggerMsgBox(true, "Registro realizado con éxito.");
       } else {
         this.$store.dispatch("clients/updateClient", this.user);
-        this.$emit("trigger-msg-box", true, "Registro actualizado con éxito.");
+        this.triggerMsgBox(true, "Registro actualizado con éxito.");
       }
     },
     async onDelete() {
@@ -396,7 +395,7 @@ export default {
           this.resetFormData();
           this.$router.replace("/signout");
           document.body.scrollTop = document.documentElement.scrollTop = 0;
-          this.$emit("trigger-msg-box", true, "Cuenta eliminada con éxito.");
+          this.triggerMsgBox(true, "Cuenta eliminada con éxito.");
         }
       }
     },

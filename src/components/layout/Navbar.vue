@@ -119,7 +119,7 @@
                 v-bind:star-size="17"
                 v-bind:show-rating="false"
                 :rating="ratings()"
-                read-only="true"
+                :read-only="true"
               />
               <div v-if="false" key="" class="fs-xs py-2">
                 {{ loggedUser.phone }}

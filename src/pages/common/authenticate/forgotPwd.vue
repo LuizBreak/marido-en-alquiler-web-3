@@ -9,12 +9,14 @@
         </router-link>
         <div class="row mx-0 align-items-center">
           <div class="col-md-6 border-end-md p-4 p-sm-5">
-            <h2 class="h3 mb-4 mb-sm-5 text-center">Olvidé mi contraseña</h2>
+            <h2 class="h3 mb-4 mb-sm-5 text-center">
+              Olvidé mi contraseña
+            </h2>
             <img
               class="d-block mx-auto"
               src="../../../assets/img/illustrations/Forgot-password-pana.svg"
               width="344"
-              alt="Illustartion"
+              alt="Illustration"
             />
           </div>
           <div class="col-md-6 px-4 pt-2 pb-4 px-sm-5 pb-sm-5 pt-md-5">
@@ -102,8 +104,7 @@ export default {
       }
       try {
         await this.$store.dispatch("sendConfirmationCode", this.email);
-        this.$emit(
-          "trigger-msg-box",
+        this.triggerMsgBox(
           true,
           "El código de reinicio fue enviado por correo electrónico. Revisa tu correo."
         );

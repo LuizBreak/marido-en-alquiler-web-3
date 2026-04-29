@@ -45,6 +45,6 @@ export const TokenService = {
   },
 
   removeTokenExpirationDate() {
-    localStorage.removeItem(REFRESH_TOKEN_KEY);
+    localStorage.removeItem(TOKEN_EXPERATION);
   },
 };

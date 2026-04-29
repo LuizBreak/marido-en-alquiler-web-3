@@ -23,9 +23,11 @@
               required
             />
             <label class="password-toggle-btn" aria-label="Show/hide password">
-              <input class="password-toggle-check" type="checkbox" /><span
-                class="password-toggle-indicator"
-              ></span>
+              <input
+                class="password-toggle-check"
+                type="checkbox"
+                @change="SetPwdVisibility('account-password')"
+              /><span class="password-toggle-indicator"></span>
             </label>
           </div>
         </div>
@@ -49,9 +51,11 @@
               required
             />
             <label class="password-toggle-btn" aria-label="Show/hide password">
-              <input class="password-toggle-check" type="checkbox" /><span
-                class="password-toggle-indicator"
-              ></span>
+              <input
+                class="password-toggle-check"
+                type="checkbox"
+                @change="SetPwdVisibility('account-password-new')"
+              /><span class="password-toggle-indicator"></span>
             </label>
           </div>
         </div>
@@ -68,9 +72,11 @@
               required
             />
             <label class="password-toggle-btn" aria-label="Show/hide password">
-              <input class="password-toggle-check" type="checkbox" /><span
-                class="password-toggle-indicator"
-              ></span>
+              <input
+                class="password-toggle-check"
+                type="checkbox"
+                @change="SetPwdVisibility('account-password-confirm')"
+              /><span class="password-toggle-indicator"></span>
             </label>
           </div>
         </div>
@@ -101,7 +107,7 @@
       <div class="d-flex border-bottom pb-3 mb-3">
         <i class="fi-device-desktop fs-5 text-muted me-1"></i>
         <div class="ps-2">
-          <div class="fw-bold mb-1">Mac – New York, USA</div>
+          <div class="fw-bold mb-1">Mac - New York, USA</div>
           <span class="d-inline-block fs-sm text-muted border-end pe-2 me-2"
             >Chrome</span
           ><span class="fs-sm fw-bold text-success">Active now</span>
@@ -110,7 +116,7 @@
       <div class="d-flex border-bottom pb-3 mb-3">
         <i class="fi-device-mobile fs-5 text-muted me-1"></i>
         <div class="ps-2">
-          <div class="fw-bold mb-1">iPhone 12 – New York, USA</div>
+          <div class="fw-bold mb-1">iPhone 12 - New York, USA</div>
           <span class="d-inline-block fs-sm text-muted border-end pe-2 me-2"
             >Finder App</span
           ><span class="fs-sm text-muted">20 hours ago</span>
@@ -136,7 +142,7 @@
       <div class="d-flex border-bottom pb-3 mb-3">
         <i class="fi-device-desktop fs-5 text-muted me-1"></i>
         <div class="ps-2">
-          <div class="fw-bold mb-1">Windows 10.1 – New York, USA</div>
+          <div class="fw-bold mb-1">Windows 10.1 - New York, USA</div>
           <span class="d-inline-block fs-sm text-muted border-end pe-2 me-2"
             >Chrome</span
           ><span class="fs-sm text-muted">November 15 at 8:42 AM</span>
@@ -169,10 +175,12 @@
 <script>
 import * as types from "../../utils/types.js";
 import { mapGetters } from "vuex";
+import PwdVisibility from "../../mixins/passwordVisibility.js";
 
 export default {
-  emits: ["trigger-msg-box"],
+  emits: ["child-breadcrumbs-urls"],
   name: "Password-Security",
+  mixins: [PwdVisibility],
   components: {},
   data() {
     return {
@@ -202,7 +210,7 @@ export default {
   methods: {
     async confirmNewPassword() {
       if (this.oldPassword === "") {
-        this.errorMessage = "Contraseña curriente es un campo obligatorio.";
+        this.errorMessage = "Contraseña actual es un campo obligatorio.";
         this.formIsValid = false;
         return;
       }
@@ -230,11 +238,7 @@ export default {
         } else {
           await this.$store.dispatch("changePassword", actionPayload);
         }
-        this.$emit(
-          "trigger-msg-box",
-          true,
-          "Contraseña actualizada con éxito."
-        );
+        this.triggerMsgBox(true, "Contraseña actualizada con éxito.");
         this.resetForm();
       } catch (error) {
         this.formIsValid = false;

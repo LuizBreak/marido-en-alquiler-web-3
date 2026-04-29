@@ -1,6 +1,20 @@
-global.jQuery = require("jquery");
-var $ = global.jQuery;
+import Modal from "bootstrap/js/dist/modal";
+
+function cleanupModalArtifacts() {
+  document
+    .querySelectorAll(".modal-backdrop")
+    .forEach((backdrop) => backdrop.remove());
+  document.body.classList.remove("modal-open");
+  document.body.style.removeProperty("padding-right");
+}
 
 export function showdModal(modalId) {
-  $(modalId).modal("show");
+  const modalElement = document.querySelector(modalId);
+
+  if (!modalElement) {
+    return;
+  }
+
+  cleanupModalArtifacts();
+  Modal.getOrCreateInstance(modalElement).show();
 }

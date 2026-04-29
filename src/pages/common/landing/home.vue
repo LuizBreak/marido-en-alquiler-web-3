@@ -2,7 +2,7 @@
   <!-- Home -->
   <section class="py-xxl-10 pb-0" id="home">
     <!-- <div class="bg-holder bg-size" style="background-image:url(src/assets/img/gallery/hero-header-bg.png);background-position:top center;background-size:cover;"> -->
-    <div class="bg-holder bg-size" v-bind:style="backgroundImage3">
+    <div class="bg-holder bg-size" v-bind:style="backgroundImage">
       <div class="container">
         <div class="row align-items-center">
           <div

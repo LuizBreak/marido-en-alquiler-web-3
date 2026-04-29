@@ -194,7 +194,6 @@
 
 <script>
 export default {
-  emits: ["trigger-msg-box"],
   name: "AcercaDe",
   props: ["name"],
   data() {
@@ -203,9 +202,6 @@ export default {
         `background-image:url(${require("../../../assets/img/gallery/user.requesting.service.4.jpg")})` +
         ";background-position:top;background-size:cover",
     };
-  },
-  triggerMsgBox: function (showIt, message) {
-    this.$emit("trigger-msg-box", showIt, message);
   },
 };
 </script>

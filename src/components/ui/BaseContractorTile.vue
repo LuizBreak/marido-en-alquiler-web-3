@@ -15,7 +15,7 @@
     :newMember="false"
     :verified="verified"
     :featured="featured"
-    :memberSince="createdAt"
+    :memberSince="memberSince"
     :services="serviceTypes"
     :isFavorite="verified"
     :email="email"

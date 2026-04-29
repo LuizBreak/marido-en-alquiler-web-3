@@ -8,6 +8,7 @@
 import { mapGetters } from "vuex";
 
 export default {
+  emits: ["child-breadcrumbs-urls"],
   name: "Signout",
   components: {},
   data() {
@@ -52,6 +53,7 @@ export default {
   },
   async created() {},
   async mounted() {
+    this.$emit("child-breadcrumbs-urls", this.urls);
     this.isLoading = true;
     this.sleep(this.logout);
   },
