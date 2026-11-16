@@ -340,9 +340,9 @@ export default {
       }
 
       try {
-        this.message = new Message();
+        const messageService = new Message();
 
-        await this.message.add(true, {
+        const saved = await messageService.add(true, {
           fromId: this.loggedUser.id,
           toId: this.id,
           quoteId: this.project.projectId,
@@ -356,6 +356,10 @@ export default {
         });
 
         this.resetForm();
+        if (saved.notificationFailed) {
+          this.triggerMsgBox(true, "Solicitud guardada. No se pudo enviar la notificacion.");
+          return;
+        }
         console.log("baseContractor.msgbox issued");
         this.triggerMsgBox(true, "Tu solicitud fue enviada al contratista.");
         this.dismissModal("#modal-contact-contractor" + this.id);
