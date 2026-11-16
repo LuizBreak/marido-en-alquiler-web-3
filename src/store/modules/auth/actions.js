@@ -1,3 +1,4 @@
+import { expirationFromJwt } from "../../../services/session-expiry";
 import { apiSvc, TokenService } from "../../../services";
 import { Auth } from "aws-amplify";
 import * as types from "../../../utils/types";
@@ -29,6 +30,7 @@ class AuthenticationError extends Error {
 export default {
   async login(context, payload) {
     clearTimeout(timer);
+    apiSvc.removeHeader();
     context.commit("setSignedIn", false);
     context.commit("setCognitoUser", null);
     context.commit("clients/RESET_CLIENT", null, { root: true });
@@ -122,7 +124,7 @@ export default {
       responseData = {};
     }
 
-    if (!response || response.statusText !== "OK" || !responseData.id) {
+    if (!response || (response.status < 200 || response.status >= 300) || !responseData.id) {
       const error = new Error(
         responseData.message || "Failed to authenticate. Check your login data."
       );
@@ -130,8 +132,7 @@ export default {
     }
     const userId = responseData.id;
     const userType = responseData.userType;
-    const expiresIn = +payload.expiresIn; // const expiresIn = 5000; //5 seconds
-    const expirationDate = new Date().getTime() + expiresIn;
+    const expirationDate = expirationFromJwt(payload.expiresIn);
 
     return await this.dispatch(types.TRY_LOGIN, {
       token: payload.idToken,
@@ -187,13 +188,29 @@ export default {
       return false;
     }
 
+    let sessionEmail = null;
+    if (typeof payload === "undefined") {
+      try {
+        const session = await Auth.currentSession();
+        const idToken = session.getIdToken();
+        token = idToken.getJwtToken();
+        expirationDate = expirationFromJwt(idToken.getExpiration());
+        sessionEmail = idToken.payload.email;
+        localStorage.setItem("access_token", token);
+        localStorage.setItem("expirationDate", expirationDate);
+      } catch (_) {
+        await context.dispatch(types.LOGOUT);
+        return false;
+      }
+    }
+    apiSvc.setHeader();
     const expiresIn = +expirationDate - new Date().getTime();
     if (expiresIn < 0) {
       context.dispatch(types.LOGOUT);
       return false;
     }
 
-    // go get all the user Info to fill loggedUser
+    // Load account details only after establishing the Cognito session.
     try {
       const response = await apiSvc.get(`accounts/${userId}`);
       const { body } = response.data;
@@ -207,6 +224,10 @@ export default {
       expiresIn: expiresIn,
     });
 
+    if (!loggedUserInfo.id || (sessionEmail && loggedUserInfo.email !== sessionEmail)) {
+      await context.dispatch(types.LOGOUT);
+      return false;
+    }
     timer = setTimeout(function () {
       context.dispatch(types.AUTO_LOGOUT);
     }, expiresIn);
@@ -237,7 +258,9 @@ export default {
 
     context.commit("setSignedIn", false);
 
+    apiSvc.removeHeader();
     TokenService.removeToken();
+    TokenService.removeRefreshToken();
     TokenService.removeTokenExpirationDate();
     localStorage.removeItem("expirationDate");
     localStorage.removeItem(types.USERID);

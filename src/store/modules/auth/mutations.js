@@ -23,7 +23,7 @@ export default {
   },
   setCognitoUser(state, payload) {
     state.user = payload || {};
-    state.token = payload?.signInUserSession?.accessToken?.jwtToken || null;
+    state.token = payload?.signInUserSession?.idToken?.jwtToken || null;
   },
   setUserAvatar(state, payload) {
     state.loggedUser.avatar = payload?.avatar || payload;

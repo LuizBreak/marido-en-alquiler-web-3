@@ -75,7 +75,7 @@ const router = createRouter({
     { path: "/privacidad", component: PrivacyPolicy },
     { path: "/terminos", component: TermsOfUse },
     { path: "/olvide", component: ForgotPwd },
-    { path: "/helper", component: Helper },
+    { path: "/helper", component: Helper, meta: { requiresAuth: true } },
     { path: "/comenta", component: Comenta },
     { path: "/aprendamas", component: Aprendamas },
     { path: "/notfound", component: PageNotFound },
@@ -100,20 +100,20 @@ const router = createRouter({
         { path: "formas-pago", component: PayMethods },
       ],
     },
-    { path: "/nuevoproyecto", component: NewProject },
+    { path: "/nuevoproyecto", component: NewProject, meta: { requiresAuth: true } },
 
     // contrators routes
     {
       path: "/profile",
       component: ContractorProfile,
       props: true,
-      meta: { requiredAuth: true },
+      meta: { requiresAuth: true },
       children: [
-        { path: "", component: ContractorInfo, meta: { requiredAuth: true } },
+        { path: "", component: ContractorInfo, meta: { requiresAuth: true } },
         {
           path: "info",
           component: ContractorInfo,
-          meta: { requiredAuth: true },
+          meta: { requiresAuth: true },
         },
         { path: "notificaciones", component: ContractorNotifications },
       ],
