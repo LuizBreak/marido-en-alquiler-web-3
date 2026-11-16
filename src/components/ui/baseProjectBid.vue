@@ -159,6 +159,10 @@ export default {
   },
   methods: {
     async save() {
+ if (this.isSaving) return;
+ this.isSaving = true;
+ try {
+
       const result = await this.v$.$validate();
       if (!result) {
         return;
@@ -172,19 +176,22 @@ export default {
       );
 
       try {
-        this.quote.add();
-        this.notifyClient();
+        const saved = await this.quote.add();
+        let notificationFailed = false;
+        try { const notice = await this.notifyClient(saved.quoteId); notificationFailed = !!notice.notificationFailed; } catch (_) { notificationFailed = true; }
 
         this.resetForm();
-        this.triggerMsgBox(true, "Tu oferta fue enviada al cliente.");
+        this.triggerMsgBox(true, notificationFailed ? "Oferta guardada. No se pudo enviar la notificacion." : "Tu oferta fue enviada al cliente.");
         this.dismissModal("#modal-bid-" + this.projectId);
         this.sysLogIt();
       } catch (error) {
         console.log("bid error", error);
         this.triggerMsgBox(true, "Erro al registrar la oferta. - " + error);
       }
-    },
-    async notifyClient() {
+    
+ } finally { this.isSaving = false; }
+},
+    async notifyClient(quoteId) {
       await this.getClientInfoProjectId(this.projectId);
 
       // subject, fromId, toId, quoteId, messageBody
@@ -204,10 +211,10 @@ export default {
 
       // console.log("messagebody", this.emailContent);
 
-      this.message.add(true, {
+      return this.message.add(true, {
         fromId: this.contractor.id,
         toId: this.client.id,
-        quoteId: this.projectId,
+        quoteId,
         subject: `Marido-en-alquiler: Nueva Oferta a tu proyecto`,
         messageBody: this.emailContent,
         wasRead: false,

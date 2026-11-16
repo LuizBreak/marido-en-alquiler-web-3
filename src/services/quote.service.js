@@ -43,14 +43,7 @@ export class Quote {
       clientComments: null,
     };
     // console.log("svc ds", ds);
-    store
-      .dispatch("quotes/createQuote", ds, { root: true })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+    return store.dispatch("quotes/createQuote", ds, { root: true });
   }
   update() {
     console.log("update.enter ");

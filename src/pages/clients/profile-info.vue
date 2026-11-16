@@ -376,18 +376,21 @@ export default {
       };
     },
     async onSubmit() {
+ if (this.isSaving) return;
+ this.isSaving = true;
+ try {
+
       const result = await this.v$.$validate();
 
       if (!result) {
         return;
       }
-      if (this.selectedFile) {
-        this.onUploadImage();
-        // this.user.avatar= this.selectedFile.name;
-        this.setUserAvatar(this.user.id, this.selectedFile.name);
-      }
-
       try {
+      if (this.selectedFile) {
+        await this.onUploadImage();
+        // this.user.avatar= this.selectedFile.name;
+        await this.setUserAvatar(this.user.id, this.selectedFile.name);
+      }
         if (!this.user.id) {
           await this.$store.dispatch("clients/createClient", this.user);
           this.user = this.getUserCopy();
@@ -403,11 +406,13 @@ export default {
           "No se pudo grabar el registro. Verifica la conexión e inténtalo de nuevo."
         );
       }
-    },
+    
+ } finally { this.isSaving = false; }
+},
     async onDelete() {
       if (this.user.id) {
         if (confirm("Estas seguro que quieres eliminar este registro?")) {
-          this.$store.dispatch("clients/deleteClient", this.user);
+          await this.$store.dispatch("clients/deleteClient", this.user);
           this.resetFormData();
           this.$router.replace("/signout");
           document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -448,7 +453,7 @@ export default {
       this.user.avatar = this.selectedFile.name || "";
     },
     onUploadImage() {
-      s3Svc.uploadFile(this.selectedFile);
+      return s3Svc.uploadFile(this.selectedFile);
     },
   },
   computed: {

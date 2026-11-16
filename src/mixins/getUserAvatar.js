@@ -28,14 +28,8 @@ export default {
       }
     },
     async setUserAvatar(userId, avatar) {
-      try {
-        await apiSvc.post(`accounts/setavatar/${userId}`, {
-          avatar,
-        });
-        this.$store.commit("setUserAvatar", avatar);
-      } catch (error) {
-        console.log(error);
-      }
+      await apiSvc.post(`accounts/setavatar/${userId}`, { avatar });
+      this.$store.commit("setUserAvatar", avatar);
     },
   },
   computed: {

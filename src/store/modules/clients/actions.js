@@ -1,72 +1,16 @@
+import { createCrudActions } from "../../crud-actions";
 import { apiSvc } from "../../../services";
 
 const resource = "clients";
 
 export default {
-  async initStore({ state, commit }) {
-    if (!state.clients["clients"]) {
-      await apiSvc
-        .get(resource)
-        .then((response) => {
-          commit("SET_CLIENT", response.data.body);
-          console.log("ini.data", response.data.body);
-        })
-        .catch((error) => {
-          console.log("There was an error fetching client: " + error.message);
-        });
-    }
-  },
-  async fetchClients({ commit }) {
-    await apiSvc
-      .get(resource)
-      .then((response) => {
-        commit("SET_CLIENTS", response.data.body);
-      })
-      .catch((error) => {
-        console.log("There was an error fetching client: " + error.message);
-      });
-  },
-  async fetchClient({ commit }, data) {
-    await apiSvc
-      .getById(resource, data.id)
-      .then((response) => {
-        commit("SET_CLIENT", response.data.body);
-      })
-      .catch((error) => {
-        console.log("There was an error fetching client: " + error.message);
-      });
-  },
-  createClient({ commit }, client) {
-    return apiSvc
-      .post(resource, client)
-      .then(() => {
-        console.log("createClient", client);
-        commit("ADD_NEW_CLIENT", client);
-        return true;
-      })
-      .catch((error) => {
-        console.log("There was a problem creating client: " + error.message);
-        throw error;
-      });
-  },
-  deleteClient({ commit }, client) {
-    apiSvc.delete(resource, client).then(() => {
-      commit("DELETE_CLIENT", client);
-    });
-  },
-  updateClient({ commit }, client) {
-    console.log(client);
-    return apiSvc
-      .update(resource, client)
-      .then(() => {
-        commit("UPDATE_CLIENT", client);
-        return true;
-      })
-      .catch((error) => {
-        console.log("there was an error updating client: " + error.message);
-        throw error;
-      });
-  },
+  ...createCrudActions({"resource":"clients","singular":"Client","plural":"Clients","mutation":"CLIENT","listMutation":"SET_CLIENTS","serialized":["SET_CLIENT","SET_CLIENTS"]}),
+  
+  
+  
+  
+  
+  
   async getClientInfoByProjectId({ commit }, data) {
     await apiSvc
       .getById(resource + "/getbyprojectid", data.id)

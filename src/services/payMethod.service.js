@@ -103,14 +103,7 @@ export class PayMethod {
       updatedAt: this.updatedAt.val,
     };
     // console.log("svc ds", ds);
-    store
-      .dispatch("payMethods/createPayMethod", ds, { root: true })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+    return store.dispatch("payMethods/createPayMethod", ds, { root: true });
   }
   update() {
     console.log("update.enter ");

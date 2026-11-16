@@ -516,41 +516,35 @@ export default {
   },
   methods: {
     async save() {
-      const result = await this.v$.$validate();
-      if (!result) {
-        return;
-      }
-      if (this.selectedFile) this.onUploadImage();
-      // const today = Date.now();
-      this.formData = {
-        clientId: this.loggedUser.id,
-        title: this.newProject.title,
-        propertyType: this.newProject.propertyType,
-        description: this.newProject.description,
-        services: this.setServiceList(this.newProject.services),
-        status: "created",
-        avatar: this.newProject.avatar,
-        intention: this.newProject.intention || "ready",
-        updatedAt: this.date(Date.now(), "YYYY-MM-DD hh:mm:ss a"),
-        startDate: this.date(this.newProject.startDate, "YYYY-MM-DD"),
-        contractorId: 0,
-      };
-      // console.log("formData", this.formData);
+ if (this.isSaving) return;
+ this.isSaving = true;
+ try {
 
-      this.$store
-        .dispatch("projects/save", JSON.stringify(this.formData))
-        .then(() => {
-          this.triggerMsgBox(
-            true,
-            this.newProject.id
-              ? "Proyecto actualizado con éxito."
-              : "Proyecto creado con éxito."
-          );
-        })
-        .catch(() => {
-          this.$triggerMsgBox(true, "Error adding project");
-        });
-    },
+  if (!(await this.v$.$validate())) return;
+  try {
+    if (this.selectedFile) await this.onUploadImage();
+    const project = {
+      clientId: this.loggedUser.id,
+      title: this.newProject.title,
+      propertyType: this.newProject.propertyType,
+      description: this.newProject.description,
+      services: JSON.stringify(this.newProject.services),
+      status: "created",
+      avatar: this.newProject.avatar,
+      intention: this.newProject.intention || "ready",
+      updatedAt: this.date(Date.now(), "YYYY-MM-DD HH:mm:ss"),
+      startDate: this.date(this.newProject.startDate, "YYYY-MM-DD"),
+      contractorId: null,
+    };
+    const saved = await this.$store.dispatch("projects/save", project);
+    this.newProject.projectId = saved.projectId;
+    this.triggerMsgBox(true, "Proyecto creado con exito.");
+  } catch (_) {
+    this.triggerMsgBox(true, "No se pudo guardar el proyecto. Intentalo de nuevo.");
+  }
+
+ } finally { this.isSaving = false; }
+},
     triggerMsgBox: function (showIt, message) {
       this.$store.dispatch("triggerMsgBox", {
         showIt,
@@ -579,7 +573,7 @@ export default {
       this.newProject.avatar = this.selectedFile.name || "";
     },
     onUploadImage() {
-      s3Svc.uploadFile(this.selectedFile);
+      return s3Svc.uploadFile(this.selectedFile);
     },
   },
   created() {

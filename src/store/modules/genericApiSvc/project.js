@@ -43,17 +43,16 @@ export default {
           console.log(error);
         });
     },
-    save({ commit }, project) {
-      return this.dispatch("create", { endpoint: "projects", params: project })
-        .then((data) => {})
-        .catch((error) => {});
+    async save({ commit }, project) {
+      const entity = typeof project === "string" ? JSON.parse(project) : project;
+      const response = await this.dispatch("create", { endpoint: "projects", params: entity });
+      const saved = { ...entity, ...response.data };
+      commit("SET_PROJECT", saved);
+      return saved;
     },
-    destroy({ commit }, project) {
-      return this.dispatch("destroy", { endpoint: "projects", params: project })
-        .then((data) => {
-          this.dispatch("project/refresh", data);
-        })
-        .catch((error) => {});
+    async destroy({ state, commit }, project) {
+      await this.dispatch("destroy", { endpoint: "projects", params: project });
+      commit("SET_PROJECTS", state.projects.filter(item => String(item.projectId) !== String(project.projectId)));
     },
     refresh({ commit }, project) {
       commit("SET_PROJECT", project);

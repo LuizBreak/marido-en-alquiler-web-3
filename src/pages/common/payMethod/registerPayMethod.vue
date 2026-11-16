@@ -369,6 +369,10 @@ export default {
   },
   methods: {
     async save() {
+ if (this.isSaving) return;
+ this.isSaving = true;
+ try {
+
       this.payMethod = new PayMethod(
         this.userId,
         this.cardNumber,
@@ -383,13 +387,15 @@ export default {
         return;
       }
       try {
-        this.payMethod.add();
+        await this.payMethod.add();
         this.resetForm();
         this.triggerMsgBox(true, "registro realizado con éxito.");
       } catch (error) {
         this.triggerMsgBox(true, "Erro al registrar le metodo de pago.");
       }
-    },
+    
+ } finally { this.isSaving = false; }
+},
     // triggerMsgBox: function (showIt, message) {
     //   this.$store.dispatch("triggerMsgBox", {
     //     showIt,

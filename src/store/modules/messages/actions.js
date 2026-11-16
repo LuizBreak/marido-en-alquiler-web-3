@@ -1,59 +1,14 @@
+import { createCrudActions } from "../../crud-actions";
 import { apiSvc } from "../../../services";
 
-const resource = "messages";
 
 export default {
-  fetchMessages({ commit }) {
-    apiSvc
-      .get(resource)
-      .then((response) => {
-        commit("SET_MESSAGES", response.data.data);
-      })
-      .catch((error) => {
-        console.log(
-          "There was an error fetching message method: " + error.message
-        );
-      });
-  },
-  fetchMessage({ commit }, data) {
-    apiSvc
-      .getById(resource, data.id)
-      .then((response) => {
-        commit("SET_MESSAGE", response.data.data);
-      })
-      .catch((error) => {
-        console.log(
-          "There was an error fetching message method: " + error.message
-        );
-      });
-  },
-  createMessage({ commit }, message) {
-    apiSvc
-      .post(resource, message)
-      .then(() => {
-        commit("ADD_NEW_MESSAGE", message);
-      })
-      .catch((error) => {
-        console.log(
-          "There was a problem creating message method: " + error.message
-        );
-      });
-  },
-  deleteMessage({ commit }, message) {
-    apiSvc.delete(resource, message).then(() => {
-      commit("DELETE_MESSAGE", message);
-    });
-  },
-  updateMessage({ commit }, message) {
-    apiSvc
-      .update(resource, message)
-      .then(() => {
-        commit("UPDATE_MESSAGE", message);
-      })
-      .catch((error) => {
-        console.log("there was an error updating message: " + error.message);
-      });
-  },
+  ...createCrudActions({"resource":"messages","singular":"Message","plural":"Messages","mutation":"MESSAGE","listMutation":"SET_MESSAGES","serialized":["SET_MESSAGES"]}),
+  
+  
+  
+  
+  
   async getMessagesByClient({ commit }, messageload) {
     await this.dispatch(
       "index",

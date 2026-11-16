@@ -17,13 +17,6 @@ export class LogTrail {
       sessionId: this.sessionId,
       postOnWall: this.postOnWall,
     };
-    store
-      .dispatch("logTrail/createLogTrail", ds, { root: true })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+    return store.dispatch("logTrail/createLogTrail", ds, { root: true });
   }
 }

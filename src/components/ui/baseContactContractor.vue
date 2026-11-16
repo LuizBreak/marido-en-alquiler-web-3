@@ -330,6 +330,10 @@ export default {
       }
     },
     async save() {
+ if (this.isSaving) return;
+ this.isSaving = true;
+ try {
+
       const result = await this.v$.$validate();
       if (!result) {
         return;
@@ -338,7 +342,7 @@ export default {
       try {
         this.message = new Message();
 
-        this.message.add(true, {
+        await this.message.add(true, {
           fromId: this.loggedUser.id,
           toId: this.id,
           quoteId: this.project.projectId,
@@ -359,7 +363,9 @@ export default {
       } catch (error) {
         this.triggerMsgBox(true, "Erro al registrar la solicitud. - " + error);
       }
-    },
+    
+ } finally { this.isSaving = false; }
+},
     resetForm() {
       this.mensaje = null;
     },

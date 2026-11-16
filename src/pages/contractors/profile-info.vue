@@ -564,6 +564,10 @@ export default {
       this.user.serviceTypes = this.parseServiceTypes(this.user.serviceTypes);
     },
     async onSubmit() {
+ if (this.isSaving) return;
+ this.isSaving = true;
+ try {
+
       const result = await this.v$.$validate();
       if (!result) {
         this.scrollToFirstInvalidField();
@@ -592,9 +596,9 @@ export default {
         }
 
         if (this.selectedFile) {
-          this.onUploadImage();
+          await this.onUploadImage();
           contractor.avatar = this.selectedFile.name;
-          this.setUserAvatar(contractor.id, contractor.avatar);
+          await this.setUserAvatar(contractor.id, contractor.avatar);
         }
 
         console.log("onSubmit", contractor);
@@ -610,7 +614,9 @@ export default {
           "No se pudo grabar el registro. Verifica la conexión e inténtalo de nuevo."
         );
       }
-    },
+    
+ } finally { this.isSaving = false; }
+},
     resolveContractorId() {
       const possibleIds = [
         this.user && this.user.id,
@@ -681,7 +687,7 @@ export default {
     async onDelete() {
       if (this.user.id) {
         if (confirm("Estas seguro que quieres eliminar este registro?")) {
-          this.$store.dispatch("contractors/deleteContractor", this.user);
+          await this.$store.dispatch("contractors/deleteContractor", this.user);
           this.resetFormData();
           this.$router.replace("/signout");
           document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -702,7 +708,7 @@ export default {
       this.user.avatar = this.selectedFile.name || "";
     },
     onUploadImage() {
-      s3Svc.uploadFile(this.selectedFile);
+      return s3Svc.uploadFile(this.selectedFile);
     },
   },
   computed: {
