@@ -147,7 +147,7 @@ Implementation commits: BE 16e846e; FE 9ba4971, 7d2a8df
 Dependencies for closure: R07, R10
 
 REMAINING ACCEPTANCE WORK
-CRUD promises, profiles/projects/bids/inquiries and uploads now wait for persistence; generated IDs are retained. Audit legacy booking/contact flows, complete server-side durable notifications and run browser failure/retry scenarios.
+CRUD promises, profiles/projects/bids/inquiries and uploads now wait for persistence; generated IDs are retained. The later missing-form-ID client save was corrected to update the signed-in account; the user confirmed save success. Audit legacy booking/contact flows, complete server-side durable notifications and run broader browser failure/retry scenarios.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `Quote.add`, `PayMethod.add`, several Vuex CRUD actions and generic `projects/save` do not return their underlying work. Generic project `save` catches errors with an empty callback. `baseProjectBid.vue` submits, notifies, resets and displays success synchronously. `addProject.vue` begins upload without awaiting it. `BaseBooking.vue` reports/reset actions independently of persistence completion.

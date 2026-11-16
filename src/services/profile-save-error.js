@@ -1,4 +1,7 @@
 export function profileSaveError(error) {
+  if (error.code === "CLIENT_ID_MISSING" || error.code === "CLIENT_ID_MISMATCH") {
+    return "No se pudo identificar tu perfil activo. Cierra sesion e inicia sesion de nuevo antes de guardar.";
+  }
   if (error.message === "Image storage is not configured.") {
     return "No se pudo guardar la foto: el almacenamiento de imagenes no esta configurado. Puedes guardar los datos sin seleccionar una foto.";
   }

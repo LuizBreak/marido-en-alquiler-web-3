@@ -120,7 +120,7 @@ Full original evidence and recommendation: [review report](review-report.md#r07-
 
 **Implementation commits:** BE 16e846e; FE 9ba4971, 7d2a8df.
 
-**Remaining acceptance work:** CRUD promises, profiles/projects/bids/inquiries and uploads now wait for persistence; generated IDs are retained. Audit legacy booking/contact flows, complete server-side durable notifications and run browser failure/retry scenarios.
+**Remaining acceptance work:** CRUD promises, profiles/projects/bids/inquiries and uploads now wait for persistence; generated IDs are retained. The later missing-form-ID client save was corrected to update the signed-in account; the user confirmed save success. Audit legacy booking/contact flows, complete server-side durable notifications and run broader browser failure/retry scenarios.
 
 **Dependencies for closure:** R07, R10.
 

@@ -307,6 +307,7 @@ import * as types from "../../utils/types.js";
 import { s3Svc } from "../../services/s3.services.js";
 import getUserAvatar from "../../mixins/getUserAvatar";
 import { profileSaveError } from "../../services/profile-save-error";
+import { clientProfileIdentity } from "../../services/client-profile-identity";
 
 // const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
@@ -382,21 +383,19 @@ export default {
       let stage = "validation";
       try {
         if (!(await this.v$.$validate())) return;
+        stage = "profile-identity";
+        const clientId = clientProfileIdentity(this.userId, this.user);
+        const client = { ...this.user, id: clientId };
         if (this.selectedFile) {
           stage = "image-upload";
           await this.onUploadImage();
           stage = "avatar-update";
-          await this.setUserAvatar(this.user.id, this.selectedFile.name);
+          await this.setUserAvatar(clientId, this.selectedFile.name);
         }
         stage = "profile-update";
-        if (!this.user.id) {
-          await this.$store.dispatch("clients/createClient", this.user);
-          this.user = await this.getUserCopy();
-          this.triggerMsgBox(true, "Registro realizado con exito.");
-        } else {
-          await this.$store.dispatch("clients/updateClient", this.user);
-          this.triggerMsgBox(true, "Registro actualizado con exito.");
-        }
+        await this.$store.dispatch("clients/updateClient", client);
+        this.user = { ...client };
+        this.triggerMsgBox(true, "Registro actualizado con exito.");
         this.selectedFile = null;
       } catch (error) {
         console.error("Client profile save failed", { stage, status: error.response?.status || null, code: error.code || "PROFILE_SAVE" });

@@ -12,7 +12,9 @@ That setup is running at **http://127.0.0.1:8080/**. The handoff check received 
 
 **Subsequent follow-up: client profile save.** The user confirmed scrolling works, then reported a generic save error while editing only text fields (no photo). The profile write was resending the entire database row, including timestamps/counters/account metadata, to the old AWS handler's direct `UPDATE ... SET ?`. The local FE now allowlists editable client fields, keeps the identity in the route, copies initial profile data synchronously, and reports distinct HTTP/network/storage failures without exposing server payloads. Three isolated regression checks cover the legacy success response, field filtering and form retention. A read-only AWS CORS/empty-record check passed; the agent did not submit profile writes to AWS. A user retry was requested; do not claim the exact live rejection was reproduced or fixed until that outcome is recorded.
 
-No next feature request has been selected beyond resolving the profile-save failure. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
+**Confirmed save-failure path:** The first cleanup did not resolve the user's failure. Their browser Console then showed `clients/createClient` followed by **POST `/clients` → 502**, with a missing CORS header masking the error. The existing profile was mistakenly taking the creation branch because form data lacked `id`. The local screen now resolves the numeric ID from the signed-in `userId`, validates any profile ID aliases against it, and always calls `clients/updateClient` for this account-edit screen. Missing/mismatched identity prevents the request; it never falls back to client creation. Two additional regression checks cover this exact missing-form-ID case and rejection of invalid identity (22 FE tests total). The user retried and explicitly confirmed "Save succeeded" and "worked". Save after page reload has not been separately checked. One proposed zero-row diagnostic PUT was rejected by automatic approval review and was not sent; only read-only AWS checks were performed by the agent. Do not repeat that rejected diagnostic request or bypass the rejection.
+
+The user confirmed the client text-profile save now works. No next feature request has been selected. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
 
 ## Repositories and Git state
 
@@ -56,10 +58,10 @@ Here `VUE_APP_ENV=production` selects the AWS API; Vue CLI still serves a develo
 
 ## Verification already completed
 
-- 20 FE isolated Node tests passed, including modal scroll-state and client profile-save regression cases.
+- 22 FE isolated Node tests passed, including modal scroll-state, filtered client profile writes and the missing-form-ID update regression.
 - 30 BE isolated Jest tests passed with DB access mocked.
 - BE TypeScript no-emit check passed.
-- 53 changed FE source files passed lint using the committed read-only workaround.
+- 54 changed FE source files passed lint using the committed read-only workaround.
 - Final FE production build passed, retaining bundle/image size warnings.
 - Build-time public env allowlisting was added after artifact scanning caught a local secret embedded by Vue CLI. The final scan found none of the checked sensitive local env values in 8 generated JS/map files. Temporary build output was removed.
 - The current local dev server compiled successfully and returned HTTP 200; user confirmed the populated client profile renders.
