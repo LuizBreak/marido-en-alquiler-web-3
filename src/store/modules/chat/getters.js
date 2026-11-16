@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { chatTimestamp } from '../../../services/chat-timestamp';
 
 export default {
   getParticipantById: (state) => (id) => {
@@ -20,11 +20,7 @@ export default {
     let messages = [];
     state.messages.forEach((message) => {
       let newMessage = { ...message };
-      try {
-        newMessage.timestamp = DateTime.fromISO(newMessage.timestamp);
-      } catch (error) {
-        console.log("no need to convert to ISO");
-      }
+      newMessage.timestamp = chatTimestamp(newMessage.timestamp);
       messages.push(newMessage);
     });
     return messages;

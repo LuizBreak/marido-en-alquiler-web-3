@@ -33,7 +33,8 @@
         </div>
       </template>
       <div class="message-timestamp" :style="{ 'justify-content': 'flex-end' }">
-        <template v-if="timestampConfig.relative">
+        <template v-if="!message.timestamp?.isValid">—</template>
+        <template v-else-if="timestampConfig.relative">
           {{ message.timestamp.toRelative() }}
         </template>
         <template v-else>
