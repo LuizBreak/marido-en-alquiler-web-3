@@ -10,23 +10,39 @@ No remote tickets were created. [CSV](asana-tickets.csv) contains all 21 import-
 | [R02](#r02) | P0 | Partial; deployed and verified | API authentication and resource ownership are not enforced in reviewed code |
 | [R03](#r03) | P0 | Partial; unsafe flow disabled | Raw card and security-code persistence path |
 | [R04](#r04) | P0 | Verified development guard | Local/offline backend can connect to production |
-| [R05](#r05) | P0 | Partial; credential paths isolated | Passwords, tokens and private payloads can reach storage/logging/responses |
-| [R06](#r06) | P1 | Code implemented; integration verification pending | Session lifetime, restoration and navigation checks disagree |
+| [R05](#r05) | P0 | Partial; signup credential logging removed | Passwords, tokens and private payloads can reach storage/logging/responses |
+| [R06](#r06) | P1 | Partial; browser refresh verified | Session lifetime, restoration and navigation checks disagree |
 | [R07](#r07) | P1 | Deployed; API verified | Response helper changes data shape and discards results |
-| [R08](#r08) | P1 | Partial | Missing promise propagation produces premature success and lost errors |
-| [R09](#r09) | P1 | Partial; provisioning deployed | Signup and generated-ID handling are not reliable |
+| [R08](#r08) | P1 | Partial; core persistence feedback verified | Missing promise propagation produces premature success and lost errors |
+| [R09](#r09) | P1 | Partial; real email confirmation verified | Signup and generated-ID handling are not reliable |
 | [R10](#r10) | P1 | Deployed; principal routes verified | Primary keys, route parameters and SQL names disagree |
-| [R11](#r11) | P1 | Partial; API routes deployed | FE invokes undeclared routes/actions |
+| [R11](#r11) | P1 | Partial; contractor navigation repaired | FE invokes undeclared routes/actions |
 | [R12](#r12) | P1 | Partial; live schema reconciled | SQL, TypeScript interfaces and payloads have drifted |
-| [R13](#r13) | P1 | Code implemented; integration verification pending | FE state updates include concrete collection bugs |
+| [R13](#r13) | P1 | Partial; affected browser flows verified | FE state updates include concrete collection bugs |
 | [R14](#r14) | P1 | Partial; boundary deployed | SQL input handling and Lambda error paths need consolidation |
-| [R15](#r15) | P1 | Partial; API read state verified | Chat read state and connection lifecycle are inconsistent |
-| [R16](#r16) | P1 | Partial; secure photos deployed | Image upload integrity and private ownership are undefined |
+| [R15](#r15) | P1 | Partial; persistence verified; realtime delivery open | Chat read state and connection lifecycle are inconsistent |
+| [R16](#r16) | P1 | Partial; photo display browser-verified | Image upload integrity and private ownership are undefined |
 | [R17](#r17) | P2 | Partial; release path documented | Multiple backend execution/configuration paths obscure the source of truth |
-| [R18](#r18) | P2 | Partial; runtime/package repaired | Dependency and verification baseline is weak |
+| [R18](#r18) | P2 | Partial; 68 BE and 41 FE checks pass | Dependency and verification baseline is weak |
 | [R19](#r19) | P2 | Partial; browser SDK removed | Initial browser payload is large |
-| [R20](#r20) | P2 | Partial; hardened AWS dev release verified | Deployment, external services and operational ownership are incomplete |
-| [R21](#r21) | P2 | Partial | Product completion and component cleanup need explicit scope |
+| [R20](#r20) | P2 | Partial; workflow deployed; delivery integrations open | Deployment, external services and operational ownership are incomplete |
+| [R21](#r21) | P2 | Partial; atomic project acceptance deployed | Product completion and component cleanup need explicit scope |
+
+## Latest journey acceptance
+
+[Journey release](releases/2026-11-16-journey.md) supersedes earlier pending-browser/quote-atomicity notes below. The CSV retains the original evidence and appends the current status to the same 21 records.
+
+- **R05 — Partial; signup credential logging removed:** Signup no longer logs passwords or confirmation codes, and no unauthenticated registration audit write is emitted. Broader historical log/secret review remains. FE a884f2e.
+- **R06 — Partial; browser refresh verified:** Configure Cognito before restoring cached sessions; authenticated reload passed locally and on the published build. Expired-session/refresh-token and broader navigation cases remain. FE cfe6f4f, 9dce372.
+- **R08 — Partial; core persistence feedback verified:** Bid/review drafts survive rejected saves; notification failure cannot turn a saved bid into a reported persistence failure. Chat persists before broadcast and no longer invents read receipts. FE 0016b31, c68ba4e.
+- **R09 — Partial; real email confirmation verified:** Client signup, invalid-code feedback, Gmail code receipt, valid confirmation and automatic verified sign-in passed in Chrome. Contractor test accounts used administrator creation; their public email signup flow remains acceptance scope.
+- **R11 — Partial; contractor navigation repaired:** Contractor messages/security/reviews/projects now resolve within their own layout; GET /projects?mine=true scopes assignments by verified identity without new AWS resources. FE ae9a87e; BE 89c6b49.
+- **R13 — Partial; affected browser flows verified:** Project tiles resolve partner details locally instead of replacing the signed-in contractor. Acceptance uses committed server quote/project data. Broader store cleanup remains. FE 5648bfa, 48b7998.
+- **R15 — Partial; persistence verified; realtime delivery open:** Saved chat renders once and survives recipient reload. WebSocket startup cannot block history; conversation matching is synchronous and fake delivered/read timers were removed. WebSocket presence opens but immediate private delivery failed; investigate the separate service/protocol and identity checks. FE 2d809e7, c68ba4e.
+- **R16 — Partial; photo display browser-verified:** Profile upload/display passed in Chrome; generated project photo keys now render via safe S3 URLs. Orphan cleanup/retention and private-document storage remain. FE 5648bfa.
+- **R18 — Partial; 68 BE and 41 FE checks pass:** Current release passed 68 BE tests, TypeScript, 41 FE tests, lint of 65 changed source files, production build, known-secret scans and actual API/browser checks. Older prototype/build-tool dependency findings remain.
+- **R20 — Partial; workflow deployed; delivery integrations open:** 76 final Node 24 Lambda hashes and stack completion verified. FE published with all 187 asset checksums checked first, index last, old assets retained and CDN completed. Notification mailer conch-app.com fails DNS; WebSocket private delivery remains open. Cognito registration email works.
+- **R21 — Partial; atomic project acceptance deployed:** Client offer review/acceptance, project completion and pending participant review passed in Chrome. Competing acceptance has one winner, stale terms get 409, retry is idempotent. Accepted terms and lifecycle transitions are guarded. Broader moderation/edit/cancellation/reassignment/product decisions remain. BE fcd40ad; FE 48b7998.
 
 ## R01
 

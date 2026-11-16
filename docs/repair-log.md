@@ -1,6 +1,6 @@
 # Restart repairs and commit ledger
 
-Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the latest hardening release record](releases/2026-11-16-hardening.md) for current deployment/acceptance status and compatible rollback.
+Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the latest journey release record](releases/2026-11-16-journey.md) for current deployment/acceptance status and compatible rollback.
 
 ## Backend release repairs
 
@@ -122,3 +122,18 @@ The user accepted the recommended next batch. It is deployed and verified: [hard
 55 BE and 30 FE tests, TypeScript, changed-source lint and build passed. Real development Cognito/MySQL/API/S3 acceptance covered successful client/contractor/project photos and rejected unsafe uploads. All fixtures were removed. A temporary Lambda directly proved the final execution role can read the app secret and cannot read the admin secret; it was removed. The old exposed upload key is inactive and the old admin password fails. Both public FE hostnames, all 76 Node 24 hashes/app identities, stack completion and CDN invalidation were verified. No Git push occurred.
 
 Rollback uses the previous application code with current compatible runtime/MySQL and restricted credentials: directly reusing the old MySQL driver failed after authentication rotation. The compatible rollback passed disposable core flows; a stack rollback was not executed. Remaining scope is in the updated ticket ledger, including browser lifecycle acceptance, quote atomicity, delivery integrations, payments/product choice, pagination, orphan handling, CI/restore and prototype/build-tool cleanup. The stack is at 486/500 resources.
+
+
+## Browser registration and project workflow — November 16, 2026
+
+Deployed; complete evidence, commit table, limits and rollback: [journey release](releases/2026-11-16-journey.md).
+
+FE a884f2e removes signup password/code logs; cfe6f4f/9dce372 configure Cognito before restoration; 5648bfa fixes photo display and actor-store replacement; 48b7998 adds reviewed offer acceptance/completion; 0016b31 retains failed drafts and distinguishes saved bids from failed notifications; 2d809e7 decouples chat history from socket startup and fixes synchronous participant matching; ae9a87e repairs contractor account routes/assignment lists; c68ba4e removes duplicated outgoing chat and fake delivery/read timers, and persists before broadcast.
+
+BE fcd40ad implements project-first transactional quote acceptance and lifecycle/review guards; 2285290 tests real competing offers and stale terms; 89c6b49 adds identity-scoped own-work queries without new routes; aeebd7d verifies client/contractor isolation through API Gateway.
+
+68 BE and 41 FE tests, TypeScript, lint (65 changed source files), build and known-secret scans passed. Real Gmail confirmation, refreshed login, profile text/photo, project creation/search, bidding, acceptance, completion and pending review passed in Chrome. Live API races have one winner and an idempotent retry; the losing/stale request gets 409. Chat persists and renders once after reload. No schema migration; 76 matching Node 24 artifacts and 486 stack resources. Both frontend hostnames serve the new index; old assets retained for rollback. No Git push.
+
+Open findings: conch-app.com mailer DNS failure prevents bid notification email, while Cognito registration email works; WebSocket opens/presence succeeds but immediate private delivery failed. These services remain next priorities, along with moderation/lifecycle denial coverage. They were not falsely marked complete. Test inbox and plus alias were user-authorized; existing accounts were untouched and disposable SQL/Cognito/S3 fixtures cleaned up. Rollback was captured, not executed.
+
+Published-site acceptance caught the client role getter casing after contractor navigation changes. FE cb7ef48 corrects the offers panel visibility; the corrected build was republished and the final browser check requires a visible client offers panel and no contractor acceptance controls.
