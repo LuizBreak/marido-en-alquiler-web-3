@@ -101,7 +101,7 @@
               class="btn btn-primary d-block w-100 mb-4"
               type="submit"
               @click.prevent="save"
-              :disabled="v$.$error"
+              :disabled="isSaving || v$.$error"
             >
               Hacer Oferta
               <i class="fi-send me-3" aria-hidden="true"></i>
@@ -141,6 +141,7 @@ export default {
     return {
       bidPrice: null,
       bidDescription: null,
+      isSaving: false,
     };
   },
   validations() {
@@ -159,38 +160,23 @@ export default {
   },
   methods: {
     async save() {
- if (this.isSaving) return;
- this.isSaving = true;
- try {
-
-      const result = await this.v$.$validate();
-      if (!result) {
-        return;
-      }
-      this.quote = new Quote(
-        this.projectId,
-        this.loggedUser.id,
-        this.bidPrice,
-        this.bidDescription,
-        this.date(Date.now(), "YYYY-MM-DD hh:mm:ss a")
-      );
-
+      if (this.isSaving) return;
+      this.isSaving = true;
       try {
-        const saved = await this.quote.add();
+        if (!(await this.v$.$validate())) return;
+        const quote = new Quote(this.projectId, this.loggedUser.id, this.bidPrice, this.bidDescription, this.date(Date.now(), 'YYYY-MM-DD HH:mm:ss'));
+        let saved;
+        try { saved = await quote.add(); }
+        catch (_) { this.triggerMsgBox(true, 'No se pudo guardar la oferta. Tus datos siguen en el formulario.'); return; }
         let notificationFailed = false;
-        try { const notice = await this.notifyClient(saved.quoteId); notificationFailed = !!notice.notificationFailed; } catch (_) { notificationFailed = true; }
-
+        try { const notice = await this.notifyClient(saved.quoteId); notificationFailed = !!notice.notificationFailed; }
+        catch (_) { notificationFailed = true; }
         this.resetForm();
-        this.triggerMsgBox(true, notificationFailed ? "Oferta guardada. No se pudo enviar la notificacion." : "Tu oferta fue enviada al cliente.");
-        this.dismissModal("#modal-bid-" + this.projectId);
-        this.sysLogIt();
-      } catch (error) {
-        console.log("bid error", error);
-        this.triggerMsgBox(true, "Erro al registrar la oferta. - " + error);
-      }
-    
- } finally { this.isSaving = false; }
-},
+        try { await this.dismissModal('#modal-bid-' + this.projectId); } catch (_) { /* The quote is already saved. */ }
+        this.triggerMsgBox(true, notificationFailed ? 'Oferta guardada. No se pudo enviar la notificación.' : 'Tu oferta fue enviada al cliente.');
+        try { await this.sysLogIt(); } catch (_) { /* Activity logging cannot undo the saved quote. */ }
+      } finally { this.isSaving = false; }
+    },
     async notifyClient(quoteId) {
       await this.getClientInfoProjectId(this.projectId);
 
@@ -251,7 +237,7 @@ export default {
         this?.loggedUser?.id,
         "Offer To: " + this.client.email,
         this.$options.name,
-        this.user.signInUserSession?.idToken?.jwtToken,
+        null,
         true
       );
     },

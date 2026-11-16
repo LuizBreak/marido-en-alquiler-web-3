@@ -85,11 +85,12 @@
               </div>
             </div>
 
+            <p v-if="reviewError" class="text-danger" role="alert">{{ reviewError }}</p>
             <button
               class="btn btn-primary d-block w-100 mb-4"
               type="submit"
               @click.prevent="onSubmit"
-              :disabled="v$.review.$error"
+              :disabled="isSaving || v$.review.$error"
             >
               Grabar Comentario
               <i class="fas fa-bullhorn me-3" aria-hidden="true"></i>
@@ -129,6 +130,8 @@ export default {
   data() {
     return {
       review: {},
+      reviewError: "",
+      isSaving: false,
     };
   },
   validations() {
@@ -149,30 +152,16 @@ export default {
   },
   methods: {
     async onSubmit() {
-      const result = await this.v$.$validate();
-
-      if (!result) {
-        return;
-      }
-
-      const dataSet = {
-        reviewedById: this.reviewedById,
-        reviewedToId: this.reviewedToId,
-        projectId: this.projectId,
-        title: this.projectTitle,
-        comments: this.review.comments,
-        rating: this.review.rating,
-        updatedAt: this.date(Date.now(), "YYYY-MM-DD hh:mm:ss a"),
-        isApproved: 0,
-      };
-
-      this.$store.dispatch("reviews/createReview", dataSet).then(() => {
-        this.dismissModal("#modal-review-" + this.projectId);
-        this.triggerMsgBox(
-          true,
-          "Registro realizado con éxito. Gracias por tu comentario. El nos ayuda a mejorar el sistema"
-        );
-      });
+      if (this.isSaving) return;
+      this.isSaving = true; this.reviewError = '';
+      try {
+        if (!(await this.v$.$validate())) return;
+        try { await this.$store.dispatch('reviews/createReview', { reviewedToId: this.reviewedToId, projectId: this.projectId, title: this.projectTitle, comments: this.review.comments, rating: this.review.rating }); }
+        catch (error) { this.reviewError = error.response?.status === 409 ? 'Ya has dejado una reseña o el proyecto todavía no está completado.' : 'No se pudo guardar el comentario. Tus datos siguen en el formulario.'; return; }
+        this.review = {};
+        await this.dismissModal('#modal-review-' + this.projectId);
+        this.triggerMsgBox(true, 'Comentario guardado. Queda pendiente de revisión antes de publicarse.');
+      } finally { this.isSaving = false; }
     },
     setRating: function (rating) {
       this.review.rating = rating;
