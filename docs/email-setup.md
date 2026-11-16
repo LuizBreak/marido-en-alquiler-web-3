@@ -1,6 +1,14 @@
 # Domain inbox setup — November 16, 2026
 
-Status: **Pending Zoho account access and domain-verification values. No mail DNS changes have been applied.**
+Status: **Zoho ownership TXT published and verified through public DNS. Awaiting the user clicking Verify TXT Record in Zoho, then mailbox creation and account-specific mail routing records.**
+
+## November 16 setup progress
+
+- The user created a Zoho organization and supplied a confirmation screen showing a paid Mail Lite 5GB annual subscription, renewing November 15, 2027. The earlier free-plan preference is superseded by this observed subscription; no subscription changes were performed by the assistant.
+- Zoho supplied the Canada data-center verification value `zoho-verification=zb74880215.zmverify.zohocloud.ca` for the domain apex.
+- Created only the apex TXT record with TTL 300 through Route 53 change `C01718321MU3S86ZSB66V`. A Google public DNS lookup returned the exact value. Existing website, certificate and name-server records were preserved. Mail routing has not been configured.
+- Change batch: `.deployments/mail-20261116/zoho-verification.json`. Reversal: delete only this exact TXT record set, provided it still contains only the verification value. Preserve any subsequently added SPF or other TXT values.
+- TinyFish installation was reported by plugin discovery, but no TinyFish browser tools were exposed in this session. The user is completing Zoho account steps directly.
 
 The user requested two separate inboxes/logins for `hello@marido-en-alquiler.com` and `notifications@marido-en-alquiler.com`, and then requested a free provider. Zoho Mail Free was recommended; availability depends on the signup data center. Do not sign up for a paid plan or substitute forwarding/aliases for the two requested users.
 
@@ -14,9 +22,9 @@ The user requested two separate inboxes/logins for `hello@marido-en-alquiler.com
 
 ## Required next steps
 
-1. Obtain a Zoho administrator session through a connected browser or have the user complete Zoho signup/verification. A browser automation connection was suggested but is not confirmed installed/connected. There is no Zoho Mail admin connection in this session; the Zoho CRM connector does not administer mailboxes.
-2. Select the Free organizational plan where offered, add the existing domain marido-en-alquiler.com, and obtain its unique TXT or CNAME verification value. Confirm administrator/recovery contact details with the user; do not infer them from application test profiles.
-3. Add only that exact verification record in Route 53, validate public DNS, then verify domain ownership in Zoho.
+1. Have the user click Verify TXT Record on the current Zoho domain-verification screen. Signup and DNS publication are complete; Zoho-side verification is not yet confirmed.
+2. Continue using the user's existing organization and observed Mail Lite subscription; do not initiate any further purchase or subscription changes.
+3. Confirm domain ownership is accepted in Zoho before continuing with mailbox setup.
 4. Create two users, hello and notifications, with separate logins/inboxes. The user should manage passwords and any account/phone verification in Zoho's sign-in flow; never commit passwords, codes or browser sessions.
 5. Obtain the actual account/data-center-specific MX, SPF and DKIM values from Zoho. Snapshot current DNS again, prepare a record-only delta and rollback, then publish the applicable mail records without altering web records. Preserve unrelated TXT values and keep one SPF policy per DNS name. Do not guess MX/DKIM values from another data center.
 6. Verify mail routing and authentication, activate the mailboxes and test sending/receiving with user-authorized test destinations. Record actual outcomes; do not claim account creation or delivery without evidence.
