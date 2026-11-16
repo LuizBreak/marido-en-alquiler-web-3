@@ -2,6 +2,26 @@
 
 Updated November 16, 2026. Both repositories have local commits; nothing was pushed to Git remotes. **The FE was subsequently deployed to AWS; the BE remains undeployed.** See [the FE release record](releases/2026-11-16-frontend.md) for the release, verification and rollback. Original review documents remain historical snapshots. Current ticket status is in [asana-tickets.md](asana-tickets.md), with all 21 records prepared in [asana-tickets.csv](asana-tickets.csv).
 
+## Current acceptance and next authorized phase
+
+The user confirmed that the deployed FE seems to be working and explicitly requested this log/handoff update so the necessary backend changes and deployment can proceed. **Backend preparation, implementation, staging validation and deployment are now the next authorized objective.** Keep each fix in its own documented, reversible commit. No backend release has happened yet; the local candidate remains `b2b03cb`.
+
+FE application commit `1016467` is live at <https://www.marido-en-alquiler.com/>; release documentation checkpoint is `7ef12dd`. Production uses the existing API at `https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend` with the explicit legacy contract. The frontend release passed 24 isolated tests, source lint, build, artifact/checksum verification and three public modal/scroll browser checks. User confirmation is additional acceptance of observed live behavior, not a claim that every workflow was tested.
+
+AWS CLI access is already verified with profile `default`, account `907823072924`, region `us-east-1`, identity `luiz.break` through the permitted execution context. Earlier restricted-shell credential failures were misleading. Reuse/check that context before requesting another login. No Git push, backend deployment, IAM change, credential rotation or database migration was performed during the FE release.
+
+### Backend continuation sequence
+
+1. Inventory the actual API, CloudFormation stack, Lambda code/versions/configuration, logs and DB networking using read-only commands. Establish which resources serve the current endpoint; `/dev/` does not establish data isolation.
+2. Preserve the known-good backend deployment/configuration and establish rollback. Verify database backup/restore before any data/schema changes. The existing FE snapshot covers only static frontend hosting.
+3. Reconcile the live schema with source snapshots, especially account/profile required columns, ID shapes and casing. Build ordered migrations only where needed; mock-based tests do not establish MySQL compatibility.
+4. Fix deployment configuration: explicit target/stage, supported runtime, secret-backed DB environment settings and inspected packages. Current source requires DB environment variables that `serverless.yml` does not declare, and still specifies Node 18.
+5. Complete necessary authentication/ownership, contract, validation, provisioning and CORS/error work in separate commits. Maintain compatibility with the released FE; switch its legacy contract only after the companion BE paths are tested and available.
+6. Test against an isolated staging API and separate sanitized database. Cover registration, login/reload, profile writes, projects/quotes, favorites, messages/read flags and failures. Do not use real user records for incidental diagnostic writes.
+7. Prepare the concrete release artifact/target/change summary and rollback instructions, then deploy the authorized backend release when prerequisites pass. Record acceptance results, remaining limitations and rollback references here and in the handoff.
+
+This authorization permits progress on the agreed backend work without repeated generic permission requests. It does not supply a missing payment business model or remove the need to resolve material destructive/data decisions with a concrete plan. Photo-upload role permissions, payment tokenization and exposed-credential rotation remain explicitly open until implemented and verified. Do not repeat or indirectly bypass the previously rejected diagnostic PUT.
+
 ## Checkpoints
 
 | Repository | Commit | Contents |

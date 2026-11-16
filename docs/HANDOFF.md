@@ -1,94 +1,78 @@
 # Session handoff
 
-Saved November 16, 2026 (America/New_York). Read this file first when resuming work, then inspect Git status in both repositories before changing anything.
+Updated November 16, 2026 (America/New_York). Read this file and the repair log before resuming; inspect Git status in both repositories before changing anything.
 
-**Latest completed action: FE deployed to AWS.** The user explicitly requested frontend deployment. The release is live at `https://www.marido-en-alquiler.com/`, from application source commit `1016467`, with CloudFront invalidation completed and public-page modal/scroll checks passing. The backend, IAM, Cognito and database were not deployed or changed. Full details, verification, local backup and rollback commands are in [the frontend release record](releases/2026-11-16-frontend.md). AWS CLI `default` authentication was verified through the permitted execution context; earlier restricted-shell `NoCredentials` observations were misleading. Do not ask the user to log in again without checking that context. The user should now validate their signed-in workflows on the public site. Photo uploads remain unavailable pending secure cloud permission/configuration work.
+## Current outcome and next authorized objective
 
-## Where we stopped
+**The frontend is deployed and the user reports that everything seems to be working.** The user then explicitly requested updates to this handoff and the repair log so work can proceed on the necessary backend changes and deployment. Backend preparation, repairs, testing and deployment are the next authorized objective. The backend has not yet been deployed from the local repaired source.
 
-The user resumed development after a long pause. We reviewed both repositories, documented the product/architecture, prepared 21 review findings, and implemented an authorized repair batch with separate local commits. The user then asked to run **the FE locally against the existing AWS BE** for now.
+Continue that objective without asking the user to reauthorize routine fixes, per-fix commits, read-only AWS inventory or the already requested deployment. First establish live configuration/schema compatibility, isolated validation and rollback. Resolve material product decisions or destructive data changes with a concrete plan when needed; this authorization does not decide the payment business model or justify speculative live-data writes. Do not replace the working backend with the unverified local batch.
 
-That setup is running at **http://127.0.0.1:8080/**. The handoff check received HTTP 200. The user reported that everything seemed to work so far and supplied a screenshot of the signed-in client profile at `/perfil/info`, populated with account details. This is user confirmation of the observed profile flow, not acceptance of all workflows.
+## Repositories and checkpoints
 
-**Latest follow-up: page scrolling.** The user reported that the client profile would not scroll. An isolated browser reproduced two sign-in backdrops and a lingering `body.style.overflow = "hidden"` after dismissal. The FE now uses one modular Bootstrap runtime, removes the legacy Bootstrap 3 script, restores scroll state only after modal close, and preserves locks for other open overlays. Browser checks passed for sign-in close, dismissal during the opening transition, and the save-message dialog: one backdrop while open, none after closing, and the page scrolls. HTTPS requests were blocked in that test browser; no AWS writes occurred. The user should refresh the local page and confirm the profile scrolls.
+- FE workspace: C:/Users/leste/OneDrive/Desktop/Target-Innovations/01-Active-Projects/Target - marido-en-alquiler-web-3
+- BE companion: C:/Users/leste/OneDrive/Desktop/Target-Innovations/01-Active-Projects/marido-en-alquiler-backend
+- FE branch: master. Latest checkpoint before this documentation update: 7ef12dd. Released application source: 1016467.
+- BE branch: main. Local repaired candidate: b2b03cb; no subsequent backend edits or deployment occurred during the FE release.
+- Original user edits were preserved in FE 65174fc and BE 3a4ccc4. Keep fixes in separate, documented, reversible commits; do not rewrite history or push Git changes without a request.
+- Tracked working trees were clean before this update. Preserve pre-existing untracked dist-build-check/ and dist-build-check-2/.
+- The ignored .deployments/ directory contains the FE build and rollback snapshot; preserve it. Old artifacts can contain exposed secrets and must remain outside Git.
 
-**Subsequent follow-up: client profile save.** The user confirmed scrolling works, then reported a generic save error while editing only text fields (no photo). The profile write was resending the entire database row, including timestamps/counters/account metadata, to the old AWS handler's direct `UPDATE ... SET ?`. The local FE now allowlists editable client fields, keeps the identity in the route, copies initial profile data synchronously, and reports distinct HTTP/network/storage failures without exposing server payloads. Three isolated regression checks cover the legacy success response, field filtering and form retention. A read-only AWS CORS/empty-record check passed; the agent did not submit profile writes to AWS. A user retry was requested; do not claim the exact live rejection was reproduced or fixed until that outcome is recorded.
+## Verified AWS access and live frontend
 
-**Confirmed save-failure path:** The first cleanup did not resolve the user's failure. Their browser Console then showed `clients/createClient` followed by **POST `/clients` → 502**, with a missing CORS header masking the error. The existing profile was mistakenly taking the creation branch because form data lacked `id`. The local screen now resolves the numeric ID from the signed-in `userId`, validates any profile ID aliases against it, and always calls `clients/updateClient` for this account-edit screen. Missing/mismatched identity prevents the request; it never falls back to client creation. Two additional regression checks cover this exact missing-form-ID case and rejection of invalid identity (22 FE tests total). The user retried and explicitly confirmed "Save succeeded" and "worked". Save after page reload has not been separately checked. One proposed zero-row diagnostic PUT was rejected by automatic approval review and was not sent; only read-only AWS checks were performed by the agent. Do not repeat that rejected diagnostic request or bypass the rejection.
+- AWS account: 907823072924; CLI profile: default; verified IAM identity: luiz.break.
+- Region: us-east-1 for the production FE and current API.
+- AWS CLI is already authenticated. Restricted commands ran as CodexSandboxOffline and misleadingly returned no profiles/credentials. The permitted elevated execution context successfully used the existing default profile. Check that context before asking the user to sign in again. Never display or commit credential values.
+- Live FE: https://www.marido-en-alquiler.com/
+- S3: www.marido-en-alquiler.com; CloudFront: EI5JEIS37I445.
+- Release: fe-20261116T074953Z; invalidation IAJLGTCJ4TZYPAQVQ6QMTRJYU1 completed.
+- Release record and rollback: [releases/2026-11-16-frontend.md](releases/2026-11-16-frontend.md).
+- Existing API used by both released/local FE: https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend
+- The /dev/ stage name is not evidence that its database or users are disposable. Treat it as live until positively identified.
+- No Lambda/API Gateway, Cognito, IAM, database or DNS change occurred in the FE release. The user has now confirmed the released FE seems to work; that is user acceptance of observed behavior, not exhaustive workflow testing.
 
-The user confirmed the client text-profile save now works. No next feature request has been selected. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
+## Important FE behavior to preserve during backend work
 
-**Latest request: safe AWS deployment.** A local readiness assessment found no configured AWS CLI credentials (`sts get-caller-identity` returned `NoCredentials`), no declared Lambda DB environment variables in the manifest, unverified live schema and rollback, Node 18 runtime, and FE/BE contract changes needing staging. No AWS changes were performed. See [deployment-readiness.md](deployment-readiness.md) for concrete blockers and the proposed sequence. Next deployment work requires authenticating the intended account for read-only inventory, then preparing an isolated staging API/database and a reviewable release/rollback plan. Do not deploy the entire batch directly to the existing `/dev/` endpoint.
+- Text-profile saving works. Its actual failure was missing form identity causing POST /clients for an existing account, returning 502 without CORS headers. Commit 3f36a0a binds updates to the signed-in userId and prevents accidental creation. Commit fd92f97 filters editable fields. The user confirmed successful saves.
+- Scrolling works. Commit 8fa38e5 removed duplicate Bootstrap runtimes and fixed post-modal overflow cleanup; three browser scenarios passed.
+- The released FE explicitly uses the legacy API contract. Commit 1016467 accepts both account ID result formats, supplies blank legacy required fields without sending Cognito passwords, and retains the legacy composite favorite-delete request until the revised BE is active. Coordinate any switch to VUE_APP_API_CONTRACT=v2 with a separately tested FE release.
+- Photo uploads remain unavailable. The existing authenticated Cognito role amplify-marido-dev-111757-authRole evaluated as implicitDeny for s3:PutObject in marido-image-bucket. The browser now requires temporary credentials and explicit storage configuration; do not restore long-lived access keys. No IAM repair has been made.
+- Payment handling remains a product/security decision: raw card/CVC persistence exists in the old flow. The user has not selected off-platform payment, provider checkout or marketplace payouts. Do not invent that model or treat payment redesign as completed.
 
-## Repositories and Git state
+## Backend work: start here
 
-- **FE workspace:** `C:\Users\leste\OneDrive\Desktop\Target-Innovations\01-Active-Projects\Target - marido-en-alquiler-web-3`
-- **BE companion:** `C:\Users\leste\OneDrive\Desktop\Target-Innovations\01-Active-Projects\marido-en-alquiler-backend`
-- FE branch: `master`; original repair documentation checkpoint: `bd9e33f`; initial handoff: `e1f9159`. Inspect current HEAD for the subsequent scrolling-fix commit.
-- BE branch at handoff: `main`; latest commit: `b2b03cb`.
-- Both tracked working trees were clean before creating this handoff. FE has pre-existing untracked `dist-build-check/` and `dist-build-check-2/`; preserve them.
-- Existing user edits were checkpointed first: FE `65174fc`, BE `3a4ccc4`. Detailed fix/companion commits: [repair-log.md](repair-log.md).
-- **FE has now been deployed; Git commits have not been pushed. Local BE repairs are not active on AWS.** The released FE explicitly retains compatibility with the deployed legacy API; consult the release record before changing contracts.
+1. Read [deployment-readiness.md](deployment-readiness.md), [review-report.md](review-report.md), [api-and-data.md](api-and-data.md) and current BE source. Those assessments contain historical observations; verify live facts rather than assuming cached artifacts match AWS.
+2. With the verified default profile, inventory the actual API, Lambda integrations/versions/configuration, CloudFormation stack, logs and database networking. Compare the current endpoint with the local service definition. Use read-only inspection first and redact secrets.
+3. Capture a known-good backend code/configuration/deployment reference and establish executable rollback. Verify database backup/restore before schema changes. The FE backup is not a backend or database backup.
+4. Reconcile the live schema using safe schema-only access. The snapshots are not migrations. Accounts have legacy NOT NULL columns, profile fields/casing differ, and mocked SQL tests have not validated inserts against real MySQL.
+5. Prepare explicit stage/account/region settings, a supported Lambda runtime, secret-backed DB settings and verified packaging. Current serverless.yml declares nodejs18.x and no Lambda DB environment variables, while the new DB helper requires DB_HOST, DB_NAME, DB_USER, DB_PASSWORD and appropriate NODE_ENV. Do not deploy without resolving this mismatch.
+6. Finish required contract, authentication/ownership, validation, provisioning and error/CORS repairs in separate commits. Preserve currently working FE behavior and explicitly track incomplete features. Current local helpers are a starting point, not a fully accepted backend.
+7. Validate on an isolated staging API and isolated database with sanitized data. A second Lambda stage connected to the live DB is not isolation. Test registration, login/reload, profiles, projects/quotes, favorites, messages/read state and failure behavior, including existing FE compatibility.
+8. Produce the concrete artifact/target/change summary, passing checks and rollback procedure, then execute the authorized backend release when ready. Verify public behavior and record the deployment, remaining limits and rollback references. Stop for a real unresolved risk or missing decision; do not repeatedly ask generic permission for the agreed work.
 
-## User instructions and preferences
+One proposed zero-row diagnostic PUT to AWS was rejected by automatic approval review and was not sent. Do not repeat or indirectly bypass that request. Existing error logs, read-only inspection and isolated tests are the appropriate diagnostic paths. During prior repair work, all successful live application saves were performed by the user.
 
-- Continue collaborating until the requested work is complete; avoid repeated permission questions for already authorized routine work.
-- The user explicitly authorized commits between fixes. Keep each fix independently reviewable and reversible, with the problem/change/verification recorded in its commit.
-- Preserve existing work and generated directories. Do not rewrite history.
-- Current setup: the FE is published on AWS and also available locally; both use the existing AWS BE. Do not switch to a local backend or deploy backend repairs merely because the next session starts.
-- Asana publishing is **deferred at the user's request**. Keep tickets locally for later import. No Asana tasks were created.
-- Production data changes, credential rotation, cloud configuration and deployment were not performed by this batch. Do not perform incidental live writes as part of a smoke check.
+## Checks already completed
 
-## Restarting the frontend
+- Released FE: 24 isolated tests; lint passed for 55 changed source files; production build passed with existing bundle/image size warnings.
+- Release artifacts: entry-point references verified; checked local secret values absent; all 187 uploaded asset checksums matched before index publication. The public hostname and CloudFront hostname served the exact new index.
+- Three production-build and public-page browser checks passed: sign-in close, close during opening transition and save-message close, each confirming page scrolling and no leftover backdrop/lock. Test browser blocked application API/Cognito calls.
+- Local BE candidate: 30 isolated Jest tests with DB mocked and TypeScript no-emit passed previously. No full staging/live-schema acceptance or backend deployment has happened.
+- Exposed credentials in old files/history still require rotation. No rotation or schema/data migration has occurred.
 
-The dev process may stop when the application/session closes. Check port 8080 before launching another server.
+## Local FE and operational preferences
 
-```powershell
-Set-Location 'C:\Users\leste\OneDrive\Desktop\Target-Innovations\01-Active-Projects\Target - marido-en-alquiler-web-3'
+The local FE was left on http://127.0.0.1:8080/ using AWS BE; the process may stop when the app/session closes. Check before restarting. In the FE folder:
+
+~~~powershell
 $env:VUE_APP_ENV = 'production'
 npm.cmd run serve -- --host 127.0.0.1 --port 8080
-```
+~~~
 
-Here `VUE_APP_ENV=production` selects the AWS API; Vue CLI still serves a development build locally. FE `.env` already selects that API, and generated `src/aws-exports.js` exists locally. No secrets should be printed or committed. PowerShell blocks `npm.ps1` on this machine; use `npm.cmd`.
+Here VUE_APP_ENV selects the remote API; Vue CLI still runs a local development server. Use npm.cmd because this machine blocks npm.ps1. Keep local env/generated Amplify files untracked. Windows companion-repository edits and Git/cloud operations may require the permitted elevated tool context.
 
-## Known limits affecting the current setup
+Asana remains deferred. No remote tickets were created. Keep [asana-tickets.md](asana-tickets.md) and [asana-tickets.csv](asana-tickets.csv) updated as backend findings close. Do not restart Asana connection troubleshooting unless requested.
 
-- AWS still runs its previous BE version. Some local FE fixes expect companion BE changes, notably the new signup creation-ID response and explicit composite favorite deletion route. Do not claim these are working against AWS until verified or deployed through an agreed process.
-- Browser S3 code now uses temporary authenticated Cognito credentials. Uploads need `VUE_APP_IMAGE_BUCKET`, an appropriate identity pool and a scoped IAM role; the bucket variable was unset at the last configuration check. Uploads therefore are not confirmed working.
-- The local BE is not configured to run end-to-end. Its env files were missing required values including `DB_USER`; no local MySQL setup/schema reconciliation was done. The new configuration refuses accidental non-production remote DB access. Do not bypass it to reach production.
-- Hardcoded AWS credentials and public ping credential output were removed locally; exposed credentials in history/local files still require operator rotation. No rotation has happened.
-- Full API JWT/ownership enforcement, payment tokenization, actual schema migrations and several feature-completion tasks remain open. See ticket statuses; the entire review is not resolved.
-- “Payment redesign” was explained to the user: current code can persist raw card numbers/CVC; a future design should use provider-hosted/tokenized collection, or remove card collection if payment happens outside the platform. The user has **not chosen a payment/business model**.
+## Resuming the next session
 
-## Verification already completed
-
-- 22 FE isolated Node tests passed, including modal scroll-state, filtered client profile writes and the missing-form-ID update regression.
-- 30 BE isolated Jest tests passed with DB access mocked.
-- BE TypeScript no-emit check passed.
-- 54 changed FE source files passed lint using the committed read-only workaround.
-- Final FE production build passed, retaining bundle/image size warnings.
-- Build-time public env allowlisting was added after artifact scanning caught a local secret embedded by Vue CLI. The final scan found none of the checked sensitive local env values in 8 generated JS/map files. Temporary build output was removed.
-- The current local dev server compiled successfully and returned HTTP 200; user confirmed the populated client profile renders.
-- A targeted browser regression check now covers modal-close scrolling (`node tests/browser/modal-scroll.cjs`, using an isolated Chrome/Edge instance on debugging port 9223). No comprehensive user-journey automation, live DB/schema inspection, AWS authorizer audit, payment, email, upload or WebSocket integration test was completed.
-
-Commands and detailed limits are in [repair-log.md](repair-log.md). Repeat checks when new changes or evidence warrant them.
-
-## Documents and Asana
-
-- [Documentation index](README.md)
-- [Original architecture assessment](architecture.md)
-- [Original API/data assessment](api-and-data.md)
-- [Original 21-finding review](review-report.md)
-- [Implemented repairs, commits, configuration and rollback](repair-log.md)
-- [Current ticket ledger](asana-tickets.md)
-- [21 import-ready ticket records](asana-tickets.csv)
-
-Asana target project: <https://app.asana.com/1/1200400511518349/project/1201474712395202/board/1205115801994358>. The user installed Asana and supplied a screenshot confirming an account connection, but Asana task tools were not available in the active agent session. The user then explicitly deferred Asana. Do not restart connection troubleshooting unless requested.
-
-## Suggested resumption
-
-1. Read this handoff and the repair log; inspect both Git working trees and current branch heads.
-2. Confirm whether the FE server is still running. Restart with AWS BE only if needed.
-3. Tell the user that the last confirmed state was the working client profile and ask which change/workflow they want next if they have not already specified it.
-4. If continuing validation, distinguish existing AWS behavior from the un-deployed local BE fixes. Coordinate any write-based checks with the user's intended data changes.
-5. Continue separate commits per fix and update this handoff/ticket ledger when the state changes.
+Read this handoff and [repair-log.md](repair-log.md), check both repositories and the existing AWS identity, then begin the backend inventory and deployment-readiness work above. The user has already selected the next objective; do not ask which feature to work on next. Keep communicating findings and update the handoff/repair log after substantive changes or deployments.
