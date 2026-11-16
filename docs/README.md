@@ -10,6 +10,7 @@ Reviewed: November 15, 2026. This documentation covers the current working copie
 | [Development restart guide](development.md) | Configuration, local commands, verification results, and a suggested order for resuming development |
 | [Repair and commit log](repair-log.md) | Implemented changes, companion commits, validation, configuration changes and rollback |
 | [Asana ticket ledger](asana-tickets.md) | Current status and remaining work for all 21 review findings; includes a CSV for later import |
+| [AWS deployment readiness](deployment-readiness.md) | Current deployment blockers and proposed staging/rollback sequence |
 
 ## Repository scope
 

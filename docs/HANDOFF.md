@@ -16,6 +16,8 @@ That setup is running at **http://127.0.0.1:8080/**. The handoff check received 
 
 The user confirmed the client text-profile save now works. No next feature request has been selected. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
 
+**Latest request: safe AWS deployment.** A local readiness assessment found no configured AWS CLI credentials (`sts get-caller-identity` returned `NoCredentials`), no declared Lambda DB environment variables in the manifest, unverified live schema and rollback, Node 18 runtime, and FE/BE contract changes needing staging. No AWS changes were performed. See [deployment-readiness.md](deployment-readiness.md) for concrete blockers and the proposed sequence. Next deployment work requires authenticating the intended account for read-only inventory, then preparing an isolated staging API/database and a reviewable release/rollback plan. Do not deploy the entire batch directly to the existing `/dev/` endpoint.
+
 ## Repositories and Git state
 
 - **FE workspace:** `C:\Users\leste\OneDrive\Desktop\Target-Innovations\01-Active-Projects\Target - marido-en-alquiler-web-3`
