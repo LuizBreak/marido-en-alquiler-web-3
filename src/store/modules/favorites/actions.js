@@ -1,91 +1,22 @@
-import { apiSvc } from "../../../services";
-
-const resource = "favorites";
-
+import { apiSvc } from "../../../services/api.service";
+import { createCrudActions } from "../../crud-actions";
 export default {
-  fetchFavorites({ commit }) {
-    apiSvc
-      .get(resource)
-      .then((response) => {
-        commit("SET_FAVORITES", response.data.body);
-      })
-      .catch((error) => {
-        console.log("There was an error fetching favorites: " + error.message);
-      });
-  },
-  fetchFavorite({ commit }, data) {
-    apiSvc
-      .getById(resource, data.id)
-      .then((response) => {
-        // console.table(response.data);
-        commit("SET_FAVORITE", response.data.data);
-      })
-      .catch((error) => {
-        console.log("There was an error fetching favorite: " + error.message);
-      });
-  },
-  async createFavorite({ commit }, favorite) {
-    // TODO: investigate how
-    // first delete any possible previous occurrence of this favorite
-    // await this.deleteFavorite(commit, favorite);
-
-    apiSvc
-      .post(resource, favorite)
-      .then(() => {
-        commit("ADD_NEW_FAVORITE", favorite);
-      })
-      .catch((error) => {
-        console.log("There was a problem creating favorite: " + error.message);
-      });
-  },
+  ...createCrudActions({ resource: "favorites", singular: "Favorite", plural: "Favorites", mutation: "FAVORITE", listMutation: "SET_FAVORITES" }),
   async deleteFavorite({ commit }, favorite) {
-    const requestData = {
-      method: "delete",
-      url: "/favorites/" + favorite.id,
-      data: favorite,
-    };
-    apiSvc.customRequest(requestData).then(() => {
-      commit("DELETE_FAVORITE", favorite);
-    });
-
-    // Attention: it needed more complex delete request than the startard one
-    // apiSvc.delete(resource, favorite).then(() => {
-    //   commit("DELETE_FAVORITE", favorite);
-    // });
-  },
-  updateFavorite({ commit }, favorite) {
-    apiSvc
-      .update(resource, favorite)
-      .then(() => {
-        commit("UPDATE_FAVORITE", favorite);
-      })
-      .catch((error) => {
-        console.log("there was an error updating favorite: " + error.message);
-      });
-  },
-  async fetchMyFavorites(clientId) {
-    const requestData = {
-      method: "get",
-      url: "/favorites/clients/58",
-      data: clientId,
-    };
-    try {
-      const response = await apiSvc.customRequest(requestData);
-      return response.data.body;
-    } catch (error) {
-      // console.log("fetchMyFavorites: error : " + error);
-      return {};
+    const id = favorite.Id ?? favorite.id;
+    if (id != null) {
+      await apiSvc.delete("favorites", favorite);
+    } else {
+      if (!favorite.clientId || !favorite.contractorId) throw new Error("Favorite owner and professional are required.");
+      await apiSvc.customRequest({ method: "delete", url: "/favorites/clients/" + encodeURIComponent(favorite.clientId) + "/contractors/" + encodeURIComponent(favorite.contractorId) });
     }
-    // try {
-    //   apiSvc.customRequest(requestData).then((response) => {
-    //     console.log("fetchMyFavorites response", response);
-    //     console.log("fetchMyFavorites body:", response.data.body);
-    //     // commit("SET_FAVORITES", []);
-
-    //     return response.data.body;
-    //   });
-    // } catch (error) {
-    //   console.log("fetchMyFavorites error", error);
-    // }
+    commit("DELETE_FAVORITE", favorite);
+    return favorite;
+  },
+  async fetchMyFavorites({ rootGetters }, clientId) {
+    const owner = clientId ?? rootGetters.userId;
+    if (!owner || owner === "undefined" || owner === "null") throw new Error("A client identity is required.");
+    const response = await apiSvc.get("favorites/clients/" + encodeURIComponent(owner));
+    return response.data.data;
   },
 };

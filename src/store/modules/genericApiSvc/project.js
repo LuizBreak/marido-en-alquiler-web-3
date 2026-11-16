@@ -1,3 +1,4 @@
+import { upsertEntity } from "../../entity-state";
 /* eslint-disable no-unused-vars */
 export default {
   namespaced: true,
@@ -20,10 +21,9 @@ export default {
         state.projects.push(x);
       }
     },
-    SET_PROJECT: (state, payload) =>
-      (state.projects[
-        state.projects.findIndex((project) => project.id === payload.id)
-      ] = payload),
+    SET_PROJECT(state, payload) {
+      if (payload) upsertEntity(state.projects, payload, "projectId");
+    },
     SOCKET_PROJECT: (state, payload) => {
       state.projects.push(payload);
     },

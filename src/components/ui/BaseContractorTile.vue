@@ -226,14 +226,14 @@ export default {
           // await this.$store
           //   .dispatch("favorites/deleteFavorite", data)
           //   .then(() => {
-          //     this.$store.dispatch("favorites/createFavorite", data);
+          //     await this.$store.dispatch("favorites/createFavorite", data);
           //   });
-          this.$store.dispatch("favorites/createFavorite", data);
+          await this.$store.dispatch("favorites/createFavorite", data);
 
           this.isFavoriteFlag = true;
         } else {
           // if client unlikes contractor, just delete it
-          this.$store.dispatch("favorites/deleteFavorite", data);
+          await this.$store.dispatch("favorites/deleteFavorite", data);
           this.isFavoriteFlag = false;
         }
       } catch (error) {
