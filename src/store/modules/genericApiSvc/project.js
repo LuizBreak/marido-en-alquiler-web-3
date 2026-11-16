@@ -29,6 +29,10 @@ export default {
     },
   },
   actions: {
+    async getMyProjects({ commit }) {
+      const data = await this.dispatch("index", "projects?mine=true");
+      commit("SET_PROJECTS", JSON.parse(data));
+    },
     async initStore({ state, commit }) {
       // Tesing Init calls from App
       // console.log("ini.Triggered", state);

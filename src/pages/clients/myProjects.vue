@@ -24,7 +24,7 @@
         :services="project.services"
         :ShowProvideReview="true"
       />
-      <ProjectOffers :project="project" />
+      <ProjectOffers v-if="IsClient" :project="project" />
       </div>
     </div>
 
@@ -56,7 +56,7 @@ export default {
           aria: "",
         },
         {
-          url: "/perfil/proyectos",
+          url: this.IsClient ? "/perfil/proyectos" : "/profile/proyectos",
           caption: "Mis Proyectos",
           isActive: true,
           aria: "page",
@@ -87,9 +87,7 @@ export default {
       this.isLoading = true;
 
       try {
-        await this.$store.dispatch("projects/getProjectsByClient", {
-          clientId: this.userId,
-        });
+        await this.$store.dispatch("projects/getMyProjects");
       } catch (error) {
         console.log("Error refreshing project list", error);
       } finally {

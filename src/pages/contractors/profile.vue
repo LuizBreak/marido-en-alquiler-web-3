@@ -73,21 +73,21 @@
                   <router-link class="card-nav-link active" to="/profile/info">
                     <i class="fi-user opacity-60 me-2"></i>Información Personal
                   </router-link>
-                  <router-link class="card-nav-link" to="/perfil/seguridad">
+                  <router-link class="card-nav-link" to="/profile/seguridad">
                     <i class="fi-lock opacity-60 me-2"></i>Contraseña &amp;
                     Seguridad
                   </router-link>
-                  <router-link class="card-nav-link" to="/perfil/proyectos">
+                  <router-link class="card-nav-link" to="/profile/proyectos">
                     <i class="fi-home opacity-60 me-2"></i>Mis Proyectos
                   </router-link>
-                  <router-link class="dropdown-item" to="/perfil/mensajes">
+                  <router-link class="card-nav-link" to="/profile/mensajes">
                     <i class="fi-chat-left opacity-60 me-2"></i>Mis Mensajes
                     <span
                       class="d-inline-block badge fw-bold bg-primary border-end pe-2 me-2 mx-3"
-                      >{{ loggedUser.numberOfRatings }}</span
+                      >{{ nrOfNewMessages }}</span
                     >
                   </router-link>
-                  <router-link class="card-nav-link" to="/perfil/reviews">
+                  <router-link class="card-nav-link" to="/profile/reviews">
                     <i class="fi-star opacity-60 me-2"> </i>Mis Comentarios
                   </router-link>
                   <router-link
@@ -135,7 +135,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters([types.LOGGED_USER, types.IS_LOGGED_IN]),
+    ...mapGetters([types.LOGGED_USER, types.IS_LOGGED_IN, "nrOfNewMessages"]),
   },
   created() {},
   mounted() {
