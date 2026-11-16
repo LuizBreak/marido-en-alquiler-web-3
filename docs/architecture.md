@@ -137,3 +137,7 @@ Most domain requests go directly from controller to mysql2. There is no consiste
 Retain the existing marketplace boundaries while first making one client/contractor journey reliable. Consolidate the backend execution path around the declared Lambda API, put identity/authorization and validation at its boundary, isolate SQL behind a small data layer, and normalize the response contract. Consolidate browser API calls into typed domain clients with predictable errors.
 
 Introduce migrations, safe development configuration and a small meaningful test suite before changing framework/build tooling broadly. Payment processing, notification delivery and WebSocket hosting need explicit ownership and acceptance criteria. These are proposals, not changes made by this review.
+
+## Latest deployment: restricted DB principal and signed photos
+
+The [hardening release](releases/2026-11-16-hardening.md) moves the app to Node 24 and a DML-only database account. The Lambda role no longer reads the administrator secret; its old password and the exposed browser-upload key were retired. Browser image writes use authenticated backend grants with exact random owner keys, short expiry, bounded size and safe types; persisted references also receive object-header validation. Account/profile image updates commit together. Photos remain public; orphan/replacement lifecycle work remains. The browser AWS SDK was removed. The stack now has 486 of 500 resources, so consolidate before growing infrastructure.

@@ -51,3 +51,5 @@ No deployment command should be run against the current service merely because t
 - [AWS Lambda function versions](https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html)
 
 Runtime dates, provider/tooling requirements and cloud state must be checked again when executing the release.
+
+Latest deployed state and rollback: [November 16 credential/runtime/photo release](releases/2026-11-16-hardening.md). Node 24, restricted application DB principal and working secure photos supersede older blockers here. Framework/plugin modernization and broader CI/restore work remain separate.

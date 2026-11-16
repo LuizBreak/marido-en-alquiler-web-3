@@ -27,3 +27,5 @@ Reviewed: November 15, 2026. This documentation covers the current working copie
 This is a development restart assessment, not an exhaustive security audit. No credentials are reproduced here. No AWS resources, email recipients, payment providers, or databases were contacted as part of the review. Existing build directories are not evidence of a current successful build.
 
 For a new change request, identify the actor, page or workflow, expected behavior, and acceptance criteria. Use the report IDs when requesting a repair, for example: “Fix R07 and make project creation show success only after the server confirms it.”
+
+Current release: [credentials, Node 24 and photo uploads](releases/2026-11-16-hardening.md); [credential actions](releases/2026-11-16-credentials.md). The initial review sections are historical; HANDOFF.md and the latest release are authoritative for deployed behavior.

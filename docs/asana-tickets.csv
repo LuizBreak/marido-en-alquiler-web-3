@@ -1,13 +1,13 @@
 "Name","Notes","Priority","Status","Dependencies","Section"
 "[R01] — Credentials committed in application source/configuration","Review ID: R01
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: FE 69b1b07, 22ba93b, c2facd0; BE 12c420c, 850cb3f
-Dependencies for closure: None
+Status: Partial; identified credentials retired
+Implementation commits: FE b8f7450; BE 0f92330
+Dependencies for closure:
 
-REMAINING ACCEPTANCE WORK
-Revoke/rotate exposed AWS/database credentials, review access history and coordinate history cleanup. Configure an authenticated Cognito identity pool, scoped S3 role and VUE_APP_IMAGE_BUCKET; uploads now fail closed without them. Existing ignored local files/history may still contain secrets.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Historical image-upload IAM key is inactive; CLI access was preserved. RDS admin password rotated and old login rejected. App now uses its own DML-only secret/account; effective Lambda admin-secret denial verified. Remaining: full history/provider-secret and access-history review, recurring rotation and coordinated history cleanup; old artifacts remain private.
+Latest evidence/rollback: docs/releases/2026-11-16-hardening.md; credentials: docs/releases/2026-11-16-credentials.md. All AWS resources are development; no remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `src/services/s3.services.js` defines an AWS access key and secret, constructs `S3` with them and is re-exported by `src/services/index.js`. FE `.env` is tracked. BE `.env`, `.env.development`, `.env.production` and `src/sequelizer/config/config.json` are tracked; database helpers contain/select credentials.
@@ -18,7 +18,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** No long-lived AWS/database secret is shipped to the browser or tracked in current source; old credentials are invalidated and replacement permissions are scoped. Secret scanning covers both repositories.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Partial","","Security and data boundaries"
+Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Partial; identified credentials retired","","Security and data boundaries"
 "[R02] — API authentication and resource ownership are not enforced in reviewed code","Review ID: R02
 Updated: November 16, 2026
 Status: Partial; deployed and verified
@@ -81,13 +81,13 @@ ORIGINAL ASSESSMENT
 This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Verified development guard","","Security and data boundaries"
 "[R05] — Passwords, tokens and private payloads can reach storage/logging/responses","Review ID: R05
 Updated: November 16, 2026
-Status: Partial; sensitive paths repaired
-Implementation commits: BE 39106f9, de696e1; FE e0474ba, f9f284b
+Status: Partial; credential paths isolated
+Implementation commits: BE bbd6f69, 0f92330; FE a519b5e, b8f7450
 Dependencies for closure: R01, R02
 
 CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
-Deployed account/private response filtering, owner-scoped endpoints, credential-free packaging, verified-login empty legacy password placeholder, random activity IDs and redacted Lambda errors. Remaining: credential rotation and review/cleanup of historical stored values, logs and artifacts; existing sensitive rows were not broadly inspected.
-See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
+DB administrator credential is no longer available to Lambda; browser has no AWS upload key/SDK. Signed policies return temporary upload authorization only; private contractor submission logging was removed. Remaining: historical logs/data/provider-secret review and unused legacy/prototype paths.
+Latest evidence/rollback: docs/releases/2026-11-16-hardening.md; credentials: docs/releases/2026-11-16-credentials.md. All AWS resources are development; no remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `auth/actions.js:createDbAccountInfo` sends the signup password to SQL; BE `accountsController.addAccount` inserts and echoes the account object. `src/sql/accounts.sql` has a plain password column. BE `src/controllers/.ping.ts:handler` returns database host, username and password in its response and is routed by `serverless.yml`. FE bid/contact/sign-in components pass Cognito JWTs as the `sessionId` argument to `logIt`; `LogTrail.add` persists it when `VUE_APP_SYS_LOG_LEVEL` enables logging. Vuex debug logger also exposes state in development.
@@ -98,7 +98,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Signup stores no SQL password, API responses exclude secrets, and logging tests verify token/password redaction.
 
-This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Partial; sensitive paths repaired","R01, R02","Security and data boundaries"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Partial; credential paths isolated","R01, R02","Security and data boundaries"
 "[R06] — Session lifetime, restoration and navigation checks disagree","Review ID: R06
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -291,13 +291,13 @@ ORIGINAL ASSESSMENT
 This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Partial; API read state verified","R02, R07, R14","Core workflows and contracts"
 "[R16] — Image upload integrity and private ownership are undefined","Review ID: R16
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: FE 69b1b07, 9ba4971
+Status: Partial; secure photos deployed
+Implementation commits: BE bbd6f69, 0f92330, 88a064b; FE a519b5e
 Dependencies for closure: R01, R02, R08
 
-REMAINING ACCEPTANCE WORK
-Uploads use temporary identity credentials and saves await completion. Configure scoped roles, use unique account-scoped keys, validate files and establish delete/orphan policies; original filenames are still used.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Client/contractor avatars and project photos work through short-lived signed POST grants. Owner UUID keys prevent filename collisions; S3 enforces size/MIME and persisted references get ownership/object-header checks. Account/profile updates are atomic; real S3 success and unsafe cases passed. Public photo policy retained. Remaining: full browser acceptance, orphan/replacement retention and legacy shared-key migration; private documents are outside this flow.
+Latest evidence/rollback: docs/releases/2026-11-16-hardening.md; credentials: docs/releases/2026-11-16-credentials.md. All AWS resources are development; no remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `s3.services.js` uses `file.name` directly as object key; project creation does not await upload. Profile/project flows share the upload service.
@@ -306,7 +306,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Same-named files from different users cannot overwrite each other, failed uploads do not report successful image updates, and unauthorized object writes/deletes fail.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R01, R02, R08","Core workflows and contracts"
+Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial; secure photos deployed","R01, R02, R08","Core workflows and contracts"
 "[R17] — Multiple backend execution/configuration paths obscure the source of truth","Review ID: R17
 Updated: November 16, 2026
 Status: Partial; release path documented
@@ -325,45 +325,45 @@ ORIGINAL ASSESSMENT
 This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; release path documented","R04","Delivery and maintainability"
 "[R18] — Dependency and verification baseline is weak","Review ID: R18
 Updated: November 16, 2026
-Status: Partial; integration baseline added
-Implementation commits: BE 4832219, 67fb927; FE fb84127
+Status: Partial; runtime/package repaired
+Implementation commits: BE 059fe2d, 0f92330, 88a064b, 701a3e9; FE a519b5e
 Dependencies for closure: R04
 
 CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
-45 BE unit tests, TypeScript, 25 FE tests, lint/build, credential scans and actual development Cognito/MySQL/API fixture checks passed. Existing Node 18/framework and dependency audit findings remain; broad toolchain upgrade was rejected by automatic review and was deferred. Plan targeted supported-runtime/dependency upgrades separately.
-See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
+All 76 Lambdas run Node 24. Targeted MySQL/AWS and compatible prototype updates preserved framework/plugin versions. Backend production audit findings went 36 to 8; reported vulnerable paths are absent from the allowlisted Lambda package. 55 BE/30 FE tests plus real AWS/S3 and compatible rollback checks passed. Remaining: prototype/build-tool and FE dependency modernization; the whole repository is not vulnerability-free.
+Latest evidence/rollback: docs/releases/2026-11-16-hardening.md; credentials: docs/releases/2026-11-16-credentials.md. All AWS resources are development; no remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE mixes Vue 3 with `vue-template-compiler` 2.x, multiple older/alpha plugins, Vue CLI 4 and several overlapping libraries. BE declares Serverless 4 with older offline/TypeScript plugins. Both npm/yarn lockfiles exist in BE. No FE test script is declared; BE Jest discovers no tests and coverage thresholds are zero. Installed versions can differ from manifest ranges.
 
 **Proposal:** Select package manager and supported runtime, inventory actual usage, remove obsolete integrations, then upgrade in small validated steps. Introduce CI for FE build/source lint, BE type check, contract checks and a few critical end-to-end journeys. Run a separate dependency advisory review; this assessment did not establish current CVEs or vendor support dates.
 
-This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; integration baseline added","R04","Delivery and maintainability"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; runtime/package repaired","R04","Delivery and maintainability"
 "[R19] — Initial browser payload is large","Review ID: R19
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Open
-Implementation commits: None
+Status: Partial; browser SDK removed
+Implementation commits: FE a519b5e
 Dependencies for closure: R18
 
-REMAINING ACCEPTANCE WORK
-Reduce the large initial bundle and images, lazy-load screens and measure mobile performance. Final build still reports size warnings.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Removing the unused browser AWS SDK reduced vendor output from about 5.74 MiB to 2.20 MiB and raw initial entry point from 6.64 MiB to 3.10 MiB. Remaining: lazy loading, image optimization and actual mobile performance measurement; build-size warnings remain.
+Latest evidence/rollback: docs/releases/2026-11-16-hardening.md; credentials: docs/releases/2026-11-16-credentials.md. All AWS resources are development; no remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** Production build succeeded with a 6.68 MiB entrypoint; vendor JS was 5910.88 KiB (1173.71 KiB gzip), app JS 608.66 KiB (173.04 KiB gzip). Images included several 2–4 MiB assets. Router imports almost all screens eagerly. AWS SDK v2, theme/vendor scripts, demo assets and duplicate date/UI libraries are present.
 
 **Proposal:** Lazy-load routed screens, resize/compress images, remove unused theme/demo assets and dependencies, replace full browser AWS SDK usage through R01/R16, and establish mobile performance budgets. Measure before/after in a browser; compilation warnings do not measure user latency.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P2","Open","R18","Delivery and maintainability"
+Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P2","Partial; browser SDK removed","R18","Delivery and maintainability"
 "[R20] — Deployment, external services and operational ownership are incomplete","Review ID: R20
 Updated: November 16, 2026
-Status: Partial; AWS dev release verified
-Implementation commits: BE de696e1, 40f9782, fde6af4; FE e0474ba, f9f284b
+Status: Partial; hardened AWS dev release verified
+Implementation commits: BE 0f92330, 701a3e9; FE a519b5e, b8f7450
 Dependencies for closure: R01, R02, R04, R17
 
 CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
-AWS identity/stack/schema, existing code/config snapshots, RDS backup settings, secret-backed TLS and reviewed deployment were established. Paired release uses API v2. Remaining: actual restore exercise, alarms/CI/environment promotion, photo storage, external email/WebSocket integrations and runtime/version strategy.
-See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
+Credential/runtime/photo release, actual IAM boundary probe, matching artifacts/public indexes, 187 asset checks and completed CDN invalidation are recorded. Prepared compatible app rollback passed disposable core flows; no stack rollback/restore was executed. Remaining: CI/monitoring/restore exercise, recurring rotation, orphan cleanup, email/WebSocket delivery and infrastructure consolidation (486/500 stack resources).
+Latest evidence/rollback: docs/releases/2026-11-16-hardening.md; credentials: docs/releases/2026-11-16-credentials.md. All AWS resources are development; no remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE README suggests direct S3 sync and obsolete JSON-server setup. History routing requires host fallback configuration. FE exposes separate email and WebSocket URLs, but BE does not declare those implementations. No complete infrastructure setup for Cognito, database, site hosting or these integrations was established. CORS configuration is broad/inconsistent. Production source maps are enabled in `vue.config.js` despite its comment about debug use.
@@ -372,7 +372,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** A new environment can be provisioned from documented configuration and a rollback/restore exercise is demonstrated. External service owners, repositories and authentication are recorded.
 
-This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; AWS dev release verified","R01, R02, R04, R17","Delivery and maintainability"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; hardened AWS dev release verified","R01, R02, R04, R17","Delivery and maintainability"
 "[R21] — Product completion and component cleanup need explicit scope","Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend

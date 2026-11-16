@@ -1,6 +1,6 @@
 # Restart repairs and commit ledger
 
-Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the backend release record](releases/2026-11-16-backend.md) for the authoritative current deployment/acceptance status and rollback.
+Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the latest hardening release record](releases/2026-11-16-hardening.md) for current deployment/acceptance status and compatible rollback.
 
 ## Backend release repairs
 
@@ -105,3 +105,20 @@ Three new isolated checks passed (20 FE tests total): filtered request/legacy su
 The user's subsequent Console screenshot identified the actual route failure: `clients/createClient` issued **POST `/clients`**, which returned **502** without a CORS header. A missing `id` in the editing form incorrectly selected creation for an existing signed-in client. The follow-up binds updates to the active account's numeric `userId`, checks any profile ID aliases for consistency and removes client creation from the profile-edit screen. Tests reproduce an existing account with no ID in its form and verify that exactly one update (no creation) is dispatched; invalid/mismatched identity issues no write. The suite now has 22 passing FE tests; lint passed for 54 changed source files and the production build passed with existing size warnings. The user explicitly confirmed "Save succeeded" and "worked" after retrying. No agent profile writes were made to AWS; persistence after a subsequent page reload has not been separately checked. This follow-up is FE-only; the local BE remains at b2b03cb and no AWS deployment occurred.
 
 Use `git show <commit>` to inspect a fix and `git revert <commit>` to create a reviewable reversal. Revert dependent commits in reverse order; coordinate FE/BE companion commits. Baseline checkpoints preserve pre-existing work. Reverting security fixes can reintroduce credential disclosure; Git reversal also cannot undo credential rotation or other external operations. No external changes were performed by this repair batch.
+
+## Completed follow-up: credentials, Node 24 and photo uploads
+
+The user accepted the recommended next batch. It is deployed and verified: [hardening release and rollback](releases/2026-11-16-hardening.md), [credential retirement/rotation](releases/2026-11-16-credentials.md). This section supersedes earlier remaining-work statements about unrotated credentials, Node 18 and unavailable photos.
+
+| Repair | Commit |
+| --- | --- |
+| Update runtime libraries while preserving framework/plugin versions | BE 059fe2d |
+| Owner-specific signed image grants, type/size/header checks, atomic avatar updates | BE bbd6f69 |
+| Node 24, DML-only app identity, upload endpoint and scoped IAM/configuration | BE 0f92330 |
+| JPEG/atomic rollback checks and executable integration/rollback acceptance | BE 88a064b, 7cfdc34, 701a3e9 |
+| Browser grants, generated photo keys, failure retention and AWS SDK removal | FE a519b5e |
+| Record identified credential retirement and administrator rotation | FE b8f7450 |
+
+55 BE and 30 FE tests, TypeScript, changed-source lint and build passed. Real development Cognito/MySQL/API/S3 acceptance covered successful client/contractor/project photos and rejected unsafe uploads. All fixtures were removed. A temporary Lambda directly proved the final execution role can read the app secret and cannot read the admin secret; it was removed. The old exposed upload key is inactive and the old admin password fails. Both public FE hostnames, all 76 Node 24 hashes/app identities, stack completion and CDN invalidation were verified. No Git push occurred.
+
+Rollback uses the previous application code with current compatible runtime/MySQL and restricted credentials: directly reusing the old MySQL driver failed after authentication rotation. The compatible rollback passed disposable core flows; a stack rollback was not executed. Remaining scope is in the updated ticket ledger, including browser lifecycle acceptance, quote atomicity, delivery integrations, payments/product choice, pagination, orphan handling, CI/restore and prototype/build-tool cleanup. The stack is at 486/500 resources.

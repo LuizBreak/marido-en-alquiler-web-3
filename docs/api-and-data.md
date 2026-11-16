@@ -141,3 +141,7 @@ Relationships in the diagram are a mixture of declared foreign keys and logical 
 8. FE project services are serialized with single-quoted elements (for example `['painting']`), which is not JSON even though comments describe later `JSON.parse` use.
 
 These are source-confirmed mismatches. Whether each path is reached by the current UI, and whether the deployed database has drifted to compensate, requires isolated integration testing.
+
+## Current secure image and credential architecture
+
+November 16 hardening release: all 76 Lambdas run Node 24 and use the DML-only application account through a resource-scoped secret. The admin password was rotated and Lambda access to its secret removed. Historical upload key is inactive. Authenticated POST /uploads signs exact owner-specific random keys with a two-minute policy and an S3-enforced 8 MB bound; changed stored references must pass ownership/size/type/header checks. Avatar persistence updates account/profile atomically. Photos remain public in the existing image bucket. Full details, evidence and compatible rollback: [hardening release](releases/2026-11-16-hardening.md). Earlier Node 18/admin-credential/unavailable-photo statements are historical.

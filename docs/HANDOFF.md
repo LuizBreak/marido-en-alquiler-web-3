@@ -1,57 +1,54 @@
 # Session handoff
 
-Updated November 16, 2026 (America/New_York). Read this and `repair-log.md`, then inspect Git status in both repositories.
+Updated November 16, 2026 (America/New_York). Read this, repair-log.md and the latest release record; inspect both working trees before edits.
 
-## Current state
+## Current outcome
 
-The user explicitly confirmed **the entire system, including AWS and its database, is development** and authorized backend repairs, deployment and separate commits. Routine development validation may use newly created disposable fixtures, with cleanup. Do not recreate an expensive separate staging database merely because older documentation proposed one. The payment business model is still undecided.
+The user confirmed **all AWS resources/data are development**, authorized fixes, per-fix commits and deployment, then accepted the next batch: credentials, supported runtime/dependencies and secure photos. **That batch is deployed and verified.** See [hardening release, evidence and rollback](releases/2026-11-16-hardening.md) and [credential record](releases/2026-11-16-credentials.md). The earlier [backend release](releases/2026-11-16-backend.md) is historical where it says Node 18, unavailable photos or unrotated credentials.
 
-The backend security/compatibility release and paired frontend are deployed and verified in AWS account `907823072924`, region `us-east-1`, profile `default`. See [the backend release record](releases/2026-11-16-backend.md) for final deployment/verification status and rollback. The existing API and database are retained. No schema migration was needed.
+- FE: this repository, branch master; image grant/key/SDK-removal app commit a519b5e; prior auth e0474ba, payment disabling f9f284b; local AWS command fb84127.
+- BE: ../marido-en-alquiler-backend, branch main; runtime libraries 059fe2d, secure images/atomic avatar bbd6f69, Node 24/deployment/app principal 0f92330, image regression checks 88a064b, integration harness 7cfdc34, compatible rollback checks 701a3e9.
+- Commits are local; nothing pushed. Original user changes remain in FE 65174fc and BE 3a4ccc4. Keep fixes separate; do not rewrite history or push without a request.
+- Preserve pre-existing untracked dist-build-check/, dist-build-check-2/ and ignored .deployments/. Historical snapshots may contain secrets and must remain outside Git.
 
-- FE: this repository, branch `master`; paired app fixes `e0474ba` (verified-token login/registration), `f9f284b` (remove raw-card form), local command `fb84127`.
-- BE: `../marido-en-alquiler-backend`, branch `main`; schema `8a40dff`, dependencies `4832219`, authorization/provisioning `39106f9`, DB secrets/TLS `de696e1`, deployment/routes `40f9782`, integration checks `67fb927`, contact `4ef1331`, username length `4dd8f90`, health CORS `fde6af4`, Lambda-loadable health rename/config `f14cb8b`/`e6cb890`, operational docs `aab9e41`.
-- Fixes are local commits; nothing was pushed to Git remotes. Original user edits remain in FE `65174fc` and BE `3a4ccc4`.
-- Preserve pre-existing untracked `dist-build-check/` and `dist-build-check-2/` and ignored `.deployments/`. Old artifacts can contain secrets; never commit them.
+## Deployed configuration and contracts
 
-## AWS and released contracts
+- AWS account 907823072924, region us-east-1, CLI profile default; authenticated user luiz.break.
+- Website/S3 www.marido-en-alquiler.com; CloudFront EI5JEIS37I445. API https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend; stack marido-backend-dev.
+- 76 functions run Node 24 with the same artifact; stack UPDATE_COMPLETE. Change sets hardening-20261116 and hardening-final-role-20261116 completed. Invalidation IBQG3DK9KASOVNV19AI80HRI1J completed; both public hostnames serve the new index.
+- RDS marido-en-alquile-prod is development despite its historical name; MySQL 8.4.10, existing database retained. No application schema migration was made. Automated backups were inventoried; a restore was not exercised.
+- App DB principal marido_app_dev: SELECT/INSERT/UPDATE/DELETE only; secret marido/dev/application-database; TLS verifies the bundled RDS CA; pool limit two per execution environment. The Lambda role can read only this DB secret. A direct temporary Lambda probe verified application access and administrator-secret denial, then was removed.
+- Historical upload IAM key for marido-image-bucket-user is Inactive. CLI credentials were unchanged. Administrator password was rotated in marido/dev/database; old password rejected. Ignored local cleanup/admin config was refreshed. Automatic recurring rotation is not configured.
+- Cognito pool us-east-1_aClJIY05r, client 1s48008e1au3e62plvvmr6h1cn. Private endpoints verify ID-token signature/issuer/client/expiry/token use and verified email, bind subject/account identity, and enforce ownership/participants. Admin privileges require the admins group.
+- API v2: Cognito registration supplies names/role; SQL account/profile provisioning follows verified login in an advisory-locked transaction. Login attaches token before /authenticate. Responses expose decoded data and serialized body compatibility. Existing accounts retain their identity/profile behavior.
+- Authenticated POST /uploads: exact random owner key, 120-second signed POST, JPEG/PNG, 8 MB bound enforced by S3. Persisted changed references also pass owner/size/type/header checks. Client/contractor avatar updates synchronize account/profile transactionally. Project photos work. Public image policy was retained; private documents are outside this flow.
+- Payment/milestone writes and coordinated account deletion remain unavailable (501). Provider/payment model is undecided; old PAN/CVC data was not inspected/purged. Lists default 100/max 200; full pagination remains future work.
 
-- Website: https://www.marido-en-alquiler.com; S3 `www.marido-en-alquiler.com`; CloudFront `EI5JEIS37I445`.
-- API: https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend; stack `marido-backend-dev`; 75 existing Lambdas.
-- Database: RDS `marido-en-alquile-prod`, MySQL 8.4.10. Despite its historical name it is development, as confirmed by the user. Schema-only inventory and seven-day automated backup configuration were checked; no restore was performed.
-- Database password is in Secrets Manager `marido/dev/database`. Lambda role gets only that secret; password is loaded once per execution environment. TLS verifies the official RDS CA. Password/key rotation remains open.
-- JWT verification checks Cognito signature, issuer, app client, expiry, ID-token use and verified email. Pool `us-east-1_aClJIY05r`, client `1s48008e1au3e62plvvmr6h1cn`. Admin privileges require the Cognito `admins` group.
-- `/authenticate` derives email from the token. It creates/reconciles SQL account/profile in a locked transaction, binds the Cognito subject and returns safe account fields. Existing email-only login lookup is gone.
-- FE must use `VUE_APP_API_CONTRACT=v2`. Cognito registration carries names and client/contractor role; SQL provisioning happens after verified login. Login attaches the bearer header before `/authenticate`.
-- Private reads/writes enforce ownership/participants. Public contractor responses exclude banking/license/private address data. Lists default to 100, maximum 200; full pagination remains future work.
-- Raw payment-method/milestone creation and updates return 501. Payment listing exposes only last four digits and expiry; owner deletion works. Account deletion returns 501 pending coordinated Cognito/profile cleanup.
-- Quote client/project routes and composite favorite deletion are declared. Message history returns the newest 100 in chronological order; unread counts and recipient-controlled read flags are checked.
+## Validation and local commands
 
-## Local development and verification
+55 BE unit tests, TypeScript, 30 FE tests, changed-source lint and FE build passed. Actual development Cognito/MySQL/API/S3 fixtures verified both roles, retry provisioning, long email, text saves, access denial, projects/quotes/favorites/messages/read flags, contact/audit writes, and successful/unsafe image upload cases. Fixtures, uploaded objects and the permission-probe function were removed. API/component acceptance is not exhaustive browser/user acceptance.
 
-Run FE locally against AWS with **`npm.cmd run serve:aws`**, then open http://127.0.0.1:8080. This explicitly sets API v2 and overrides an older ignored `.env` value. Do not assume a process survives closing the app/session. `NODE_ENV=production` in Lambda is a configuration selector, not a claim that these resources are production.
+Backend production audit findings went 36 to 8; no reported vulnerable dependency path is included in the allowlisted Lambda artifact. Unused prototype/development and FE dependency findings remain open. Framework/plugin versions were preserved. Browser AWS SDK removal reduced the raw initial entry point from roughly 6.64 MiB to 3.10 MiB; large images/bundle warnings remain.
 
-AWS CLI already works in the permitted elevated execution context. Restricted-shell checks hide the user's credentials. Verify that context before asking for a new login; never print credential values.
-
-Checks: 45 BE unit tests and TypeScript, 25 FE tests, changed-source lint and FE build passed. Real Cognito SRP/MySQL fixture journeys passed before deployment and against AWS, including extended route/contact/read-state acceptance. The final health-only artifact was proven equivalent for every other packaged file and passed public health verification. CloudFormation is UPDATE_COMPLETE and CloudFront invalidation I6PKSWK3O1KYUKC86YWPU9GVRJ completed. Tests create unique development users/records and delete those fixtures. They do not edit existing application records.
-
-BE commands:
+Run FE against AWS with `npm.cmd run serve:aws` at http://127.0.0.1:8080. This overrides older ignored env values with API v2. Check port 8080 before starting a duplicate process. No process is guaranteed to survive closing the app/session.
 
 ```powershell
+# FE
+node --test tests/*.test.cjs
+node scripts/lint-changed.cjs 65174fc
+
+# BE
 node node_modules/typescript/bin/tsc --noEmit --incremental false
 node node_modules/jest/bin/jest.js --runInBand
-node scripts/verify-development.cjs '<absolute FE path>/.deployments/be-20261116T080605Z' --development-fixtures --remote
+node scripts/verify-development.cjs '<absolute FE path>/.deployments/hardening-20261116T122519Z' --development-fixtures --remote
 ```
 
-The last command requires connected AWS access, companion FE dependencies and the ignored local DB configuration. It intentionally creates/removes test fixtures. Never repeat or indirectly bypass the previously rejected diagnostic PUT to an existing account.
+The last command deliberately creates/removes test users, records and S3 objects; requires AWS access, companion FE dependencies and the refreshed ignored admin cleanup config. Never repeat/bypass the earlier rejected diagnostic PUT to an existing account. Restricted-shell checks hide AWS credentials; use the permitted elevated context before asking the user to sign in. Never print secrets.
 
-## Remaining work and next pickup
+## Rollback and next pickup
 
-1. Read the final release status and ask the user to refresh/sign in and confirm their own workflow. Do not claim every screen or admin workflow has browser acceptance.
-2. Finish secure photo uploads: existing Cognito authenticated role lacks `s3:PutObject`; do not restore long-lived keys or grant unrestricted bucket writes. Design identity-scoped object keys/permissions together.
-3. Choose the payment model/provider before implementing payments/payouts; raw entry is disabled. Existing stored PAN/CVC rows were neither inspected nor purged.
-4. Rotate previously exposed AWS/DB credentials. Moving the old password to Secrets Manager did not rotate it or scrub old artifacts/history.
-5. Upgrade deprecated Node 18 and audit runtime dependencies separately. The broad framework/plugin upgrade was rejected by automatic approval review; this release retained the existing framework/plugins/runtime and used an allowlisted package with native CloudFormation. Do not silently force dependency upgrades. API integrations invoke unqualified functions; historical published-version outputs were preserved, not republished.
-6. Complete robust pagination, field length/business-state validation, atomic quote acceptance, review moderation, coordinated account deletion, and schema migrations rather than relying on snapshot SQL. External email/WebSocket delivery, admin browser flows, image storage and provider/payment flows remain unverified.
-7. Investigate DB connection concurrency/RDS Proxy, alarms, CI and the near-limit CloudFormation resource count before expanding infrastructure.
+Use .deployments/hardening-20261116T122519Z/ and the latest release's compatible rollback template/artifact. A raw pre-upgrade MySQL driver failed against rotated authentication; do not deploy it. The prepared rollback restores prior accepted application source while retaining Node 24, current compatible libraries and restricted credentials. Its disposable core flows passed. Do not reactivate exposed keys or restore old passwords. An actual stack rollback was not executed.
 
-Asana stays deferred. [asana-tickets.md](asana-tickets.md) and [asana-tickets.csv](asana-tickets.csv) are the ticket source; no remote tickets were created. Update this handoff and the repair log when work changes. Continue authorized repairs without repeated generic permission requests; surface concrete product decisions and actual blockers.
+Next priorities: browser signup/email confirmation and complete project/quote journey, atomic quote acceptance, actual email/WebSocket delivery, coordinated account deletion, pagination, orphan-image cleanup, CI/monitoring/restore checks, recurring credential rotation and legacy/prototype/build-tool dependency cleanup. The stack has **486 of 500 resources**: consolidate before expanding endpoints. Payment model/provider requires a product decision before implementation.
+
+Asana stays deferred: 21-ticket [Markdown](asana-tickets.md) and [CSV](asana-tickets.csv) are current; no remote tickets were created. Continue authorized repairs without repeated generic permission questions and keep this handoff/log current. For the user's next task, start from this deployed state rather than redoing the completed credential/runtime/photo batch.
