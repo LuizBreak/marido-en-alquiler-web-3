@@ -1,5 +1,4 @@
 import store from "../store/index";
-import { EmailService } from "../services/email.services";
 import { apiSvc } from "../services";
 
 export class Message {
@@ -33,22 +32,13 @@ export class Message {
       subject: msgAttributes.subject,
       messageBody: msgAttributes.messageBody,
       wasRead: msgAttributes.wasRead,
-      msgType: msgAttributes.msgType,
+      msgType: msgAttributes.msgType || (notifyTarget ? "email" : "chat"),
       msgAsset: msgAttributes.msgAsset,
       updatedAt: msgAttributes.updatedAt,
       clientMessageKey: msgAttributes.clientMessageId,
     };
     const saved = await store.dispatch("messages/createMessage", ds, { root: true });
-    if (notifyTarget) {
-      try { await this.notify(msgAttributes); }
-      catch (_) { return { ...saved, notificationFailed: true }; }
-    }
     return saved;
-  }
-  async notify(msgAttributes) {
-    const result = await EmailService.send(msgAttributes);
-    if (!result) throw new Error("Notification delivery failed.");
-    return result;
   }
   update() {
     console.log("update.enter ");

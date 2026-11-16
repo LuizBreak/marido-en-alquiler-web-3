@@ -168,12 +168,12 @@ export default {
         let saved;
         try { saved = await quote.add(); }
         catch (_) { this.triggerMsgBox(true, 'No se pudo guardar la oferta. Tus datos siguen en el formulario.'); return; }
-        let notificationFailed = false;
-        try { const notice = await this.notifyClient(saved.quoteId); notificationFailed = !!notice.notificationFailed; }
+        let notificationFailed = !!saved.notificationFailed;
+        try { const notice = await this.notifyClient(saved.quoteId); notificationFailed = notice.emailNotification === 'accepted' ? false : notificationFailed || !!notice.notificationFailed; }
         catch (_) { notificationFailed = true; }
         this.resetForm();
         try { await this.dismissModal('#modal-bid-' + this.projectId); } catch (_) { /* The quote is already saved. */ }
-        this.triggerMsgBox(true, notificationFailed ? 'Oferta guardada. No se pudo enviar la notificación.' : 'Tu oferta fue enviada al cliente.');
+        this.triggerMsgBox(true, notificationFailed ? 'Oferta guardada. No se pudo enviar la notificación.' : 'Tu oferta fue guardada y está disponible para el cliente.');
         try { await this.sysLogIt(); } catch (_) { /* Activity logging cannot undo the saved quote. */ }
       } finally { this.isSaving = false; }
     },
