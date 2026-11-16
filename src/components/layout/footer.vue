@@ -194,28 +194,16 @@ export default {
   methods: {
     async notify() {
       try {
-        console.log("notify.Enter");
-        this.SetEmailContent();
-
-        const msgData = {
-          subject: "Marido-en-alquiler: Welcome to our newsletter ",
-          name: `Marido-en-alquiler`,
-          email: this.fromEmail,
-          mobile: this.subscriberEmail,
-          messageBody: this.emailContent,
-        };
-
-        EmailService.send(msgData);
-        this.syslogIt();
+        const saved = await EmailService.subscribe(this.subscriberEmail);
 
         this.subscriberEmail = "";
 
         await this.$store.dispatch("setEmailAttributes", {
           subscriberEmail: "",
         });
-        this.triggerMsgBox(true, "Suscripción creada con éxito.");
+        this.triggerMsgBox(true, saved.notificationFailed ? "Solicitud guardada. El aviso por correo está pendiente." : "Solicitud de suscripción recibida.");
       } catch (error) {
-        console.log(error);
+        this.triggerMsgBox(true, "No se pudo guardar la solicitud. Inténtalo de nuevo.");
       }
     },
     async SetEmailContent() {

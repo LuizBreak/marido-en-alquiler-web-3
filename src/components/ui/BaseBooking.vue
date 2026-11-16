@@ -202,10 +202,14 @@ export default {
       // vuex: Testing only - to be implemented in the future
       // this.$store.dispatch('contactus/registerContactus', this.formData);
 
-      this.InvokeApi(this.formData);
-      this.notify();
-      this.resetFormData();
-      await this.v$.$reset();
+      try {
+        const saved = await this.notify();
+        this.resetFormData();
+        await this.v$.$reset();
+        this.triggerMsgBox(true, saved.notificationFailed ? "Solicitud guardada. El aviso por correo está pendiente." : "Solicitud recibida.");
+      } catch (_) {
+        this.triggerMsgBox(true, "No se pudo guardar la solicitud. Tus datos siguen en el formulario.");
+      }
     },
     InvokeApi: function (dataElements) {
       // vuex: TODO: Testing only - to be implemented in the future
@@ -254,7 +258,7 @@ export default {
         // console.log("Notify SysAdm by Email");
         // console.table("msgData", msgData);
 
-        EmailService.send(msgData);
+        return EmailService.send(msgData);
       } catch (error) {
         console.log(error);
       }

@@ -27,8 +27,8 @@
                 electrónico para</span
               ><a
                 class="ms-1 text-nowrap"
-                href="mailto:hello@target-innovations.com"
-                >hello@target-innovations.com</a
+                href="mailto:hello@marido-en-alquiler.com"
+                >hello@marido-en-alquiler.com</a
               >
             </p>
           </div>
@@ -166,7 +166,6 @@ import DateFormatter from "../../../mixins/dateFormatter.js";
 import ErrorList from "../../../components/ui/BaseValidationErrorList.vue";
 
 import { ContactUs } from "../../../services/contactus.service";
-import { EmailService } from "../../../services/email.services";
 import ContactUsEmail from "../../../components/email/contactUs.email.vue";
 
 const selectionRequired = (value) => value; // if no selected value will be null therefore true
@@ -238,14 +237,13 @@ export default {
         };
 
         this.contactUs = new ContactUs(ds);
-        this.contactUs.add().then(() => {
-          this.sendMessage();
-          this.sysLogIt();
-          this.resetForm();
-          this.triggerMsgBox(true, "Mensage enviada con éxito.");
-        });
+        const saved = await this.contactUs.add();
+        this.resetForm();
+        this.triggerMsgBox(true, saved.notificationFailed
+          ? "Solicitud guardada. No se pudo enviar el aviso por correo."
+          : "Solicitud recibida. Gracias por contactarnos.");
       } catch (error) {
-        console.log(error);
+        this.triggerMsgBox(true, "No se pudo guardar la solicitud. Tus datos siguen en el formulario.");
       }
     },
     resetForm() {
@@ -278,17 +276,6 @@ export default {
         message: this.message,
         updatedAt: this.date(Date.now(), "YYYY-MM-DD hh:mm:ss a"),
       });
-    },
-    async sendMessage() {
-      this.SetEmailContent();
-      const msgData = {
-        subject: "Marido-en-alquiler: ContactUs Message ",
-        name: `Marido-en-alquiler`,
-        email: this.email,
-        mobile: this.email,
-        messageBody: this.emailContent,
-      };
-      await EmailService.send(msgData);
     },
   },
   computed: {

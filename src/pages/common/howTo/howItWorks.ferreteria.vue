@@ -183,7 +183,7 @@ export default {
     };
   },
   methods: {
-    notify() {
+    async notify() {
       try {
         const msgData = {
           subject: "Marido-en-alquiler: Referral Program for ",
@@ -193,7 +193,7 @@ export default {
           messageBody: this.emailContent,
         };
 
-        EmailService.send(msgData);
+        const saved = await EmailService.send(msgData);
 
         this.logIt(
           this?.loggedUser?.id || "visitor",
@@ -208,10 +208,10 @@ export default {
 
         this.triggerMsgBox(
           true,
-          "Mensaje enviada con éxito. Gracias por tu indicacion."
+          saved.notificationFailed ? "Solicitud guardada. El aviso por correo está pendiente." : "Solicitud recibida. Gracias por tu indicación."
         );
       } catch (error) {
-        console.log(error);
+        this.triggerMsgBox(true, "No se pudo guardar la solicitud. Revisa el correo e inténtalo de nuevo.");
       }
     },
     async SetEmailContent() {

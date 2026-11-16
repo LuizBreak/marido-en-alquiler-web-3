@@ -22,15 +22,8 @@ export class ContactUs {
     }
     return this.IsValid;
   }
-  async add() {
-    await store
-      .dispatch("contactus/addContactus", this.data, { root: true })
-      .then(() => {
-        return true;
-      })
-      .catch(() => {
-        return false;
-      });
+  add() {
+    return store.dispatch("contactus/addContactus", this.data, { root: true });
   }
   update() {
     console.log("update.enter ");

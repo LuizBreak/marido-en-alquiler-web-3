@@ -4,17 +4,11 @@ import { apiSvc } from "../../../services";
 const resource = "contactus";
 
 export default {
-  addContactus({ commit }, payload) {
-    apiSvc
-      .post(resource, payload)
-      .then(() => {
-        commit("registerContactus", payload);
-      })
-      .catch((error) => {
-        console.log(
-          "There was a problem creating contactus message: " + error.message
-        );
-      });
+  async addContactus({ commit }, payload) {
+    const response = await apiSvc.post(resource, payload);
+    const saved = response.data.data;
+    commit("registerContactus", { ...payload, ...saved });
+    return saved;
   },
 
   async registerContactus({ commit, state }, data) {
