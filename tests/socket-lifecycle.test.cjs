@@ -5,7 +5,7 @@ test("socket reconnect restores listeners and disconnect clears all timers", asy
   const sockets = [], intervals = new Map(), timeouts = new Map();
   let id = 0;
   class Socket {
-    constructor() { this.readyState = 0; this.listeners = []; this.sent = []; sockets.push(this); }
+    constructor(url, protocols) { this.readyState = 0; this.protocols = protocols; this.listeners = []; this.sent = []; sockets.push(this); }
     addEventListener(name, callback) { this.listeners.push([name, callback]); }
     removeEventListener(name, callback) { this.listeners = this.listeners.filter(x => x[0] !== name || x[1] !== callback); }
     send(payload) { this.sent.push(payload); }
@@ -20,13 +20,17 @@ test("socket reconnect restores listeners and disconnect clears all timers", asy
     clearTimeout: key => timeouts.delete(key),
   });
   const service = new SocketioService(4);
-  const connecting = service.setupSocketConnection({ url: "ws://test.invalid" });
+  const connecting = service.setupSocketConnection({ url: "ws://test.invalid", getToken: async () => 'first.token.signature' });
+  await new Promise(setImmediate);
   sockets[0].open(); await connecting;
+  assert.deepEqual(Array.from(sockets[0].protocols), ['marido-chat', 'auth.first.token.signature']);
+  assert.equal(sockets[0].sent.length, 0);
   const listener = () => {};
   service.addEventListener("message", listener);
   sockets[0].close();
   assert.equal(intervals.size, 0); assert.equal(timeouts.size, 1);
   const timer = timeouts.entries().next().value; timeouts.delete(timer[0]); timer[1]();
+  await new Promise(setImmediate);
   sockets[1].open(); await Promise.resolve();
   assert.equal(sockets[1].listeners.length, 1); assert.equal(intervals.size, 1);
   service.disconnect();

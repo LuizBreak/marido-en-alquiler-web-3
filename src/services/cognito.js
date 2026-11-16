@@ -4,3 +4,6 @@ import awsExports from '../aws-exports';
 // the store's initial cached-session restore as well as interactive sign-in.
 Amplify.configure(awsExports);
 export { Auth };
+export async function chatSessionToken() {
+  return (await Auth.currentSession()).getIdToken().getJwtToken();
+}

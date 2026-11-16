@@ -10,10 +10,14 @@ export class SocketioService {
     this.generation = 0;
     this.stopped = true;
   }
-  connect(options) {
+  async connect(options) {
+    const generation = this.generation;
+    if (typeof options.getToken !== 'function') throw new Error('Chat authentication is required.');
+    const token = await options.getToken();
+    if (this.stopped || generation !== this.generation) throw new Error('Connection cancelled.');
+    if (typeof token !== 'string' || !/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token)) throw new Error('Chat authentication is required.');
     return new Promise((resolve, reject) => {
-      const socket = new WebSocket(options.url);
-      const generation = this.generation;
+      const socket = new WebSocket(options.url, ['marido-chat', 'auth.' + token]);
       this.socket = socket;
       let opened = false;
       socket.onopen = () => {
@@ -23,7 +27,7 @@ export class SocketioService {
         for (const [name, callback, option] of this.listeners) socket.addEventListener(name, callback, option);
         this.clearPulse();
         this.pulseTimer = setInterval(() => this.pulse(), options.pulseInterval || 60000);
-        this.sendMessage({ action: "setName", id: this.loggedUserId });
+        if (options.onConnected) options.onConnected();
         resolve(socket);
       };
       socket.onerror = () => {
@@ -83,7 +87,7 @@ export class SocketioService {
     this.socket = null;
   }
   pulse() {
-    return this.sendMessage({ action: "keepItAlive", to: this.loggedUserId, message: "keepItAlive" });
+    return this.sendMessage({ action: "keepItAlive" });
   }
   reconnect() { this.scheduleReconnect(); }
 }
