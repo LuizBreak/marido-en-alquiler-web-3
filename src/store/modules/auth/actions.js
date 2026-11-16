@@ -79,7 +79,13 @@ export default {
     }
   },
   async signup(context, payload) {
-  const registration = await Auth.signUp({ username: payload.email, password: payload.password, attributes: { email: payload.email }, validationData: [] });
+  const registration = await Auth.signUp({ username: payload.email, password: payload.password, attributes: {
+    email: payload.email,
+    given_name: payload.firstName || "",
+    family_name: payload.lastName || "",
+    profile: JSON.stringify({ userType: payload.userType === "contractor" ? "contractor" : "client" }),
+  }, validationData: [] });
+  if (!usesLegacyApi()) return registration;
   try {
     const account = await context.dispatch("createDbAccountInfo", { ...payload, username: registration.user.username });
     await context.dispatch("createDbClientInfo", { ...payload, id: account.id });
@@ -93,7 +99,9 @@ export default {
     let responseData = null;
 
     try {
-      // db account authentication by email to get the UseId
+      // Establish the verified Cognito identity before requesting the SQL profile.
+      localStorage.setItem("access_token", payload.idToken);
+      apiSvc.setHeader();
       response = await apiSvc.post(`authenticate`, {
         email: payload.email,
         returnSecureToken: true,
@@ -101,6 +109,8 @@ export default {
       const { body } = response.data;
       responseData = normalizeAccountInfo(JSON.parse(body));
     } catch (e) {
+      apiSvc.removeHeader();
+      localStorage.removeItem("access_token");
       responseData = {};
     }
 

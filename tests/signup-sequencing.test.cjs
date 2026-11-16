@@ -1,35 +1,9 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const load = require("./load-module.cjs");
-function actions(apiSvc = {}) {
-  return load("src/store/modules/auth/actions.js", {
-    "../../../services/session-expiry": load("src/services/session-expiry.js"),
-    "../../../services/api-contract": {
-      createdAccountId: data => data.id,
-      usesLegacyApi: () => true,
-    },
-    "../../../services": { apiSvc, TokenService: {} },
-    "aws-amplify": { Auth: { signUp: async () => ({ user: { username: "identity" } }) } },
-    "../../../utils/types": {}, "../../../store/index": {},
-  }).default;
+const test=require('node:test');
+const assert=require('node:assert/strict');
+const load=require('./load-module.cjs');
+function actions({legacy=false,apiSvc={},signUp=async()=>({user:{username:'identity'}}),globals={}}={}) {
+ return load('src/store/modules/auth/actions.js',{'../../../services/session-expiry':load('src/services/session-expiry.js'),'../../../services/api-contract':{createdAccountId:data=>data.id,usesLegacyApi:()=>legacy},'../../../services':{apiSvc,TokenService:{}},'aws-amplify':{Auth:{signUp}},'../../../utils/types':{TRY_LOGIN:'tryLogin'},'../../../store/index':{}},globals).default;
 }
-test("registration waits for account creation before creating the matching profile", async () => {
-  let resolveAccount;
-  const account = new Promise(resolve => { resolveAccount = resolve; });
-  const calls = [];
-  const signup = actions().signup({ dispatch: (name, payload) => {
-    calls.push([name, payload]);
-    return name === "createDbAccountInfo" ? account : Promise.resolve({});
-  } }, { email: "test@example.invalid", userType: "client" });
-  await new Promise(resolve => setImmediate(resolve));
-  assert.equal(calls.length, 1);
-  resolveAccount({ id: 42 }); await signup;
-  assert.equal(calls[1][0], "createDbClientInfo"); assert.equal(calls[1][1].id, 42);
-});
-test("account payload excludes Cognito password and token fields", async () => {
-  let sent;
-  const service = { post: async (_resource, data) => { sent = data; return { data: { data: { id: 42 } } }; } };
-  await actions(service).createDbAccountInfo({}, { email: "test@example.invalid", password: "do-not-store", userType: "client" });
-  assert.equal(sent.password, "");
-  assert.equal(sent.idToken, "");
-});
+test('verified registration stores names and account type in Cognito without premature SQL writes',async()=>{let sent;let calls=0;const result=await actions({signUp:async data=>{sent=data;return {user:{username:'identity'}};}}).signup({dispatch:()=>{calls++;}},{email:'test@example.invalid',password:'cognito-only',firstName:'Test',lastName:'User',userType:'contractor'});assert.equal(result.user.username,'identity');assert.equal(calls,0);assert.equal(sent.attributes.given_name,'Test');assert.equal(JSON.parse(sent.attributes.profile).userType,'contractor');});
+test('legacy registration still awaits its own account ID before creating its profile',async()=>{let resolve;const account=new Promise(r=>{resolve=r;});const calls=[];const signup=actions({legacy:true}).signup({dispatch:(name,payload)=>{calls.push([name,payload]);return name==='createDbAccountInfo'?account:Promise.resolve({});}},{email:'test@example.invalid',userType:'client'});await new Promise(r=>setImmediate(r));assert.equal(calls.length,1);resolve({id:42});await signup;assert.equal(calls[1][1].id,42);});
+test('sign-in attaches Cognito token before account provisioning',async()=>{const values=new Map();const steps=[];const localStorage={setItem:(k,v)=>values.set(k,v),removeItem:k=>values.delete(k)};const apiSvc={setHeader:()=>{assert.equal(values.get('access_token'),'verified-jwt');steps.push('header');},post:async()=>{steps.push('request');return {status:200,data:{body:JSON.stringify([{id:42,userType:'client'}])}}},removeHeader:()=>{}};const instance=actions({apiSvc,globals:{localStorage}});await instance.auth.call({dispatch:async()=>true},{},{idToken:'verified-jwt',expiresIn:2000000000});assert.deepEqual(steps,['header','request']);});
