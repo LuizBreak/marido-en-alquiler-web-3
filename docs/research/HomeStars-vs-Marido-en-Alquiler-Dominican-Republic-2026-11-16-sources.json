@@ -1,0 +1,67 @@
+{
+  "checked": "2026-11-16",
+  "sources": [
+    {
+      "id": "1",
+      "title": "HomeStars — professional registration and lead charging",
+      "url": "https://www.homestars.com/pro/register",
+      "supports": "Free profile; matching/interest; shortlisted contact fee."
+    },
+    {
+      "id": "2",
+      "title": "HomeStars — homeowner workflow",
+      "url": "https://www.homestars.com/how-it-works",
+      "supports": "Free job posting, contact consent, quotes and reviews."
+    },
+    {
+      "id": "3",
+      "title": "HomeStars — Professional User Agreement, 21 January 2025",
+      "url": "https://www.homestars.com/assets/en_CA/HomeStars-Professional-User-Agreement-January-2025.pdf",
+      "supports": "Sections 1.4, 5.1–5.4 and 6.1–6.6: CAD, trigger, variable fees, credits and refunds."
+    },
+    {
+      "id": "4",
+      "title": "HomeStars — quality checks",
+      "url": "https://www.homestars.com/quality-check",
+      "supports": "Published onboarding checks as of 7 January 2026."
+    },
+    {
+      "id": "5",
+      "title": "HomeStars — Reviews Policy",
+      "url": "https://www.homestars.com/reviews-policy",
+      "supports": "Eligibility and authenticity rules."
+    },
+    {
+      "id": "6",
+      "title": "HomeStars — Confidence Program, 1 January 2026",
+      "url": "https://www.homestars.com/assets/en_CA/HomeStars-Confidence-Program-January-2026.pdf",
+      "supports": "Conditional scope/cap, preregistration and exclusions."
+    },
+    {
+      "id": "7",
+      "title": "BCRD — ENIEF 2023, published report marked 2024",
+      "url": "https://cdn.bancentral.gov.do/documents/otras-publicaciones/documents/Informe_de_Encuesta_Nacional_de_Inclusion.pdf",
+      "supports": "Printed page 25: principal-income payment channel."
+    },
+    {
+      "id": "8",
+      "title": "World Bank — Global Findex account ownership table",
+      "url": "https://data.worldbank.org/indicator/FX.OWN.TOTL.ZS?locations=XJ",
+      "supports": "Dominican Republic row: 64.78%, aged 15+, 2024; regional comparison table."
+    },
+    {
+      "id": "9",
+      "title": "HomeStars — About Us",
+      "url": "https://www.homestars.com/about-us",
+      "supports": "Canadian marketplace and Angi / Instapro group context."
+    }
+  ],
+  "project_evidence": [
+    "docs/HANDOFF.md",
+    "docs/releases/2026-11-16-crud-consistency.md",
+    "docs/releases/2026-11-16-notifications.md",
+    "../marido-en-alquiler-backend/src/http/resources.ts",
+    "../marido-en-alquiler-backend/src/controllers/clientsController.ts",
+    "../marido-en-alquiler-backend/src/http/project-workflow.ts"
+  ]
+}

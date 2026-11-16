@@ -5,6 +5,7 @@ Updated November 16, 2026. This documentation covers **both** repositories. The 
 | Document | Use it for |
 | --- | --- |
 | [Current handoff](HANDOFF.md) | Current deployed state, local commits, verification, secure recovery and next priorities |
+| [HomeStars / Dominican model brief](research/HomeStars-vs-Marido-en-Alquiler-Dominican-Republic-2026-11-16.docx) | Word comparison of current HomeStars pricing, MEA capabilities, monetization pros/cons and proposed local pilot; [editable text](research/HomeStars-vs-Marido-en-Alquiler-Dominican-Republic-2026-11-16.md) |
 | [CRUD consistency release](releases/2026-11-16-crud-consistency.md) | Shared mysql2 client handlers, retired Sequelize prototype, secret-backed verification and rollback |
 | [Application email release](releases/2026-11-16-notifications.md) | SES delivery, confirmed Gmail receipt, Zoho boundaries and reversible deployment |
 | [Authenticated live chat release](releases/2026-11-16-chat.md) | Verified live delivery, sender/participant checks, managed connection storage and deployment recovery |
