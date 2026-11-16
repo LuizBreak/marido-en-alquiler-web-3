@@ -1,5 +1,6 @@
 import { axiosSvc } from "./axious.service";
 import { TokenService } from "./storage.service";
+import { resourceId } from "./resource-id";
 
 export const apiSvc = {
   /**
@@ -34,11 +35,11 @@ export const apiSvc = {
   },
 
   delete(resource, entity) {
-    return axiosSvc.delete(`/${resource}/` + entity.id);
+    return axiosSvc.delete(`/${resource}/` + resourceId(resource, entity));
   },
 
   update(resource, entity) {
-    return axiosSvc.put(`/${resource}/` + entity.id, entity);
+    return axiosSvc.put(`/${resource}/` + resourceId(resource, entity), entity);
   },
 
   /**
