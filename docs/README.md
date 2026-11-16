@@ -5,6 +5,7 @@ Updated November 16, 2026. This documentation covers **both** repositories. The 
 | Document | Use it for |
 | --- | --- |
 | [Current handoff](HANDOFF.md) | Current deployed state, local commits, verification, secure recovery and next priorities |
+| [Application email release](releases/2026-11-16-notifications.md) | SES delivery, confirmed Gmail receipt, Zoho boundaries and reversible deployment |
 | [Authenticated live chat release](releases/2026-11-16-chat.md) | Verified live delivery, sender/participant checks, managed connection storage and deployment recovery |
 | [Purpose and architecture](architecture.md) | Product scope, feature maturity, application structure, integrations, and change locations |
 | [API and data reference](api-and-data.md) | Declared backend routes, response behavior, entity relationships, and FE/BE contract mismatches |

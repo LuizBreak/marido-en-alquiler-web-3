@@ -1,6 +1,14 @@
 # Restart repairs and commit ledger
 
-Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the latest chat release record](releases/2026-11-16-chat.md) for current deployment/acceptance status and compatible rollback.
+## Owned application notification email — November 16, 2026
+
+Deployed; the user confirmed both Gmail test emails arrived. See the [notification release, evidence and recovery](releases/2026-11-16-notifications.md). SES replaces the broken external mailer. Saved projects/messages determine recipients; public support requests target hello. Browser-supplied addresses/HTML cannot control application notifications. Opt-outs, atomic duplicate/rate checks and separate persistence/delivery results are implemented. Zoho routing is preserved.
+
+BE c719d44/675945e add SES; babb752 implements delivery/security tests; 7017d2a manages state/roles/metrics; 2081242 adds live acceptance. FE 0cacc41 removes duplicate browser sends; 5cfacc6 routes support through the owned API with accurate save feedback.
+
+94 BE / 49 FE tests, TypeScript, lint of 76 changed source files, build, secret scan, 187 asset checksums, live mail checks and prior core AWS regression passed. Temporary users/SQL/event rows were cleaned. All 77 Node 24 functions match the artifact; REST remains 486 resources, chat six, plus a new six-resource mail stack. Both public hostnames serve the released index after CDN completion. No schema migration or Git push. Delivery remains best effort without automatic resend; DMARC and an alarm destination remain open.
+
+Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The whole AWS system is development. The [notification release](releases/2026-11-16-notifications.md) is current; earlier repair/release sections below are historical and retain their original validation limits.
 
 ## Backend release repairs
 

@@ -13,22 +13,24 @@ No remote tickets were created. [CSV](asana-tickets.csv) contains all 21 import-
 | [R05](#r05) | P0 | Partial; chat token paths protected | Passwords, tokens and private payloads can reach storage/logging/responses |
 | [R06](#r06) | P1 | Partial; browser refresh verified | Session lifetime, restoration and navigation checks disagree |
 | [R07](#r07) | P1 | Deployed; API verified | Response helper changes data shape and discards results |
-| [R08](#r08) | P1 | Partial; chat persistence/delivery separated | Missing promise propagation produces premature success and lost errors |
+| [R08](#r08) | P1 | Partial; saved records survive notification failures | Missing promise propagation produces premature success and lost errors |
 | [R09](#r09) | P1 | Partial; real email confirmation verified | Signup and generated-ID handling are not reliable |
 | [R10](#r10) | P1 | Deployed; principal routes verified | Primary keys, route parameters and SQL names disagree |
-| [R11](#r11) | P1 | Partial; authenticated chat routes verified | FE invokes undeclared routes/actions |
+| [R11](#r11) | P1 | Partial; owned notification paths verified | FE invokes undeclared routes/actions |
 | [R12](#r12) | P1 | Partial; live schema reconciled | SQL, TypeScript interfaces and payloads have drifted |
 | [R13](#r13) | P1 | Partial; affected browser flows verified | FE state updates include concrete collection bugs |
 | [R14](#r14) | P1 | Partial; boundary deployed | SQL input handling and Lambda error paths need consolidation |
 | [R15](#r15) | P1 | Partial; live delivery and authorization verified | Chat read state and connection lifecycle are inconsistent |
 | [R16](#r16) | P1 | Partial; photo display browser-verified | Image upload integrity and private ownership are undefined |
-| [R17](#r17) | P2 | Partial; managed chat stack documented | Multiple backend execution/configuration paths obscure the source of truth |
-| [R18](#r18) | P2 | Partial; 81 BE and 45 FE checks pass | Dependency and verification baseline is weak |
+| [R17](#r17) | P2 | Partial; managed chat and mail stacks documented | Multiple backend execution/configuration paths obscure the source of truth |
+| [R18](#r18) | P2 | Partial; 94 BE and 49 FE checks pass | Dependency and verification baseline is weak |
 | [R19](#r19) | P2 | Partial; browser SDK removed | Initial browser payload is large |
-| [R20](#r20) | P2 | Partial; live chat deployed; mailer still open | Deployment, external services and operational ownership are incomplete |
-| [R21](#r21) | P2 | Partial; atomic project acceptance deployed | Product completion and component cleanup need explicit scope |
+| [R20](#r20) | P2 | Partial; notification delivery user-confirmed | Deployment, external services and operational ownership are incomplete |
+| [R21](#r21) | P2 | Partial; workflow and support feedback repaired | Product completion and component cleanup need explicit scope |
 
 ## Authenticated live chat acceptance
+
+The newer [notification release](releases/2026-11-16-notifications.md) supersedes older mailer-open statements below. SES delivery is deployed; the user confirmed both application Gmail test messages arrived. Stored recipients/fixed templates, opt-outs, event deduplication/rate limits and support-save feedback are verified. 94 BE / 49 FE checks and live AWS regression pass. The CSV appends these outcomes to the same 21 tickets; no remote tasks were created. DMARC, durable retry, alarm destinations and broader ticket acceptance remain open.
 
 [Chat release](releases/2026-11-16-chat.md) supersedes earlier notes saying private WebSocket delivery failed. The same 21 CSV records retain history and append the current acceptance.
 

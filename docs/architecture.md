@@ -129,6 +129,8 @@ Most domain requests go directly from controller to mysql2. There is no consiste
 
 ## Important workflow boundaries
 
+The bullets below describe the original assessment. Current email behavior is superseded by the [deployed notification release](releases/2026-11-16-notifications.md): backend-owned SES notices after committed quotes/non-chat messages, fixed support delivery, separate saved/delivery results, scoped Lambda roles and a DynamoDB event/rate table. Zoho hosts the inboxes; SES authenticates with its own DKIM and bounce-app MAIL FROM. The browser no longer invokes the external mailer. See current handoff/releases for the repaired upload, quote and authenticated-chat boundaries as well.
+
 - **Project creation:** screen validates, optionally starts S3 upload, submits project data through generic Vuex actions. Upload completion is not awaited, failures can be swallowed, and the project is created with `contractorId: 0` despite a nullable foreign key in the SQL snapshot.
 - **Bidding:** `baseProjectBid.vue` creates a quote through the `Quote` class, then starts client notification and clears the form. The quote helper/action do not propagate persistence completion reliably. Notification uses the project ID as `quoteId`.
 - **Messaging:** REST stores/history/contacts/read counts are in the BE; `ChatApp.vue` separately connects through a class named `SocketioService` that actually uses native `WebSocket`. No corresponding WebSocket server is declared in BE `serverless.yml`.
