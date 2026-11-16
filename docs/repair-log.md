@@ -66,6 +66,12 @@ node node_modules/jest/bin/jest.js --runInBand
 
 ## Remaining work and rollback
 
+### Follow-up: scrolling after closing dialogs
+
+An isolated browser reproduced duplicate sign-in backdrops and a remaining inline `overflow: hidden` after dismissal. The scrolling-fix commit replaces the separate Bootstrap bundle with shared modular plugins, removes the old Bootstrap 3 CDN script, centralizes scrollbar/backdrop cleanup, and waits for the actual hidden event instead of a 250 ms timeout. Sign-in/signup and message dialogs use the same cleanup, which preserves another visible overlay's lock.
+
+Validation after this follow-up: **17 FE tests**, **50 changed source files linted**, a passing production build (existing size warnings), and three real browser scenarios passed (sign-in close, close during opening transition, save-message close). The browser check verifies actual scroll position after dismissal and blocks HTTPS requests to avoid AWS operations. The local FE still targets the existing AWS BE; no deployment occurred.
+
 The code repairs do not close all 21 review findings. API JWT/ownership enforcement, payment tokenization, schema migrations, undeclared endpoints, provider setup, unique upload keys, legacy booking behavior and production operations remain in the ticket ledger with explicit acceptance work.
 
 Use `git show <commit>` to inspect a fix and `git revert <commit>` to create a reviewable reversal. Revert dependent commits in reverse order; coordinate FE/BE companion commits. Baseline checkpoints preserve pre-existing work. Reverting security fixes can reintroduce credential disclosure; Git reversal also cannot undo credential rotation or other external operations. No external changes were performed by this repair batch.

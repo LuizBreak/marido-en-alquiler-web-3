@@ -1,12 +1,5 @@
 import Modal from "bootstrap/js/dist/modal";
-
-function cleanupModalArtifacts() {
-  document
-    .querySelectorAll(".modal-backdrop")
-    .forEach((backdrop) => backdrop.remove());
-  document.body.classList.remove("modal-open");
-  document.body.style.removeProperty("padding-right");
-}
+import { cleanupModalArtifacts } from "../services/modal-state";
 
 export function showdModal(modalId) {
   const modalElement = document.querySelector(modalId);

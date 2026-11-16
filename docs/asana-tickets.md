@@ -276,7 +276,7 @@ Full original evidence and recommendation: [review report](review-report.md#r20-
 
 **Implementation commits:** FE 33423f5.
 
-**Remaining acceptance work:** Dialog registration is fixed. Decide launch scope, complete/hide placeholders and legacy test routes, fix remaining helper validation/booking behavior, and perform accessibility/responsive/copy checks.
+**Remaining acceptance work:** Dialog registration is fixed. A subsequent modal scrolling fix is implemented locally and verified in an isolated browser; user profile confirmation is pending. Decide launch scope, complete/hide placeholders and legacy test routes, fix remaining helper validation/booking behavior, and perform accessibility/responsive/copy checks.
 
 **Dependencies for closure:** R02, R03, R08.
 

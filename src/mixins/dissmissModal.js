@@ -1,12 +1,5 @@
 import Modal from "bootstrap/js/dist/modal";
-
-function cleanupModalArtifacts() {
-  document
-    .querySelectorAll(".modal-backdrop")
-    .forEach((backdrop) => backdrop.remove());
-  document.body.classList.remove("modal-open");
-  document.body.style.removeProperty("padding-right");
-}
+import { cleanupModalArtifacts } from "../services/modal-state";
 
 function moveFocusOutsideModal(modalElement) {
   const activeElement = document.activeElement;
@@ -32,11 +25,17 @@ export default {
       const modalElement = document.querySelector(modalId);
 
       if (!modalElement) {
+        cleanupModalArtifacts();
         return Promise.resolve();
       }
 
       const modalInstance = Modal.getOrCreateInstance(modalElement);
       moveFocusOutsideModal(modalElement);
+
+      if (!modalElement.classList.contains("show") && modalElement.style.display !== "block") {
+        cleanupModalArtifacts();
+        return Promise.resolve();
+      }
 
       return new Promise((resolve) => {
         let resolved = false;
@@ -45,15 +44,17 @@ export default {
             return;
           }
           resolved = true;
+          modalElement.removeEventListener("shown.bs.modal", hide);
           moveFocusOutsideModal(modalElement);
           cleanupModalArtifacts();
           resolve();
         };
 
+        const hide = () => modalInstance.hide();
         modalElement.addEventListener("hidden.bs.modal", finish, { once: true });
-        modalInstance.hide();
-
-        setTimeout(finish, 250);
+        // Bootstrap ignores hide() during its opening transition; retry on shown.
+        modalElement.addEventListener("shown.bs.modal", hide, { once: true });
+        hide();
       });
     },
   },

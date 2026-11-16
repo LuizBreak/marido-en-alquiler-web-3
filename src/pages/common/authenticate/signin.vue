@@ -144,6 +144,7 @@
 </template>
 
 <script>
+import { cleanupModalArtifacts } from "../../../services/modal-state";
 import { mapGetters } from "vuex";
 import Signup from "./signup.vue";
 import PwdVisibility from "../../../mixins/passwordVisibility.js";
@@ -172,11 +173,7 @@ export default {
   },
   methods: {
     cleanupModalState() {
-      document
-        .querySelectorAll(".modal-backdrop")
-        .forEach((backdrop) => backdrop.remove());
-      document.body.classList.remove("modal-open");
-      document.body.style.removeProperty("padding-right");
+      cleanupModalArtifacts();
     },
     async closeSigninModal() {
       await this.dismissModal("#signin-modal");

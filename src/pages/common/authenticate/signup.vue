@@ -331,6 +331,7 @@
 </template>
 
 <script>
+import { cleanupModalArtifacts } from "../../../services/modal-state";
 import PwdVisibility from "../../../mixins/passwordVisibility.js";
 import ErrorList from "../../../components/ui/BaseValidationErrorList.vue";
 import { showdModal } from "../../../mixins/showModal";
@@ -416,11 +417,7 @@ export default {
   },
   methods: {
     cleanupModalState() {
-      document
-        .querySelectorAll(".modal-backdrop")
-        .forEach((backdrop) => backdrop.remove());
-      document.body.classList.remove("modal-open");
-      document.body.style.removeProperty("padding-right");
+      cleanupModalArtifacts();
     },
     async closeSignupModal() {
       await this.dismissModal("#signup-modal");

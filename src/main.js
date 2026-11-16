@@ -23,7 +23,21 @@ import "./css/theme.min.css";
 // import "../node_modules/tiny-slider/dist/tiny-slider";
 // import "../node_modules/tiny-slider/dist/tiny-slider.css";
 import "../node_modules/simplebar/dist/simplebar.min.css";
-import "../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js";
+// Use the same modular instances as programmatic dialogs; a second bundle
+// registers duplicate data-API handlers and leaves body scrolling locked.
+import "bootstrap/js/dist/alert";
+import "bootstrap/js/dist/button";
+import "bootstrap/js/dist/carousel";
+import "bootstrap/js/dist/collapse";
+import "bootstrap/js/dist/dropdown";
+import "bootstrap/js/dist/modal";
+import "bootstrap/js/dist/offcanvas";
+import "bootstrap/js/dist/popover";
+import "bootstrap/js/dist/scrollspy";
+import "bootstrap/js/dist/tab";
+import "bootstrap/js/dist/toast";
+import "bootstrap/js/dist/tooltip";
+import { cleanupModalArtifacts } from "./services/modal-state";
 import "../node_modules/smooth-scroll/dist/smooth-scroll.polyfills.min.js";
 // import "../node_modules/@lottiefiles/lottie-player/dist/lottie-player.js";
 import "../node_modules/leaflet/dist/leaflet.js";
@@ -86,4 +100,5 @@ app.mixin(msgBoxDialog);
 
 authBootstrap.finally(() => {
   app.mount("#app");
+  cleanupModalArtifacts();
 });

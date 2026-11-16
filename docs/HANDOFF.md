@@ -8,13 +8,15 @@ The user resumed development after a long pause. We reviewed both repositories, 
 
 That setup is running at **http://127.0.0.1:8080/**. The handoff check received HTTP 200. The user reported that everything seemed to work so far and supplied a screenshot of the signed-in client profile at `/perfil/info`, populated with account details. This is user confirmation of the observed profile flow, not acceptance of all workflows.
 
-**No next feature request has been selected.** Suggested next checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
+**Latest follow-up: page scrolling.** The user reported that the client profile would not scroll. An isolated browser reproduced two sign-in backdrops and a lingering `body.style.overflow = "hidden"` after dismissal. The FE now uses one modular Bootstrap runtime, removes the legacy Bootstrap 3 script, restores scroll state only after modal close, and preserves locks for other open overlays. Browser checks passed for sign-in close, dismissal during the opening transition, and the save-message dialog: one backdrop while open, none after closing, and the page scrolls. HTTPS requests were blocked in that test browser; no AWS writes occurred. The user should refresh the local page and confirm the profile scrolls.
+
+No next feature request has been selected beyond that scrolling fix. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
 
 ## Repositories and Git state
 
 - **FE workspace:** `C:\Users\leste\OneDrive\Desktop\Target-Innovations\01-Active-Projects\Target - marido-en-alquiler-web-3`
 - **BE companion:** `C:\Users\leste\OneDrive\Desktop\Target-Innovations\01-Active-Projects\marido-en-alquiler-backend`
-- FE branch at handoff: `master`; last implementation/documentation commit before this handoff: `bd9e33f`.
+- FE branch: `master`; original repair documentation checkpoint: `bd9e33f`; initial handoff: `e1f9159`. Inspect current HEAD for the subsequent scrolling-fix commit.
 - BE branch at handoff: `main`; latest commit: `b2b03cb`.
 - Both tracked working trees were clean before creating this handoff. FE has pre-existing untracked `dist-build-check/` and `dist-build-check-2/`; preserve them.
 - Existing user edits were checkpointed first: FE `65174fc`, BE `3a4ccc4`. Detailed fix/companion commits: [repair-log.md](repair-log.md).
@@ -52,14 +54,14 @@ Here `VUE_APP_ENV=production` selects the AWS API; Vue CLI still serves a develo
 
 ## Verification already completed
 
-- 14 FE isolated Node tests passed.
+- 17 FE isolated Node tests passed, including three modal scroll-state regression cases.
 - 30 BE isolated Jest tests passed with DB access mocked.
 - BE TypeScript no-emit check passed.
-- 45 changed FE source files passed lint using the committed read-only workaround.
+- 50 changed FE source files passed lint using the committed read-only workaround.
 - Final FE production build passed, retaining bundle/image size warnings.
 - Build-time public env allowlisting was added after artifact scanning caught a local secret embedded by Vue CLI. The final scan found none of the checked sensitive local env values in 8 generated JS/map files. Temporary build output was removed.
 - The current local dev server compiled successfully and returned HTTP 200; user confirmed the populated client profile renders.
-- No comprehensive browser automation, live DB/schema inspection, AWS authorizer audit, payment, email, upload or WebSocket integration test was completed.
+- A targeted browser regression check now covers modal-close scrolling (`node tests/browser/modal-scroll.cjs`, using an isolated Chrome/Edge instance on debugging port 9223). No comprehensive user-journey automation, live DB/schema inspection, AWS authorizer audit, payment, email, upload or WebSocket integration test was completed.
 
 Commands and detailed limits are in [repair-log.md](repair-log.md). Repeat checks when new changes or evidence warrant them.
 

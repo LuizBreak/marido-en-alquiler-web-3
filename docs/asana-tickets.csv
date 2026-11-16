@@ -381,7 +381,7 @@ Implementation commits: FE 33423f5
 Dependencies for closure: R02, R03, R08
 
 REMAINING ACCEPTANCE WORK
-Dialog registration is fixed. Decide launch scope, complete/hide placeholders and legacy test routes, fix remaining helper validation/booking behavior, and perform accessibility/responsive/copy checks.
+Dialog registration is fixed. A subsequent modal scrolling fix is implemented locally and verified in an isolated browser; user profile confirmation is pending. Decide launch scope, complete/hide placeholders and legacy test routes, fix remaining helper validation/booking behavior, and perform accessibility/responsive/copy checks.
 
 ORIGINAL ASSESSMENT
 **Evidence:** Admin/payment pages are placeholders; guide pages show construction content. `/testpad` and `/helper` are registered. `src/main.js` registers `base-dialog` from `BaseBadge.vue`. `Quote`/`PayMethod` expose unimplemented methods and inconsistent validation (`biddescription`, `.trim` compared without invocation). Booking maps `comments` while the contact SQL snapshot uses `message` and requires other absent fields.

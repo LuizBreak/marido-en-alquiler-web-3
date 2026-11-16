@@ -46,6 +46,7 @@
 
 <script>
 import Modal from "bootstrap/js/dist/modal";
+import { cleanupModalArtifacts } from "../../services/modal-state";
 
 export default {
   name: "msg-box-modal",
@@ -76,6 +77,10 @@ export default {
         this.hideDialog();
       }, 3000);
     },
+    onHidden() {
+      cleanupModalArtifacts();
+      this.resetShowIt();
+    },
     resetShowIt() {
       if (this.$store.getters.showIt) {
         this.$store.dispatch("resetShowIt");
@@ -104,11 +109,11 @@ export default {
   },
   mounted() {
     this.modalInstance = Modal.getOrCreateInstance(this.$refs.modal);
-    this.$refs.modal.addEventListener("hidden.bs.modal", this.resetShowIt);
+    this.$refs.modal.addEventListener("hidden.bs.modal", this.onHidden);
   },
   beforeUnmount() {
     this.clearAutoHideTimeout();
-    this.$refs.modal?.removeEventListener("hidden.bs.modal", this.resetShowIt);
+    this.$refs.modal?.removeEventListener("hidden.bs.modal", this.onHidden);
     this.modalInstance?.dispose();
   },
 };
