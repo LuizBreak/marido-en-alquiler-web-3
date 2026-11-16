@@ -4,6 +4,8 @@ The paired FE/BE release is deployed (November 16, 2026). From the FE repository
 
 All AWS resources/data were confirmed development by the user. Backend access/secret/TLS/provisioning and current verification commands are in [HANDOFF.md](HANDOFF.md) and [the release record](releases/2026-11-16-backend.md). The older setup notes below are historical where their deployment/authentication assumptions differ.
 
+Current backend CRUD uses pooled mysql2 and the shared HTTP boundary. The unused Express/Sequelize prototype has been removed. Backend verification scripts read non-secret `scripts/development-target.json`, verify the expected AWS account, and obtain the cleanup administrator password from `marido/dev/database` through `scripts/verification-database.cjs`; they no longer read the ignored Sequelize configuration. Use the permitted authenticated AWS CLI context for these checks. Application Lambdas retain the separate DML-only secret and no administrator-secret access. See the [consistency release](releases/2026-11-16-crud-consistency.md) for deployment/recovery.
+
 ---
 # Development restart guide
 

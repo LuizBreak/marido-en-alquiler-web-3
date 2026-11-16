@@ -9,7 +9,7 @@ The AWS development release is deployed. See [release evidence](releases/2026-11
 - Lists default to 100 records, maximum 200 through `limit`; complete pagination is future work. Message conversation returns newest 100 ordered chronologically, and recipient ownership governs read flags/counts.
 - Canonical `data` and serialized `body` compatibility envelopes are deployed. Missing records return 404; invalid/missing identity 401, forbidden access 403, bad input 400, unexpected failures a redacted 500, with CORS.
 - Raw payment/milestone creation/update returns 501 pending a provider decision. Coordinated account deletion returns 501. Existing payment entries can be listed safely and deleted by their owner.
-- Public inquiry defaults match the actual development schema. `GET /ping` uses `src/controllers/ping.ts` and returns safe liveness with CORS. The prototype `/clientes` delegates to the secured client handler.
+- Public inquiry defaults match the actual development schema. `GET /ping` uses `src/controllers/ping.ts` and returns safe liveness with CORS. `/clients` and compatibility `/clientes` both directly target `src/controllers/clientsController.getClients`, with identical authentication, admin-only list access, envelopes and limits. The old Sequelize wrapper/prototype is removed; see the [consistency release](releases/2026-11-16-crud-consistency.md).
 
 The original contract assessment below is historical. Its descriptions of unauthenticated access, absent routes, unordered/unscoped messages and the dot-prefixed health module are superseded by this section and current source.
 

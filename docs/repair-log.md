@@ -1,5 +1,11 @@
 # Restart repairs and commit ledger
 
+## Backend CRUD consistency — November 16, 2026
+
+Deployed and verified; [release, evidence and compatible recovery](releases/2026-11-16-crud-consistency.md). Both client-list URLs use the shared mysql2 handler directly. Unused Sequelize wrapper/models, Express app/entry point and nodemon config are removed, with corresponding direct dependencies/lockfile cleanup. Verification scripts now validate the development AWS account and read the existing administrator secret through a shared helper; ignored legacy config and private historical releases remain protected.
+
+Separate BE commits: cbb9e2f secret-backed verification, b185c57 CRUD/prototype consolidation, 1cf5d6c dependency cleanup. 104 BE tests, TypeScript, secret scan and live AWS regression passed, including both client-list URLs' authentication/admin restrictions and fixture cleanup. All 77 Node 24 function hashes/handlers match. Artifact comparison found exactly one removed wrapper, with no other runtime/dependency changes. Roles/mail/chat configuration and resource counts are preserved. No frontend application changes, schema migration, actual rollback or Git push.
+
 ## Owned application notification email — November 16, 2026
 
 Deployed; the user confirmed both Gmail test emails arrived. See the [notification release, evidence and recovery](releases/2026-11-16-notifications.md). SES replaces the broken external mailer. Saved projects/messages determine recipients; public support requests target hello. Browser-supplied addresses/HTML cannot control application notifications. Opt-outs, atomic duplicate/rate checks and separate persistence/delivery results are implemented. Zoho routing is preserved.
@@ -8,7 +14,7 @@ BE c719d44/675945e add SES; babb752 implements delivery/security tests; 7017d2a 
 
 94 BE / 49 FE tests, TypeScript, lint of 76 changed source files, build, secret scan, 187 asset checksums, live mail checks and prior core AWS regression passed. Temporary users/SQL/event rows were cleaned. All 77 Node 24 functions match the artifact; REST remains 486 resources, chat six, plus a new six-resource mail stack. Both public hostnames serve the released index after CDN completion. No schema migration or Git push. Delivery remains best effort without automatic resend; DMARC and an alarm destination remain open.
 
-Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The whole AWS system is development. The [notification release](releases/2026-11-16-notifications.md) is current; earlier repair/release sections below are historical and retain their original validation limits.
+Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The whole AWS system is development. The [CRUD consistency release](releases/2026-11-16-crud-consistency.md) is current; earlier repair/release sections retain their historical evidence and validation limits.
 
 ## Backend release repairs
 

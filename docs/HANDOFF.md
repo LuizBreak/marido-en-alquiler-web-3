@@ -4,7 +4,9 @@ Updated November 16, 2026 (America/New_York). Read this, repair-log.md and the l
 
 ## Current outcome
 
-Latest release: [application notification email](releases/2026-11-16-notifications.md). SES now sends fixed backend notices after quotes, non-chat messages and support requests are saved. The user confirmed both live Gmail test emails arrived. Zoho inbox setup is confirmed; its DNS records remain unchanged. FE 0cacc41/5cfacc6; BE c719d44/675945e/babb752/7017d2a/2081242. Read the release for limits, opt-outs and recovery.
+Latest release: [backend CRUD consistency](releases/2026-11-16-crud-consistency.md). `/clientes` directly uses the shared mysql2 client controller, with unchanged admin-only access/URLs. The unused Sequelize/Express prototype/direct dependencies are removed. Verification credentials now come from the existing development administrator secret after an AWS-account check, not the old Sequelize config. BE cbb9e2f/b185c57/1cf5d6c. 104 BE tests, TypeScript, packaged-secret/artifact checks, all 77 deployed hashes/handlers and full remote regression/fixture cleanup passed. Frontend application code is unchanged.
+
+The [application notification email](releases/2026-11-16-notifications.md) behavior remains deployed. SES sends fixed backend notices after quotes, non-chat messages and support requests are saved. The user confirmed both live Gmail test emails arrived. Zoho inbox setup is confirmed; its DNS records remain unchanged. FE 0cacc41/5cfacc6; BE c719d44/675945e/babb752/7017d2a/2081242. Read that release for delivery limits and opt-outs; use the newer consistency release for current artifacts/recovery.
 
 The user confirmed all AWS resources/data are development and authorized repairs, separate local commits and deployment. The credentials/runtime/photos, project workflow and authenticated live-chat batches are deployed. Read the latest [chat release, evidence and secure recovery](releases/2026-11-16-chat.md), [journey release, evidence and rollback](releases/2026-11-16-journey.md), [hardening release](releases/2026-11-16-hardening.md) and [credential record](releases/2026-11-16-credentials.md).
 
@@ -30,7 +32,7 @@ The conch-app.com mailer has been replaced by backend-owned SES delivery. Cognit
 
 - AWS account 907823072924, region us-east-1, CLI profile default; authenticated user luiz.break.
 - Website/S3 www.marido-en-alquiler.com; CloudFront EI5JEIS37I445. API https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend; stack marido-backend-dev.
-- REST retains 76 Node 24 functions and 486 resources. Chat has six resources / one function; new marido-mail-dev has six resources. All 77 active functions match notification artifact repairs/notifications-20261116/backend.zip, SHA-256 5f0ff4369e8628a63eeaffd290ac67c3473712bd42986282dc8e9f13ef047382. Chat/REST notification change sets completed; the mail stack was created. Both public hostnames serve the released index after CDN completion. Current evidence: .deployments/notifications-20261116/.
+- REST retains 76 Node 24 functions and 486 resources. Chat and mail each retain six resources. All 77 active functions match repairs/consistency-20261116/backend.zip, SHA-256 868e168913107151b4dabbf23d43846bc12dc8e784d12c5a0084924338b4ff28. Both consistency-20261116 change sets completed, with roles/environment/mail configuration preserved and the compatibility handler direct. Current backend evidence: .deployments/consistency-20261116/. Frontend remains the published notification release, with prior asset/index/CDN evidence in .deployments/notifications-20261116/.
 - WebSocket API 0ord21fqk7 keeps its historical production stage/URL (all data remains development); all eight integrations target marido-chat-dev-handler, deployment 2az9g7. Table marido-chat-dev-connections stores metadata only, with TTL and expiry filtering; API tracing off, throttle 20/second and burst 40. Legacy marido-chat-api-handler remains disabled.
 - RDS marido-en-alquile-prod is development despite its historical name; MySQL 8.4.10, existing database retained. No application schema migration was made. Automated backups were inventoried; a restore was not exercised.
 - App DB principal marido_app_dev: SELECT/INSERT/UPDATE/DELETE only; secret marido/dev/application-database; TLS verifies the bundled RDS CA; pool limit two per execution environment. The Lambda role can read only this DB secret. A direct temporary Lambda probe verified application access and administrator-secret denial, then was removed.
@@ -42,7 +44,7 @@ The conch-app.com mailer has been replaced by backend-owned SES delivery. Cognit
 
 ## Validation and local commands
 
-94 BE tests, TypeScript, 49 FE tests, lint across 76 changed source files, production build and packaged known-secret scans passed. Real development API/Cognito/MySQL/S3 tests verify both roles, concurrency/stale terms/idempotency, lifecycle/participant checks, own-work isolation and prior identity/profile/image/message contracts. New live mail checks verify stored recipients, deduplication, opt-outs and fixed support delivery; the user confirmed both application Gmail emails arrived. Fixtures, uploads and notification event rows were removed. Hashed shared rate counters expire normally via TTL.
+104 BE tests, TypeScript, packaged-secret/artifact-diff checks and live AWS regression passed for the consistency release. Both list URLs retain 401/403 restrictions, and shared-handler admin success/limits are tested. FE application code did not change; its prior 49 tests, 76-file lint, production build and public asset/index checks remain the baseline. Prior mail acceptance verified stored recipients, deduplication, opt-outs and fixed support delivery, with user-confirmed Gmail receipt. Temporary SQL/Cognito/S3 fixtures were cleaned. Hashed shared rate counters expire normally via TTL.
 
 Backend production audit findings went 36 to 8; no reported vulnerable dependency path is included in the allowlisted Lambda artifact. Unused prototype/development and FE dependency findings remain open. Framework/plugin versions were preserved. Browser AWS SDK removal reduced the raw initial entry point from roughly 6.64 MiB to 3.10 MiB; large images/bundle warnings remain.
 
@@ -56,14 +58,14 @@ node scripts/lint-changed.cjs 65174fc
 # BE
 node node_modules/typescript/bin/tsc --noEmit --incremental false
 node node_modules/jest/bin/jest.js --runInBand
-node scripts/verify-development.cjs '<absolute FE path>/.deployments/notifications-20261116' --development-fixtures --remote
+node scripts/verify-development.cjs '<absolute FE path>/.deployments/consistency-20261116' --development-fixtures --remote
 ```
 
 The last command deliberately creates/removes test users, records and S3 objects; requires AWS access, companion FE dependencies and the refreshed ignored admin cleanup config. Never repeat/bypass the earlier rejected diagnostic PUT to an existing account. Restricted-shell checks hide AWS credentials; use the permitted elevated context before asking the user to sign in. Never print secrets.
 
 ## Rollback and next pickup
 
-Current evidence: .deployments/notifications-20261116/. Read the notification release recovery section first. Captured previous REST/chat templates and index restore the accepted authenticated chat release, preserving current libraries/credentials. Keep WebSocket authentication and the legacy handler disabled. REST imports both chat and mail resources; remove imports before deleting either stack, and retain their state as documented. Code rollback normally leaves working SES/Zoho DNS intact. No MySQL migration or actual rollback was performed.
+Current backend evidence: .deployments/consistency-20261116/. Use rollback-rest-template.json and the captured previous chat template to restore the prior artifact while retaining the direct client handler (present in both artifacts), current roles and credentials. No frontend rollback is needed for this backend-only release. Keep authenticated chat and the disabled anonymous handler; remove imports before deleting chat/mail stacks. Keep working SES/Zoho DNS. Recovery was captured, not executed. No MySQL migration or Git push.
 
 Next priorities:
 

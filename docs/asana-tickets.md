@@ -22,13 +22,15 @@ No remote tickets were created. [CSV](asana-tickets.csv) contains all 21 import-
 | [R14](#r14) | P1 | Partial; boundary deployed | SQL input handling and Lambda error paths need consolidation |
 | [R15](#r15) | P1 | Partial; live delivery and authorization verified | Chat read state and connection lifecycle are inconsistent |
 | [R16](#r16) | P1 | Partial; photo display browser-verified | Image upload integrity and private ownership are undefined |
-| [R17](#r17) | P2 | Partial; managed chat and mail stacks documented | Multiple backend execution/configuration paths obscure the source of truth |
-| [R18](#r18) | P2 | Partial; 94 BE and 49 FE checks pass | Dependency and verification baseline is weak |
+| [R17](#r17) | P2 | Partial; active CRUD consolidated on mysql2 | Multiple backend execution/configuration paths obscure the source of truth |
+| [R18](#r18) | P2 | Partial; 104 BE tests; FE baseline 49 | Dependency and verification baseline is weak |
 | [R19](#r19) | P2 | Partial; browser SDK removed | Initial browser payload is large |
 | [R20](#r20) | P2 | Partial; notification delivery user-confirmed | Deployment, external services and operational ownership are incomplete |
 | [R21](#r21) | P2 | Partial; workflow and support feedback repaired | Product completion and component cleanup need explicit scope |
 
 ## Authenticated live chat acceptance
+
+Latest [CRUD consistency release](releases/2026-11-16-crud-consistency.md): retired the unused Sequelize/Express prototype and direct dependencies, pointed `/clientes` directly at the shared mysql2 client handler, and moved verification credentials to the existing development secret with account/error guards. 104 BE tests, TypeScript, secret/artifact checks, 77 deployed hashes and live regression/cleanup passed. Frontend application code is unchanged; its prior 49-test baseline remains. R17 stays partial for other legacy mysql2 paths, migrations and infrastructure consolidation; R18 retains unrelated dependency/toolchain work.
 
 The newer [notification release](releases/2026-11-16-notifications.md) supersedes older mailer-open statements below. SES delivery is deployed; the user confirmed both application Gmail test messages arrived. Stored recipients/fixed templates, opt-outs, event deduplication/rate limits and support-save feedback are verified. 94 BE / 49 FE checks and live AWS regression pass. The CSV appends these outcomes to the same 21 tickets; no remote tasks were created. DMARC, durable retry, alarm destinations and broader ticket acceptance remain open.
 

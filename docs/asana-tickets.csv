@@ -398,7 +398,9 @@ Status: Partial; managed chat stack documented
 The standalone process-local chat handler is replaced by a six-resource managed stack with durable expiring connection indexes, an authenticated handler and isolated socket/publisher roles. Main REST stack stays 486 resources. BE fde4f51.
 Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
 
-November 16, 2026 notification release: Added a six-resource mail stack with retained TTL event/rate state, scoped role and failure metrics/alarm. REST stays 486 resources. Alarm destination and broader configuration cleanup remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.",P2,Partial; managed chat and mail stacks documented,R04,Delivery and maintainability
+November 16, 2026 notification release: Added a six-resource mail stack with retained TTL event/rate state, scoped role and failure metrics/alarm. REST stays 486 resources. Alarm destination and broader configuration cleanup remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
+
+November 16, 2026 CRUD consistency release: Retired unused Sequelize/Express prototype and direct dependencies. Both client-list routes directly target the shared mysql2 controller. Verification tools use Secrets Manager with target-account checks rather than the old Sequelize JSON. All 77 deployed hashes/handlers and live regression/cleanup passed. Other legacy mysql2 paths, migrations and infrastructure consolidation remain. See docs/releases/2026-11-16-crud-consistency.md. BE cbb9e2f/b185c57/1cf5d6c. No remote Asana tickets created.",P2,Partial; active CRUD consolidated on mysql2,R04,Delivery and maintainability
 [R18] — Dependency and verification baseline is weak,"Review ID: R18
 Updated: November 16, 2026
 Status: Partial; runtime/package repaired
@@ -426,7 +428,9 @@ Status: Partial; 81 BE and 45 FE checks pass
 Current chat release passes 81 backend and 45 frontend tests, TypeScript, lint, build, secret scans and live AWS/browser acceptance. Active REST/socket functions use Node 24. Legacy/prototype/build-tool dependency work remains.
 Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
 
-November 16, 2026 notification release: 94 BE/49 FE tests, TypeScript, lint of 76 changed source files, build, packaged-secret scan, 187 asset hashes, live notifications and the prior core AWS regression passed. Legacy dependencies/toolchain remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.",P2,Partial; 94 BE and 49 FE checks pass,R04,Delivery and maintainability
+November 16, 2026 notification release: 94 BE/49 FE tests, TypeScript, lint of 76 changed source files, build, packaged-secret scan, 187 asset hashes, live notifications and the prior core AWS regression passed. Legacy dependencies/toolchain remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
+
+November 16, 2026 CRUD consistency release: 104 BE tests and TypeScript passed, with new compatibility and secret-safety cases. Removed 86 installed packages; whole-repository npm findings changed from 59 to 56, with unrelated findings still open. Artifact comparison found exactly one removed wrapper and no changed runtime dependencies. Frontend application code is unchanged; prior 49-test baseline remains. See docs/releases/2026-11-16-crud-consistency.md. BE cbb9e2f/b185c57/1cf5d6c. No remote Asana tickets created.",P2,Partial; 104 BE tests; FE baseline 49,R04,Delivery and maintainability
 [R19] — Initial browser payload is large,"Review ID: R19
 Updated: November 16, 2026
 Status: Partial; browser SDK removed
