@@ -24,7 +24,7 @@
         :services="project.services"
         :ShowProvideReview="true"
       />
-      <ProjectOffers v-if="IsClient" :project="project" />
+      <ProjectOffers v-if="isClient" :project="project" />
       </div>
     </div>
 
@@ -50,13 +50,13 @@ export default {
       urls: [
         { url: "/", caption: "Inicio", isActive: false, aria: "" },
         {
-          url: this.IsClient ? "/perfil" : "/profile",
+          url: this.isClient ? "/perfil" : "/profile",
           caption: "Cuenta",
           isActive: false,
           aria: "",
         },
         {
-          url: this.IsClient ? "/perfil/proyectos" : "/profile/proyectos",
+          url: this.isClient ? "/perfil/proyectos" : "/profile/proyectos",
           caption: "Mis Proyectos",
           isActive: true,
           aria: "page",
@@ -68,7 +68,7 @@ export default {
     ...mapGetters([
       types.LOGGED_USER,
       types.IS_LOGGED_IN,
-      "IsClient",
+      "isClient",
       "isContractor",
       "user",
     ]),
