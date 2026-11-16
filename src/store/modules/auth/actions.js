@@ -6,6 +6,17 @@ import store from "../../../store/index";
 let timer;
 let lastUserId;
 
+function normalizeAccountInfo(accountInfo) {
+  const account = Array.isArray(accountInfo) ? accountInfo[0] || {} : accountInfo || {};
+  const id = account.id || account.Id || account.localId;
+
+  return {
+    ...account,
+    id,
+    userType: account.userType,
+  };
+}
+
 class AuthenticationError extends Error {
   constructor(errorCode, message) {
     super(message);
@@ -17,24 +28,51 @@ class AuthenticationError extends Error {
 
 export default {
   async login(context, payload) {
+    clearTimeout(timer);
+    context.commit("setSignedIn", false);
+    context.commit("setCognitoUser", null);
+    context.commit("clients/RESET_CLIENT", null, { root: true });
+    context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
+    context.commit(types.SET_USER, {
+      token: null,
+      userId: null,
+      loggedUser: {},
+    });
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("expirationDate");
+    localStorage.removeItem(types.USERID);
+    localStorage.removeItem(types.LOGGED_USER);
+
     try {
-      await Auth.signIn(payload.email, payload.password).then((user) => {
-        context.commit("setSignedIn", !!user);
-        context.commit("setCognitoUser", user);
+      const user = await Auth.signIn(payload.email, payload.password);
 
-        // Helper function to validate ExpiresIn
-        // context.dispatch("showExpiresIn", {
-        //   source: "ExpiresIn From aws Auth",
-        //   expiresIn: user.signInUserSession.accessToken.payload.exp,
-        // });
+      // Helper function to validate ExpiresIn
+      // context.dispatch("showExpiresIn", {
+      //   source: "ExpiresIn From aws Auth",
+      //   expiresIn: user.signInUserSession.accessToken.payload.exp,
+      // });
 
-        return context.dispatch(types.AUTH, {
-          ...payload,
-          idToken: user.signInUserSession.idToken.jwtToken,
-          expiresIn: user.signInUserSession.accessToken.payload.exp,
-        });
+      await context.dispatch(types.AUTH, {
+        ...payload,
+        idToken: user.signInUserSession.idToken.jwtToken,
+        expiresIn: user.signInUserSession.accessToken.payload.exp,
       });
+
+      context.commit("setCognitoUser", user);
     } catch (error) {
+      context.commit("setSignedIn", false);
+      context.commit("setCognitoUser", null);
+      context.commit("clients/RESET_CLIENT", null, { root: true });
+      context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
+      context.commit(types.SET_USER, {
+        token: null,
+        userId: null,
+        loggedUser: {},
+      });
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("expirationDate");
+      localStorage.removeItem(types.USERID);
+      localStorage.removeItem(types.LOGGED_USER);
       throw new AuthenticationError(error.code, error.message);
     }
   },
@@ -79,12 +117,12 @@ export default {
         returnSecureToken: true,
       });
       const { body } = response.data;
-      responseData = JSON.parse(body);
+      responseData = normalizeAccountInfo(JSON.parse(body));
     } catch (e) {
-      responseData == {};
+      responseData = {};
     }
 
-    if (!response.statusText == "OK" || response.data.length == 0) {
+    if (!response || response.statusText !== "OK" || !responseData.id) {
       const error = new Error(
         responseData.message || "Failed to authenticate. Check your login data."
       );
@@ -111,6 +149,7 @@ export default {
     let expirationDate = localStorage.getItem("expirationDate");
     let userId = localStorage.getItem(types.USERID);
     let loggedUserInfo = null;
+    let userType = null;
     // console.log("ExpiresIn from localStorage", [
     //   token,
     //   expirationDate,
@@ -128,6 +167,7 @@ export default {
       userId = payload.userId;
       expirationDate = payload.expirationDate;
       loggedUserInfo = null;
+      userType = payload.userType || null;
 
       localStorage.setItem("access_token", token);
       localStorage.setItem(types.USERID, userId);
@@ -142,6 +182,11 @@ export default {
       return false;
     }
 
+    if (userId === "undefined" || userId === "null") {
+      context.dispatch(types.LOGOUT);
+      return false;
+    }
+
     const expiresIn = +expirationDate - new Date().getTime();
     if (expiresIn < 0) {
       context.dispatch(types.LOGOUT);
@@ -149,12 +194,12 @@ export default {
     }
 
     // go get all the user Info to fill loggedUser
-    const response = await apiSvc.get(`accounts/${userId}`);
-    const { body } = response.data;
     try {
-      loggedUserInfo = JSON.parse(body);
+      const response = await apiSvc.get(`accounts/${userId}`);
+      const { body } = response.data;
+      loggedUserInfo = normalizeAccountInfo(JSON.parse(body));
     } catch (e) {
-      loggedUserInfo == {};
+      loggedUserInfo = {};
     }
 
     context.dispatch("showExpiresIn", {
@@ -170,6 +215,7 @@ export default {
       await this.dispatch(types.SET_USER_TYPE_INFO, {
         token: token,
         userId: userId,
+        userType: userType,
         loggedUserInfo: loggedUserInfo,
       });
       return true;
@@ -193,6 +239,7 @@ export default {
 
     TokenService.removeToken();
     TokenService.removeTokenExpirationDate();
+    localStorage.removeItem("expirationDate");
     localStorage.removeItem(types.USERID);
     localStorage.removeItem(types.LOGGED_USER);
 
@@ -206,6 +253,7 @@ export default {
       userId: null,
       loggedUser: {},
     });
+    context.commit("setCognitoUser", null);
   },
   autoLogout(context) {
     context.dispatch(types.LOGOUT);
@@ -231,6 +279,10 @@ export default {
     // Setting the userType (client or Contractor) information about this user
     switch (resolvedUserType) {
       case "client":
+        if (!payload.userId) {
+          break;
+        }
+
         await this.dispatch(types.FETCH_CLIENT, { id: payload.userId });
 
         // eslint-disable-next-line no-case-declarations
@@ -242,6 +294,10 @@ export default {
         }
         break;
       case "contractor":
+        if (!payload.userId) {
+          break;
+        }
+
         await this.dispatch(types.FETCH_CONTRACTOR, { id: payload.userId });
         // eslint-disable-next-line no-case-declarations
         let contractor = store.getters["contractors/contractor"];
@@ -317,10 +373,8 @@ export default {
     switch (payload.userType) {
       case "client":
         return await this.dispatch("clients/createClient", client);
-        break;
       case "contractor":
         return await this.dispatch("contractors/createContractor", client);
-        break;
       default:
         return false;
     }

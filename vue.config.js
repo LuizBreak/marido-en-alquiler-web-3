@@ -1,13 +1,12 @@
 module.exports = {
-
-     /*
-      This file is only use for debuging puporses using Chrome DevTools. 
-      It is not used in production build. You can remove it if you don't need it.
-    */
-
+  /*
+    This file is only use for debuging puporses using Chrome DevTools.
+    It is not used in production build. You can remove it if you don't need it.
+  */
+  parallel: false,
   configureWebpack: {
-    devtool: 'source-map'
-  }
+    devtool: "source-map",
+  },
 
 
 //   configureWebpack: {

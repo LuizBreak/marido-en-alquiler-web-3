@@ -130,7 +130,7 @@
                       style="color: red; text-decoration: blink"
                       v-if="!formIsValid"
                     >
-                      Por favor, entra un correo y contraseña válida.<br />
+                      {{ error || "Por favor, entra un correo y contraseña válida." }}<br />
                     </p>
                   </div>
                 </form>
@@ -187,12 +187,14 @@ export default {
     },
     async submitForm() {
       this.formIsValid = true;
+      this.error = null;
       if (
         this.email === "" ||
         !this.email.includes("@") ||
         this.password.length < 6
       ) {
         this.formIsValid = false;
+        this.error = "Por favor, entra un correo y contraseña válida.";
         return;
       }
       this.isLoading = true;
@@ -220,6 +222,13 @@ export default {
         this.$router.replace(redirectUrl);
         this.isLoading = false;
       } catch (error) {
+        console.error("Cognito login error", {
+          code: error?.errorCode || error?.code,
+          message: error?.message,
+          name: error?.name,
+        });
+        this.error =
+          error?.message || "No se pudo iniciar sesión. Verifica tus credenciales.";
         this.formIsValid = false;
         this.isLoading = false;
       }

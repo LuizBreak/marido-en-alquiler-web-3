@@ -366,6 +366,15 @@ export default {
     };
   },
   methods: {
+    async initializeUserFromStore() {
+      const baseUser = await this.getUserCopy();
+      this.user = {
+        ...baseUser,
+        firstName: baseUser.firstName || this.loggedUser.firstName || "",
+        lastName: baseUser.lastName || this.loggedUser.lastName || "",
+        email: baseUser.email || this.loggedUser.email || "",
+      };
+    },
     async onSubmit() {
       const result = await this.v$.$validate();
 
@@ -482,16 +491,14 @@ export default {
       immediate: false,
       deep: true,
       async handler() {
-        this.user = await this.getUserCopy();
-        this.user.email = this.loggedUser.email;
+        await this.initializeUserFromStore();
       },
     },
     loggedUser: {
       immediate: false,
       deep: true,
       async handler() {
-        this.user = await this.getUserCopy();
-        this.user.email = this.loggedUser.email;
+        await this.initializeUserFromStore();
       },
     },
   },
@@ -503,9 +510,7 @@ export default {
 
     this.$emit("child-breadcrumbs-urls", this.urls);
 
-    // Why Get Copy that internally uses Getters work?? :()
-    this.user = await this.getUserCopy();
-    this.user.email = this.loggedUser.email;
+    await this.initializeUserFromStore();
   },
 };
 </script>

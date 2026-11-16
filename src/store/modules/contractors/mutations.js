@@ -11,6 +11,7 @@ export default {
   },
   ADD_NEW_CONTRACTOR(state, contractor) {
     state.contractors.push(contractor);
+    state.contractor = contractor;
   },
   DELETE_CONTRACTOR(state, contractor) {
     let index = state.contractors.indexOf(contractor);

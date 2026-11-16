@@ -2,6 +2,10 @@
 
 # A general services platform for connecting homeowner to handyman professional in Dominican Republic
 
+## Development restart documentation
+
+See [the project documentation](docs/README.md) for the purpose and architecture of both repositories, API/data reference, prioritized discrepancies and improvements, and safe development setup/verification results (reviewed November 15, 2026).
+
 ## Project setup
 
 ```

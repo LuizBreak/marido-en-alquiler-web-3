@@ -201,6 +201,7 @@
                         type="checkbox"
                         id="plomeria"
                         value="plomeria"
+                        :class="v$.user.serviceTypes.$error ? 'is-invalid' : ''"
                         v-model="user.serviceTypes"
                       />
                       <label class="form-check-label" for="plomeria"
@@ -213,6 +214,7 @@
                         type="checkbox"
                         id="aire"
                         value="aire"
+                        :class="v$.user.serviceTypes.$error ? 'is-invalid' : ''"
                         v-model="user.serviceTypes"
                       />
                       <label class="form-check-label" for="aire"
@@ -227,6 +229,7 @@
                         type="checkbox"
                         id="remodelacion"
                         value="remodelacion"
+                        :class="v$.user.serviceTypes.$error ? 'is-invalid' : ''"
                         v-model="user.serviceTypes"
                       />
                       <label class="form-check-label" for="remodelacion"
@@ -239,6 +242,7 @@
                         type="checkbox"
                         id="eletricidad"
                         value="eletricidad"
+                        :class="v$.user.serviceTypes.$error ? 'is-invalid' : ''"
                         v-model="user.serviceTypes"
                       />
                       <label class="form-check-label" for="eletricidad"
@@ -253,6 +257,7 @@
                         type="checkbox"
                         id="herreria"
                         value="herreria"
+                        :class="v$.user.serviceTypes.$error ? 'is-invalid' : ''"
                         v-model="user.serviceTypes"
                       />
                       <label class="form-check-label" for="herreria"
@@ -265,6 +270,7 @@
                         type="checkbox"
                         id="pintura"
                         value="pintura"
+                        :class="v$.user.serviceTypes.$error ? 'is-invalid' : ''"
                         v-model="user.serviceTypes"
                       />
                       <label class="form-check-label" for="pintura"
@@ -378,7 +384,12 @@
                   <label class="form-label" for="city"
                     >Ciudad <span class="text-danger">*</span></label
                   >
-                  <select class="form-select" id="city" v-model="user.city">
+                  <select
+                    class="form-select"
+                    id="city"
+                    :class="v$.user.city.$error ? 'is-invalid' : ''"
+                    v-model="user.city"
+                  >
                     <option :value="null" disabled>
                       --- Eligir Ciudad ---
                     </option>
@@ -540,34 +551,59 @@ export default {
     };
   },
   methods: {
+    initializeUserFromStore() {
+      const baseUser = this.getUserCopy();
+      this.user = {
+        ...baseUser,
+        id: baseUser.id || this.resolveContractorId() || "",
+        firstName: baseUser.firstName || this.loggedUser.firstName || "",
+        lastName: baseUser.lastName || this.loggedUser.lastName || "",
+        email: baseUser.email || this.loggedUser.email || "",
+        userType: baseUser.userType || this.loggedUser.userType || "contractor",
+      };
+      this.user.serviceTypes = this.parseServiceTypes(this.user.serviceTypes);
+    },
     async onSubmit() {
       const result = await this.v$.$validate();
       if (!result) {
+        this.scrollToFirstInvalidField();
+        this.triggerMsgBox(
+          true,
+          "Complete los campos obligatorios antes de grabar el registro."
+        );
         return;
       }
-      if (this.selectedFile) {
-        this.onUploadImage();
-        this.user.avatar = this.selectedFile.name;
-        this.setUserAvatar(this.user.id, this.user.avatar);
-      }
 
-      // Previous approach
-      // this.user.services = this.services;
-      // console.log("user data", JSON.stringify(this.user));
-
-      // TODO: Investigate if approach must be used here too like in addProjects
-      // this.setServiceList(this.newProject.services),
-      this.user.serviceTypes = this.setServiceList(this.user.serviceTypes);
+      const contractorId = this.resolveContractorId();
+      const contractor = {
+        ...this.user,
+        id: contractorId,
+        userType: this.user.userType || this.loggedUser.userType || "contractor",
+        serviceTypes: this.setServiceList(this.user.serviceTypes),
+      };
 
       try {
-        if (!this.user.id) {
-          await this.$store.dispatch("contractors/createContractor", this.user);
-          this.triggerMsgBox(true, "Registro realizado con éxito.");
-        } else {
-          console.log("onSubmit", this.user);
-          await this.$store.dispatch("contractors/updateContractor", this.user);
-          this.triggerMsgBox(true, "Registro actualizado con éxito.");
+        if (!contractor.id) {
+          this.triggerMsgBox(
+            true,
+            "No se pudo identificar el contratista activo. Cierra sesión e inicia sesión nuevamente."
+          );
+          return;
         }
+
+        if (this.selectedFile) {
+          this.onUploadImage();
+          contractor.avatar = this.selectedFile.name;
+          this.setUserAvatar(contractor.id, contractor.avatar);
+        }
+
+        console.log("onSubmit", contractor);
+        await this.$store.dispatch("contractors/updateContractor", contractor);
+        this.triggerMsgBox(true, "Registro actualizado con éxito.");
+        this.user = {
+          ...contractor,
+          serviceTypes: this.parseServiceTypes(contractor.serviceTypes),
+        };
       } catch (error) {
         this.triggerMsgBox(
           true,
@@ -575,13 +611,38 @@ export default {
         );
       }
     },
+    resolveContractorId() {
+      const possibleIds = [
+        this.user && this.user.id,
+        this.contractor && this.contractor.id,
+        this.loggedUser && this.loggedUser.id,
+        this.userId,
+        localStorage.getItem(types.USERID),
+      ];
+
+      return possibleIds.find(
+        (id) => id && id !== "undefined" && id !== "null"
+      );
+    },
+    scrollToFirstInvalidField() {
+      this.$nextTick(() => {
+        const firstInvalidField = document.querySelector(".is-invalid");
+        if (firstInvalidField) {
+          firstInvalidField.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          firstInvalidField.focus();
+        }
+      });
+    },
     setServiceList(services) {
       /*
        * Function to ensure problem quotation for a array-like string
        * for future use with JSON.parse() in other pages
        */
-      //console.log("newProject", services);
-      const serviceList = services.map((item) => `'${item}'`).join(",");
+      const serviceTypes = this.parseServiceTypes(services);
+      const serviceList = serviceTypes.map((item) => `'${item}'`).join(",");
       // console.log("Transformed serviceList", serviceList);
       return "[" + serviceList + "]";
       // services: "[" + this.newProject.serviceTypes.join() + "]", // this approach had a bug since it would now put single quotes around it
@@ -599,14 +660,22 @@ export default {
        *                Final Array = [ "Pintura", "Remodelacion" ]
        */
       // console.log("List of Services from DB", this.services);
+      if (Array.isArray(services)) {
+        return services;
+      }
+
+      if (typeof services !== "string") {
+        return [];
+      }
+
       var data = services;
       try {
         const replaced = data.replaceAll(`'`, `"`);
         // console.log("data", replaced);
         var arr = JSON.parse(replaced);
-        return arr;
+        return Array.isArray(arr) ? arr : [];
       } catch (error) {
-        return data;
+        return [];
       }
     },
     async onDelete() {
@@ -639,6 +708,7 @@ export default {
   computed: {
     ...mapGetters([
       types.LOGGED_USER,
+      types.USERID,
       types.IS_LOGGED_IN,
       "IsClient",
       "isContractor",
@@ -673,8 +743,14 @@ export default {
       immediate: false,
       deep: true,
       handler() {
-        this.user = this.getUserCopy();
-        this.user.serviceTypes = this.parseServiceTypes(this.user.serviceTypes);
+        this.initializeUserFromStore();
+      },
+    },
+    loggedUser: {
+      immediate: false,
+      deep: true,
+      handler() {
+        this.initializeUserFromStore();
       },
     },
   },
@@ -687,8 +763,7 @@ export default {
 
     this.$emit("child-breadcrumbs-urls", this.urls);
 
-    this.user = this.getUserCopy();
-    this.user.serviceTypes = this.parseServiceTypes(this.user.serviceTypes);
+    this.initializeUserFromStore();
 
     // We have to convert a string-like array to real array
     // console.log(

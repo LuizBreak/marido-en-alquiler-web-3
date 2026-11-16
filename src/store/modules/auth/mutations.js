@@ -22,10 +22,10 @@ export default {
     state.signedIn = flag;
   },
   setCognitoUser(state, payload) {
-    state.user = payload;
-    state.token = payload.signInUserSession.accessToken.jwtToken;
+    state.user = payload || {};
+    state.token = payload?.signInUserSession?.accessToken?.jwtToken || null;
   },
   setUserAvatar(state, payload) {
-    state.loggedUser.avatar = payload.avatar;
+    state.loggedUser.avatar = payload?.avatar || payload;
   },
 };
