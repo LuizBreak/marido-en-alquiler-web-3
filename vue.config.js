@@ -1,18 +1,12 @@
+const publicEnvironment = require("./scripts/public-environment.cjs");
+
 module.exports = {
-  /*
-    This file is only use for debuging puporses using Chrome DevTools.
-    It is not used in production build. You can remove it if you don't need it.
-  */
   parallel: false,
-  configureWebpack: {
-    devtool: "source-map",
+  configureWebpack: { devtool: "source-map" },
+  chainWebpack(config) {
+    config.plugin("define").tap(args => {
+      args[0]["process.env"] = publicEnvironment(args[0]["process.env"] || {});
+      return args;
+    });
   },
-
-
-//   configureWebpack: {
-//     devtool: process.env.NODE_ENV === 'production'
-//       ? false
-//       : 'eval-source-map'
-//   }
-
 };
