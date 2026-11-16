@@ -43,8 +43,6 @@ import "../node_modules/smooth-scroll/dist/smooth-scroll.polyfills.min.js";
 import "../node_modules/leaflet/dist/leaflet.js";
 import "../node_modules/jarallax/dist/jarallax.min.js";
 
-import Amplify from "aws-amplify";
-import awsExports from "./aws-exports";
 import AmplifyVue from "@aws-amplify/ui-vue";
 import VueSocialSharing from "vue-social-sharing";
 
