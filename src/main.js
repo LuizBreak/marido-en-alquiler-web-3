@@ -48,7 +48,7 @@ import awsExports from "./aws-exports";
 import AmplifyVue from "@aws-amplify/ui-vue";
 import VueSocialSharing from "vue-social-sharing";
 
-Amplify.configure(awsExports);
+
 
 // import "../node_modules/flatpickr/dist/flatpickr.min.css";
 // import "../node_modules/flatpickr/dist/flatpickr.min.js";

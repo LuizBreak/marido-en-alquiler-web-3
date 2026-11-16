@@ -1,7 +1,7 @@
 import { expirationFromJwt } from "../../../services/session-expiry";
 import { createdAccountId, usesLegacyApi } from "../../../services/api-contract";
 import { apiSvc, TokenService } from "../../../services";
-import { Auth } from "aws-amplify";
+import { Auth } from "../../../services/cognito";
 import * as types from "../../../utils/types";
 import store from "../../../store/index";
 
