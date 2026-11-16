@@ -1,0 +1,15 @@
+# Credential retirement and database access — November 16, 2026
+
+Completed with the user's authorization to proceed with credential rotation, supported-runtime updates and secure photo uploads. All targets are development in AWS account `907823072924`, region `us-east-1`. No secret values belong in this record.
+
+- The historical browser upload key belonged to `marido-image-bucket-user` (suffix `AJXT`). It was set Inactive and verified; no replacement long-lived browser key was created. The separate working CLI identity `luiz.break` was unchanged and verified. The inactive key was retained for audit, not deleted or reactivated.
+- Created `marido_app_dev` with only SELECT, INSERT, UPDATE and DELETE on the application database. A connection succeeded and a CREATE TABLE permission probe was denied. Its generated credential is stored in `marido/dev/application-database`. All 76 application functions now use it.
+- Rotated the RDS administrator password, verified the new credential and verified a fresh connection using the old password is rejected. Secrets Manager `marido/dev/database` now contains the new administrator value. Ignored local `src/sequelizer/config/config.json` and `src/config.json` were updated; no replacement password was committed or printed. Other saved administrator connections need the current value from Secrets Manager.
+- After rollout, the Lambda role's database grant was narrowed to the application secret alone. A disposable Lambda using the exact execution role directly verified application-secret access succeeds and administrator-secret access returns AccessDeniedException. The probe was deleted; no probe log group existed. The IAM simulator returned unresolved placeholder data and was not treated as permission evidence.
+- Password rotation is manual; recurring automatic rotation was not configured. Application-secret changes must be coordinated with cached database pools. Administrator rotation is independent of the application's new account.
+
+Sanitized receipts are in ignored `.deployments/hardening-20261116T122519Z/`: `credential-inventory.json`, `retired-key.json`, `app-credential.json`, `admin-rotation-completed.json`, `credential-probe-result.json` and final deployment receipts. Historical access metadata was inspected; a comprehensive CloudTrail/history audit was not performed.
+
+Historical artifacts and Git history were retained, not scrubbed. Identified retired credentials no longer work; other provider secrets/history still require their own review. Do not reactivate an exposed key or restore an old password for rollback.
+
+The original MySQL client failed against the rotated administrator authentication with `ER_NOT_SUPPORTED_AUTH_MODE`. The prepared application rollback therefore retains Node 24, the updated MySQL/runtime libraries and the restricted application credential while restoring the previously accepted application source. Its connection and disposable Cognito/MySQL core flows passed. Use the [hardening release rollback](2026-11-16-hardening.md), not an unpatched old backend artifact.
