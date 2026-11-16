@@ -102,8 +102,8 @@ if (process.env.VUE_APP_ENV === "development") {
     `border: 1px dashed;`,
   ].join(`;`);
   console.log(msg, styles);
-  console.table("Store Information:", store);
-  console.log("Env Variables:", process.env);
+
+
   console.log(`%c ***            End of Dashboard           ***`, styles);
 
   // TODO: Still having issues to trigger initStore

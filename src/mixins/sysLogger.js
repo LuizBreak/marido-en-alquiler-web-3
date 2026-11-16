@@ -2,12 +2,12 @@ import { LogTrail } from "../services/logTrail.service";
 
 export default {
   methods: {
-    logIt(who, what, whereWasIt, sessionId, postOnWall) {
+    logIt(who, what, whereWasIt, _sessionId, postOnWall) {
       const sysLogger = new LogTrail(
         who,
         what,
         whereWasIt,
-        sessionId,
+        `event-${Date.now()}-${Math.random().toString(36).slice(2)}`,
         postOnWall
       );
       try {
