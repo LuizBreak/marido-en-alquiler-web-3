@@ -5,6 +5,9 @@
       Mis Mensajes
     </h2>
     <p class="pt-1">Mantenga todas tus conversaciones grabadas en el sistema</p>
+    <p v-if="realtimeUnavailable" class="text-warning" role="status">
+      La conexión en tiempo real no está disponible. Puedes consultar tus conversaciones guardadas; actualiza la página para ver mensajes nuevos.
+    </p>
     <div class="row align-items-start">
       <div class="col-sm-6">
         <div class="card card-body shadow-lg pt-4 pb-5">
@@ -147,6 +150,7 @@ export default {
   data() {
     return {
       socketSvc: null,
+      realtimeUnavailable: false,
       MultiAsyncDataHolder: [],
       newMessages: 0,
       rating: 3.7,
@@ -615,7 +619,7 @@ export default {
 
       await this.messagingSvc.add(false, dbMessage);
     },
-    async isMsgForThisChat(msgFromId, msgToId, chatFromId, chatToId) {
+    isMsgForThisChat(msgFromId, msgToId, chatFromId, chatToId) {
       // console.log("Same Participant? msg for me?", [
       //   msgFromId == chatFromId,
       //   msgToId == chatToId,
@@ -769,7 +773,7 @@ export default {
       return store.getters["participants"];
     },
     firstContactId() {
-      return this.$store.getters.participants[0].id;
+      return this.$store.getters.participants[0]?.id;
     },
     myself() {
       return {
@@ -787,21 +791,16 @@ export default {
   async created() {
     this.socketSvc = new SocketioService(this.loggedUser.id);
 
-    await this.socketSvc.setupSocketConnection({
+    this.socketSvc.addEventListener("message", this.onProcessIncomingMsg, false);
+    this.socketSvc.addEventListener("close", () => { this.realtimeUnavailable = true; }, false);
+    this.socketSvc.setupSocketConnection({
       url: process.env.VUE_APP_WEB_SOCKET,
       reconnectInterval: 2000,
       maxReconnectInterval: 3000,
       pulseInterval: 120000,
       loggedUserId: this.loggedUser.id,
-    });
-
-    console.log("created.addEventListener");
-    await this.socketSvc.addEventListener(
-      "message",
-      this.onProcessIncomingMsg,
-      false
-    );
-    await this.socketSvc.addEventListener("close", this.onClose, false);
+    }).then(() => { this.realtimeUnavailable = false; })
+      .catch(() => { this.realtimeUnavailable = true; });
 
     // set Listener for incoming messages
     // this.$socket.addEventListener("message", this.onProcessIncomingMsg, false);
@@ -821,6 +820,7 @@ export default {
     await this.messagingSvc.getNrOfNewMessages(id);
 
     this.messagingSvc.getMyContactList(this.loggedUser.id).then(() => {
+      if (!this.firstContactId) return;
       this.messagingSvc.setActiveChat(this.firstContactId);
 
       // get individual number of new messages for each contact
