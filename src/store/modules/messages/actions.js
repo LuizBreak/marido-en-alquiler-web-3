@@ -7,7 +7,7 @@ export default {
     apiSvc
       .get(resource)
       .then((response) => {
-        commit("SET_MESSAGE", response.data);
+        commit("SET_MESSAGES", response.data.data);
       })
       .catch((error) => {
         console.log(
@@ -19,7 +19,7 @@ export default {
     apiSvc
       .getById(resource, data.id)
       .then((response) => {
-        commit("SET_MESSAGE", response.data);
+        commit("SET_MESSAGE", response.data.data);
       })
       .catch((error) => {
         console.log(

@@ -7,7 +7,7 @@ export default {
     apiSvc
       .get(resource)
       .then((response) => {
-        commit("SET_FAVORITES", response.data);
+        commit("SET_FAVORITES", response.data.body);
       })
       .catch((error) => {
         console.log("There was an error fetching favorites: " + error.message);
@@ -18,7 +18,7 @@ export default {
       .getById(resource, data.id)
       .then((response) => {
         // console.table(response.data);
-        commit("SET_FAVORITE", response.data);
+        commit("SET_FAVORITE", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching favorite: " + error.message);

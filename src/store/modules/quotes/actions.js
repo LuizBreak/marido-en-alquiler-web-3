@@ -7,7 +7,7 @@ export default {
     apiSvc
       .get(resource)
       .then((response) => {
-        commit("SET_QUOTE", response.data);
+        commit("SET_QUOTES", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching quote method: " + error.quote);
@@ -17,7 +17,7 @@ export default {
     apiSvc
       .getById(resource, data.id)
       .then((response) => {
-        commit("SET_QUOTE", response.data);
+        commit("SET_QUOTE", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching quote method: " + error.quote);

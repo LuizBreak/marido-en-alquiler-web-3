@@ -7,7 +7,7 @@ export default {
     apiSvc
       .get(resource)
       .then((response) => {
-        commit("SET_LOGTRAIL", response.data);
+        commit("SET_LOGTRAIL", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching pay method: " + error.message);
@@ -18,7 +18,7 @@ export default {
       .getById(resource, data.id)
       .then((response) => {
         // console.table(response.data);
-        commit("SET_LOGTRAIL", response.data);
+        commit("SET_LOGTRAIL", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching pay method: " + error.message);

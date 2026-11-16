@@ -7,7 +7,7 @@ export default {
     apiSvc
       .get(resource)
       .then((response) => {
-        commit("SET_REVIEW", response.data);
+        commit("SET_REVIEWS", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching review: " + error.message);
@@ -18,7 +18,7 @@ export default {
       .getById(resource, data.id)
       .then((response) => {
         // console.table(response.data);
-        commit("SET_REVIEW", response.data);
+        commit("SET_REVIEW", response.data.data);
       })
       .catch((error) => {
         console.log("There was an error fetching review: " + error.message);

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { normalizeApiResponse } from "./api-response";
 
 export const API_ROOT =
   process.env.VUE_APP_ENV === "production"
@@ -13,3 +14,5 @@ export const axiosSvc = axios.create({
     "Content-Type": "application/json",
   },
 });
+
+axiosSvc.interceptors.response.use(normalizeApiResponse);
