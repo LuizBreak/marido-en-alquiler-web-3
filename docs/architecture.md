@@ -1,12 +1,29 @@
-# Deployed architecture update — November 16, 2026
+# Current deployed architecture — November 16, 2026
 
-The user confirmed all AWS resources/data are development. The Vue/Vuex/Amplify frontend still calls API Gateway/Lambda/MySQL, now with server-side Cognito JWT verification, account-to-subject binding, owner/participant checks and public/private field filtering. Verified sign-in transactionally creates/reconciles SQL account/profile; the frontend no longer provisions SQL rows before email confirmation.
+All AWS resources/data are development. Vue/Vuex/Amplify communicates with Cognito, the existing API Gateway REST API and the existing WebSocket endpoint. All 76 REST functions and one managed socket function run Node 24. The nearly full REST stack remains at 486 resources; an isolated six-resource chat stack owns the connection table, socket handler, log group, permission and two scoped roles. The old standalone unauthenticated handler is disabled and unrouted.
 
-Lambda loads its DB password from one resource-scoped Secrets Manager secret, caches a two-connection pool per execution environment and verifies the RDS TLS certificate. A shared HTTP/resource layer consolidates validation, safe errors, access scopes and response projection. All 75 existing Lambda identities and the API/database were retained. Native CloudFormation plus allowlisted runtime packaging was used for this release; no schema migration or framework upgrade occurred.
+REST verifies Cognito claims and SQL subject/account binding, scopes private data to owners/participants and provisions profiles transactionally after verified login. MySQL is the durable source for accounts, projects, quotes and messages. Secrets Manager supplies a DML-only principal; RDS TLS verifies the CA and each execution environment uses a two-connection pool. Secure owner-specific photo grants write public profile/project images to S3. Raw payment/milestone writes remain disabled pending product/provider decisions.
 
-Unsafe card collection is disabled pending a payment model/provider. The existing upload role still lacks write permission; secure image ownership/key/permission design remains open. Node 18, legacy interfaces/prototypes, complete pagination/business transitions, external service delivery and operational modernization remain tracked improvements. See [handoff](HANDOFF.md), [release/rollback](releases/2026-11-16-backend.md) and [tickets](asana-tickets.md).
+WebSocket identity is verified during the handshake using a token in the subprotocol header, with no token in the URL, connection table or request logs. DynamoDB maintains transactional connection/account indexes across Lambda instances and tabs. JWT expiry is enforced independently of eventual TTL deletion. The REST message publisher builds live events from the saved SQL row and targets only verified sender/recipient sessions; browsers cannot publish arbitrary socket messages or choose another sender. Presence is scoped to the caller's contacts. Strongly consistent connection queries, frontend deduplication and reconnect history catch-up replace the old process-local dictionary/protocol mismatch. Live push remains best effort after persistence, not a transactional outbox.
 
-The purpose/domain assessment below remains useful context; implementation statements dated November 15 are historical where they conflict with this update.
+```mermaid
+flowchart LR
+  Browser[Vue browser] --> Cognito[Cognito]
+  Browser --> REST[Authenticated REST API]
+  REST --> SQL[MySQL durable messages]
+  Browser --> Gate[Verified WebSocket handshake]
+  Gate --> Sessions[DynamoDB expiring sessions]
+  REST --> Publisher[Saved-message publisher]
+  Publisher --> Sessions
+  Publisher --> Callback[API Gateway private callbacks]
+  Callback --> Browser
+```
+
+Project acceptance locks project before quote and commits confirmation/quoted price/assignment together. Completion and participant/duplicate review guards are enforced; moderation/admin workflows remain incomplete. Direct account-to-account messaging keeps existing product behavior and does not require a project relationship.
+
+Latest evidence and remaining work: [chat release](releases/2026-11-16-chat.md), [workflow release](releases/2026-11-16-journey.md), [hardening release](releases/2026-11-16-hardening.md), [handoff](HANDOFF.md), [tickets](asana-tickets.md). Notification email DNS/service remains unavailable; live-chat delivery/identity/participant acceptance passed. Pagination, coordinated deletion, moderation, attachments/read-receipt UX, CI/monitoring and restore drills remain work.
+
+The purpose/domain assessment below is historical. Current implementation statements above and the handoff supersede its older Node 18/upload-permission/route-defect observations.
 
 ---
 # Purpose and architecture

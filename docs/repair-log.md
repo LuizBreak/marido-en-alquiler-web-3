@@ -1,6 +1,6 @@
 # Restart repairs and commit ledger
 
-Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the latest journey release record](releases/2026-11-16-journey.md) for current deployment/acceptance status and compatible rollback.
+Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the latest chat release record](releases/2026-11-16-chat.md) for current deployment/acceptance status and compatible rollback.
 
 ## Backend release repairs
 
@@ -132,8 +132,19 @@ FE a884f2e removes signup password/code logs; cfe6f4f/9dce372 configure Cognito 
 
 BE fcd40ad implements project-first transactional quote acceptance and lifecycle/review guards; 2285290 tests real competing offers and stale terms; 89c6b49 adds identity-scoped own-work queries without new routes; aeebd7d verifies client/contractor isolation through API Gateway.
 
-68 BE and 41 FE tests, TypeScript, lint (65 changed source files), build and known-secret scans passed. Real Gmail confirmation, refreshed login, profile text/photo, project creation/search, bidding, acceptance, completion and pending review passed in Chrome. Live API races have one winner and an idempotent retry; the losing/stale request gets 409. Chat persists and renders once after reload. No schema migration; 76 matching Node 24 artifacts and 486 stack resources. Both frontend hostnames serve the new index; old assets retained for rollback. No Git push.
+68 BE and 41 FE tests, TypeScript, lint (68 changed source files), build and known-secret scans passed. Real Gmail confirmation, refreshed login, profile text/photo, project creation/search, bidding, acceptance, completion and pending review passed in Chrome. Live API races have one winner and an idempotent retry; the losing/stale request gets 409. Chat persists and renders once after reload. No schema migration; 76 matching Node 24 artifacts and 486 stack resources. Both frontend hostnames serve the new index; old assets retained for rollback. No Git push.
 
 Open findings: conch-app.com mailer DNS failure prevents bid notification email, while Cognito registration email works; WebSocket opens/presence succeeds but immediate private delivery failed. These services remain next priorities, along with moderation/lifecycle denial coverage. They were not falsely marked complete. Test inbox and plus alias were user-authorized; existing accounts were untouched and disposable SQL/Cognito/S3 fixtures cleaned up. Rollback was captured, not executed.
 
 Published-site acceptance caught the client role getter casing after contractor navigation changes. FE cb7ef48 corrects the offers panel visibility; the corrected build was republished and the final browser check requires a visible client offers panel and no contractor acceptance controls.
+
+
+## Authenticated live chat — November 16, 2026
+
+Deployed and accepted; [chat release, evidence and secure recovery](releases/2026-11-16-chat.md). Root causes were toId/to protocol mismatch, Lambda-local connection storage and unauthenticated claimed identities. BE 89059f2 adds targeted runtime clients; ea02ead verifies handshake identity/expiry, stores durable session indexes and publishes canonical saved messages only to participants; fde4f51 generates an isolated six-resource chat stack and scoped socket/publisher roles. FE 0269a39 authenticates socket handshakes with current Cognito tokens; 418ec72 merges/deduplicates events, catches up after reconnect and isolates conversation/account changes.
+
+81 BE/45 FE tests, TypeScript, lint, build, secret scans and live AWS/browser checks passed. Verified two recipient tabs, outsider denial, protected history, spoofing/rebinding denial, scoped presence, expiry before TTL deletion and reconnect catch-up. Real browser delivery passed without refreshing, with one sender copy and persisted history after reload. The prior account/project/quote/review/image/message regression suite passed on a fresh run after one transport-level fetch failure; its failed-run fixtures were removed too.
+
+All 77 active functions use the verified Node 24 artifact. Main stack remains 486 resources; new chat stack has six. Eight existing WebSocket integrations target the authenticated handler. Request tracing is off; legacy anonymous Lambda is disabled (reserved concurrency 0). Both frontend hostnames and all 187 asset checksums/CDN completion were verified. No Git push or MySQL migration; temporary fixtures/session rows/profile credentials were removed. Recovery preserves authentication and does not reactivate the old anonymous service. Notification email DNS failure remains open.
+
+A final browser inspection found missing legacy chat times rendered as Invalid DateTime. BE a8b9d54 assigns server creation time/persisted status; FE ebe023e normalizes valid time formats and renders unknown historical times as a dash. Final checks: 81 BE tests, 45 FE tests, TypeScript, lint across 68 changed source files and corrected production build.

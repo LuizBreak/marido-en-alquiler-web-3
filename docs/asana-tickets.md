@@ -7,26 +7,39 @@ No remote tickets were created. [CSV](asana-tickets.csv) contains all 21 import-
 | Ticket | Priority | Current status | Title |
 | --- | --- | --- | --- |
 | [R01](#r01) | P0 | Partial; identified credentials retired | Credentials committed in application source/configuration |
-| [R02](#r02) | P0 | Partial; deployed and verified | API authentication and resource ownership are not enforced in reviewed code |
+| [R02](#r02) | P0 | Partial; live chat identity/participants verified | API authentication and resource ownership are not enforced in reviewed code |
 | [R03](#r03) | P0 | Partial; unsafe flow disabled | Raw card and security-code persistence path |
 | [R04](#r04) | P0 | Verified development guard | Local/offline backend can connect to production |
-| [R05](#r05) | P0 | Partial; signup credential logging removed | Passwords, tokens and private payloads can reach storage/logging/responses |
+| [R05](#r05) | P0 | Partial; chat token paths protected | Passwords, tokens and private payloads can reach storage/logging/responses |
 | [R06](#r06) | P1 | Partial; browser refresh verified | Session lifetime, restoration and navigation checks disagree |
 | [R07](#r07) | P1 | Deployed; API verified | Response helper changes data shape and discards results |
-| [R08](#r08) | P1 | Partial; core persistence feedback verified | Missing promise propagation produces premature success and lost errors |
+| [R08](#r08) | P1 | Partial; chat persistence/delivery separated | Missing promise propagation produces premature success and lost errors |
 | [R09](#r09) | P1 | Partial; real email confirmation verified | Signup and generated-ID handling are not reliable |
 | [R10](#r10) | P1 | Deployed; principal routes verified | Primary keys, route parameters and SQL names disagree |
-| [R11](#r11) | P1 | Partial; contractor navigation repaired | FE invokes undeclared routes/actions |
+| [R11](#r11) | P1 | Partial; authenticated chat routes verified | FE invokes undeclared routes/actions |
 | [R12](#r12) | P1 | Partial; live schema reconciled | SQL, TypeScript interfaces and payloads have drifted |
 | [R13](#r13) | P1 | Partial; affected browser flows verified | FE state updates include concrete collection bugs |
 | [R14](#r14) | P1 | Partial; boundary deployed | SQL input handling and Lambda error paths need consolidation |
-| [R15](#r15) | P1 | Partial; persistence verified; realtime delivery open | Chat read state and connection lifecycle are inconsistent |
+| [R15](#r15) | P1 | Partial; live delivery and authorization verified | Chat read state and connection lifecycle are inconsistent |
 | [R16](#r16) | P1 | Partial; photo display browser-verified | Image upload integrity and private ownership are undefined |
-| [R17](#r17) | P2 | Partial; release path documented | Multiple backend execution/configuration paths obscure the source of truth |
-| [R18](#r18) | P2 | Partial; 68 BE and 41 FE checks pass | Dependency and verification baseline is weak |
+| [R17](#r17) | P2 | Partial; managed chat stack documented | Multiple backend execution/configuration paths obscure the source of truth |
+| [R18](#r18) | P2 | Partial; 81 BE and 45 FE checks pass | Dependency and verification baseline is weak |
 | [R19](#r19) | P2 | Partial; browser SDK removed | Initial browser payload is large |
-| [R20](#r20) | P2 | Partial; workflow deployed; delivery integrations open | Deployment, external services and operational ownership are incomplete |
+| [R20](#r20) | P2 | Partial; live chat deployed; mailer still open | Deployment, external services and operational ownership are incomplete |
 | [R21](#r21) | P2 | Partial; atomic project acceptance deployed | Product completion and component cleanup need explicit scope |
+
+## Authenticated live chat acceptance
+
+[Chat release](releases/2026-11-16-chat.md) supersedes earlier notes saying private WebSocket delivery failed. The same 21 CSV records retain history and append the current acceptance.
+
+- **R02 — Partial; live chat identity/participants verified:** Verified Cognito handshake identity, SQL subject binding, server-derived message sender and delivery only to stored participants. Outsider message/history reads, arbitrary publishing, rebind and expired-session attempts fail. BE ea02ead.
+- **R05 — Partial; chat token paths protected:** WebSocket tokens stay in handshake headers, never URLs or connection records; request tracing is off. Legacy anonymous handler is disabled and unrouted. Broader historical logging review remains.
+- **R08 — Partial; chat persistence/delivery separated:** SQL save remains authoritative; live callback failures do not turn a saved message into a failed database write. Frontend deduplicates sender echoes and retains live events across history loads. FE 418ec72.
+- **R11 — Partial; authenticated chat routes verified:** All eight existing WebSocket integrations target the new authenticated handler; no new REST routes/resources. Browser publishing routes reject attempts. Existing endpoint URL is retained.
+- **R15 — Partial; live delivery and authorization verified:** Immediate text delivery passed in two recipient tabs and real local/published browsers. Saved history, forced reconnect catch-up, identity binding, outsider denial, scoped presence and expiry passed. Fake read timers remain removed. Timestamp display/server defaults fixed. Attachments, full read-receipt UX and broader load/outbox guarantees remain. FE 0269a39, 418ec72, ebe023e; BE ea02ead, a8b9d54.
+- **R17 — Partial; managed chat stack documented:** The standalone process-local chat handler is replaced by a six-resource managed stack with durable expiring connection indexes, an authenticated handler and isolated socket/publisher roles. Main REST stack stays 486 resources. BE fde4f51.
+- **R18 — Partial; 81 BE and 45 FE checks pass:** Current chat release passes 81 backend and 45 frontend tests, TypeScript, lint, build, secret scans and live AWS/browser acceptance. Active REST/socket functions use Node 24. Legacy/prototype/build-tool dependency work remains.
+- **R20 — Partial; live chat deployed; mailer still open:** 77 active functions share the verified artifact; six-resource isolated chat stack, all endpoint integrations, scoped roles, tracing off and legacy quarantine verified. Public FE asset/index/CDN checks passed. Immediate WebSocket delivery/security is accepted; conch-app.com notification mailer DNS remains open.
 
 ## Latest journey acceptance
 

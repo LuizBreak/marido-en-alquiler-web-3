@@ -38,7 +38,12 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Unauthenticated private calls return 401; cross-account access returns 403/404; client, contractor and admin permissions are tested; public responses omit bank, credential and private contact fields as appropriate.
 
-This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Partial; deployed and verified","R01, R04","Security and data boundaries"
+This is the original historical assessment. Current development release verification and remaining work are stated above.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; live chat identity/participants verified
+Verified Cognito handshake identity, SQL subject binding, server-derived message sender and delivery only to stored participants. Outsider message/history reads, arbitrary publishing, rebind and expired-session attempts fail. BE ea02ead.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P0","Partial; live chat identity/participants verified","R01, R04","Security and data boundaries"
 "[R03] — Raw card and security-code persistence path","Review ID: R03
 Updated: November 16, 2026
 Status: Partial; unsafe flow disabled
@@ -103,7 +108,12 @@ This is the original historical assessment. Current development release verifica
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; signup credential logging removed
 Signup no longer logs passwords or confirmation codes, and no unauthenticated registration audit write is emitted. Broader historical log/secret review remains. FE a884f2e.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.","P0","Partial; signup credential logging removed","R01, R02","Security and data boundaries"
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; chat token paths protected
+WebSocket tokens stay in handshake headers, never URLs or connection records; request tracing is off. Legacy anonymous handler is disabled and unrouted. Broader historical logging review remains.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P0","Partial; chat token paths protected","R01, R02","Security and data boundaries"
 "[R06] — Session lifetime, restoration and navigation checks disagree","Review ID: R06
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -173,7 +183,12 @@ Evidence was reviewed from source and isolated tests. No deployment/live-data va
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; core persistence feedback verified
 Bid/review drafts survive rejected saves; notification failure cannot turn a saved bid into a reported persistence failure. Chat persists before broadcast and no longer invents read receipts. FE 0016b31, c68ba4e.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.","P1","Partial; core persistence feedback verified","R07, R10","Core workflows and contracts"
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; chat persistence/delivery separated
+SQL save remains authoritative; live callback failures do not turn a saved message into a failed database write. Frontend deduplicates sender echoes and retains live events across history loads. FE 418ec72.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P1","Partial; chat persistence/delivery separated","R07, R10","Core workflows and contracts"
 "[R09] — Signup and generated-ID handling are not reliable","Review ID: R09
 Updated: November 16, 2026
 Status: Partial; provisioning deployed
@@ -239,7 +254,12 @@ This is the original historical assessment. Current development release verifica
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; contractor navigation repaired
 Contractor messages/security/reviews/projects now resolve within their own layout; GET /projects?mine=true scopes assignments by verified identity without new AWS resources. FE ae9a87e; BE 89c6b49.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.","P1","Partial; contractor navigation repaired","R02, R07, R10","Core workflows and contracts"
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; authenticated chat routes verified
+All eight existing WebSocket integrations target the new authenticated handler; no new REST routes/resources. Browser publishing routes reject attempts. Existing endpoint URL is retained.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P1","Partial; authenticated chat routes verified","R02, R07, R10","Core workflows and contracts"
 "[R12] — SQL, TypeScript interfaces and payloads have drifted","Review ID: R12
 Updated: November 16, 2026
 Status: Partial; live schema reconciled
@@ -323,7 +343,12 @@ This is the original historical assessment. Current development release verifica
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; persistence verified; realtime delivery open
 Saved chat renders once and survives recipient reload. WebSocket startup cannot block history; conversation matching is synchronous and fake delivered/read timers were removed. WebSocket presence opens but immediate private delivery failed; investigate the separate service/protocol and identity checks. FE 2d809e7, c68ba4e.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.","P1","Partial; persistence verified; realtime delivery open","R02, R07, R14","Core workflows and contracts"
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; live delivery and authorization verified
+Immediate text delivery passed in two recipient tabs and real local/published browsers. Saved history, forced reconnect catch-up, identity binding, outsider denial, scoped presence and expiry passed. Fake read timers remain removed. Timestamp display/server defaults fixed. Attachments, full read-receipt UX and broader load/outbox guarantees remain. FE 0269a39, 418ec72, ebe023e; BE ea02ead, a8b9d54.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P1","Partial; live delivery and authorization verified","R02, R07, R14","Core workflows and contracts"
 "[R16] — Image upload integrity and private ownership are undefined","Review ID: R16
 Updated: November 16, 2026
 Status: Partial; secure photos deployed
@@ -362,7 +387,12 @@ ORIGINAL ASSESSMENT
 
 **Proposal:** Choose one supported execution/deployment path, consolidate configuration, retire or clearly archive prototypes, and correct metadata. Add health/readiness checks with safe DB behavior. Actual runtime/provider upgrade compatibility needs separate verification.
 
-This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; release path documented","R04","Delivery and maintainability"
+This is the original historical assessment. Current development release verification and remaining work are stated above.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; managed chat stack documented
+The standalone process-local chat handler is replaced by a six-resource managed stack with durable expiring connection indexes, an authenticated handler and isolated socket/publisher roles. Main REST stack stays 486 resources. BE fde4f51.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P2","Partial; managed chat stack documented","R04","Delivery and maintainability"
 "[R18] — Dependency and verification baseline is weak","Review ID: R18
 Updated: November 16, 2026
 Status: Partial; runtime/package repaired
@@ -383,7 +413,12 @@ This is the original historical assessment. Current development release verifica
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; 68 BE and 41 FE checks pass
 Current release passed 68 BE tests, TypeScript, 41 FE tests, lint of 65 changed source files, production build, known-secret scans and actual API/browser checks. Older prototype/build-tool dependency findings remain.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.","P2","Partial; 68 BE and 41 FE checks pass","R04","Delivery and maintainability"
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; 81 BE and 45 FE checks pass
+Current chat release passes 81 backend and 45 frontend tests, TypeScript, lint, build, secret scans and live AWS/browser acceptance. Active REST/socket functions use Node 24. Legacy/prototype/build-tool dependency work remains.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P2","Partial; 81 BE and 45 FE checks pass","R04","Delivery and maintainability"
 "[R19] — Initial browser payload is large","Review ID: R19
 Updated: November 16, 2026
 Status: Partial; browser SDK removed
@@ -422,7 +457,12 @@ This is the original historical assessment. Current development release verifica
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; workflow deployed; delivery integrations open
 76 final Node 24 Lambda hashes and stack completion verified. FE published with all 187 asset checksums checked first, index last, old assets retained and CDN completed. Notification mailer conch-app.com fails DNS; WebSocket private delivery remains open. Cognito registration email works.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.","P2","Partial; workflow deployed; delivery integrations open","R01, R02, R04, R17","Delivery and maintainability"
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
+Status: Partial; live chat deployed; mailer still open
+77 active functions share the verified artifact; six-resource isolated chat stack, all endpoint integrations, scoped roles, tracing off and legacy quarantine verified. Public FE asset/index/CDN checks passed. Immediate WebSocket delivery/security is accepted; conch-app.com notification mailer DNS remains open.
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.","P2","Partial; live chat deployed; mailer still open","R01, R02, R04, R17","Delivery and maintainability"
 "[R21] — Product completion and component cleanup need explicit scope","Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
