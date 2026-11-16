@@ -10,7 +10,9 @@ That setup is running at **http://127.0.0.1:8080/**. The handoff check received 
 
 **Latest follow-up: page scrolling.** The user reported that the client profile would not scroll. An isolated browser reproduced two sign-in backdrops and a lingering `body.style.overflow = "hidden"` after dismissal. The FE now uses one modular Bootstrap runtime, removes the legacy Bootstrap 3 script, restores scroll state only after modal close, and preserves locks for other open overlays. Browser checks passed for sign-in close, dismissal during the opening transition, and the save-message dialog: one backdrop while open, none after closing, and the page scrolls. HTTPS requests were blocked in that test browser; no AWS writes occurred. The user should refresh the local page and confirm the profile scrolls.
 
-No next feature request has been selected beyond that scrolling fix. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
+**Subsequent follow-up: client profile save.** The user confirmed scrolling works, then reported a generic save error while editing only text fields (no photo). The profile write was resending the entire database row, including timestamps/counters/account metadata, to the old AWS handler's direct `UPDATE ... SET ?`. The local FE now allowlists editable client fields, keeps the identity in the route, copies initial profile data synchronously, and reports distinct HTTP/network/storage failures without exposing server payloads. Three isolated regression checks cover the legacy success response, field filtering and form retention. A read-only AWS CORS/empty-record check passed; the agent did not submit profile writes to AWS. A user retry was requested; do not claim the exact live rejection was reproduced or fixed until that outcome is recorded.
+
+No next feature request has been selected beyond resolving the profile-save failure. Suggested broader checks were profile-save/reload, favorites, project creation and messaging. These have not been systematically exercised by the agent. Image uploads and signup have configuration/contract limits described below.
 
 ## Repositories and Git state
 
@@ -54,10 +56,10 @@ Here `VUE_APP_ENV=production` selects the AWS API; Vue CLI still serves a develo
 
 ## Verification already completed
 
-- 17 FE isolated Node tests passed, including three modal scroll-state regression cases.
+- 20 FE isolated Node tests passed, including modal scroll-state and client profile-save regression cases.
 - 30 BE isolated Jest tests passed with DB access mocked.
 - BE TypeScript no-emit check passed.
-- 50 changed FE source files passed lint using the committed read-only workaround.
+- 53 changed FE source files passed lint using the committed read-only workaround.
 - Final FE production build passed, retaining bundle/image size warnings.
 - Build-time public env allowlisting was added after artifact scanning caught a local secret embedded by Vue CLI. The final scan found none of the checked sensitive local env values in 8 generated JS/map files. Temporary build output was removed.
 - The current local dev server compiled successfully and returned HTTP 200; user confirmed the populated client profile renders.

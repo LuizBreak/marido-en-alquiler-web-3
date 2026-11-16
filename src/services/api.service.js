@@ -38,8 +38,8 @@ export const apiSvc = {
     return axiosSvc.delete(`/${resource}/` + resourceId(resource, entity));
   },
 
-  update(resource, entity) {
-    return axiosSvc.put(`/${resource}/` + resourceId(resource, entity), entity);
+  update(resource, entity, payload = entity) {
+    return axiosSvc.put(`/${resource}/` + resourceId(resource, entity), payload);
   },
 
   /**

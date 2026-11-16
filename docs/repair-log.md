@@ -74,4 +74,10 @@ Validation after this follow-up: **17 FE tests**, **50 changed source files lint
 
 The code repairs do not close all 21 review findings. API JWT/ownership enforcement, payment tokenization, schema migrations, undeclared endpoints, provider setup, unique upload keys, legacy booking behavior and production operations remain in the ticket ledger with explicit acceptance work.
 
+### Follow-up: client text-profile saves against the old AWS API
+
+After confirming the scroll fix, the user reported a generic error saving text-only client profile changes. Inspection showed that the FE resubmitted the complete database row to the legacy direct-SQL update, including server timestamps/counters/account metadata. The client module now prepares an explicit editable-field payload, while the URL retains the existing client ID and local state keeps its metadata. Initial profile copying is synchronous; failures retain input and distinguish HTTP, network and missing-storage errors without echoing server payloads.
+
+Three new isolated checks passed (20 FE tests total): filtered request/legacy success compatibility, no upload on text-only submission with retained input on failure, and safe error classification. Changed-source lint passed for 53 files; the production build passed with existing size warnings. Read-only AWS checks confirmed the PUT preflight permits authorization/content-type and the nonexistent-client GET returns the legacy message-only envelope. The exact failed live request has not been captured, and no agent profile writes were sent to AWS. User retry confirmation is pending.
+
 Use `git show <commit>` to inspect a fix and `git revert <commit>` to create a reviewable reversal. Revert dependent commits in reverse order; coordinate FE/BE companion commits. Baseline checkpoints preserve pre-existing work. Reverting security fixes can reintroduce credential disclosure; Git reversal also cannot undo credential rotation or other external operations. No external changes were performed by this repair batch.

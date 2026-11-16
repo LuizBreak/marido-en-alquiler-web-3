@@ -1,10 +1,15 @@
 import { createCrudActions } from "../../crud-actions";
+import { clientProfilePayload } from "../../../services/client-profile-payload";
 import { apiSvc } from "../../../services";
 
 const resource = "clients";
 
 export default {
-  ...createCrudActions({"resource":"clients","singular":"Client","plural":"Clients","mutation":"CLIENT","listMutation":"SET_CLIENTS","serialized":["SET_CLIENT","SET_CLIENTS"]}),
+  ...createCrudActions({
+    resource: "clients", singular: "Client", plural: "Clients",
+    mutation: "CLIENT", listMutation: "SET_CLIENTS",
+    serialized: ["SET_CLIENT", "SET_CLIENTS"], prepareWrite: clientProfilePayload,
+  }),
   
   
   

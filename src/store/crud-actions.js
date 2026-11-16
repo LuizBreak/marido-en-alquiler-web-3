@@ -1,7 +1,7 @@
 import { apiSvc } from "../services/api.service";
 
 // Every operation returns its request, so callers can retain input on failure.
-export function createCrudActions({ resource, singular, plural, mutation, listMutation, serialized = [] }) {
+export function createCrudActions({ resource, singular, plural, mutation, listMutation, serialized = [], prepareWrite = entity => entity }) {
   const payload = (name, data) => serialized.includes(name) ? JSON.stringify(data) : data;
   const actions = {
     async [`fetch${plural}`]({ commit }) {
@@ -15,13 +15,13 @@ export function createCrudActions({ resource, singular, plural, mutation, listMu
       return response.data.data;
     },
     async [`create${singular}`]({ commit }, entity) {
-      const response = await apiSvc.post(resource, entity);
+      const response = await apiSvc.post(resource, prepareWrite(entity, "create"));
       const saved = { ...entity, ...(response.data.data || {}) };
       commit(`ADD_NEW_${mutation}`, saved);
       return saved;
     },
     async [`update${singular}`]({ commit }, entity) {
-      await apiSvc.update(resource, entity);
+      await apiSvc.update(resource, entity, prepareWrite(entity, "update"));
       commit(`UPDATE_${mutation}`, entity);
       return entity;
     },

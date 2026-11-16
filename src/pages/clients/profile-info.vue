@@ -306,6 +306,7 @@ import BaseImageUploaderCard from "../../components/ui/BaseImageUploaderCard.vue
 import * as types from "../../utils/types.js";
 import { s3Svc } from "../../services/s3.services.js";
 import getUserAvatar from "../../mixins/getUserAvatar";
+import { profileSaveError } from "../../services/profile-save-error";
 
 // const selectionRequired = (value) => value; // if no selected value will be null therefore true
 
@@ -376,39 +377,34 @@ export default {
       };
     },
     async onSubmit() {
- if (this.isSaving) return;
- this.isSaving = true;
- try {
-
-      const result = await this.v$.$validate();
-
-      if (!result) {
-        return;
-      }
+      if (this.isSaving) return;
+      this.isSaving = true;
+      let stage = "validation";
       try {
-      if (this.selectedFile) {
-        await this.onUploadImage();
-        // this.user.avatar= this.selectedFile.name;
-        await this.setUserAvatar(this.user.id, this.selectedFile.name);
-      }
+        if (!(await this.v$.$validate())) return;
+        if (this.selectedFile) {
+          stage = "image-upload";
+          await this.onUploadImage();
+          stage = "avatar-update";
+          await this.setUserAvatar(this.user.id, this.selectedFile.name);
+        }
+        stage = "profile-update";
         if (!this.user.id) {
           await this.$store.dispatch("clients/createClient", this.user);
-          this.user = this.getUserCopy();
-          console.log("prof-info.msgbox issued");
-          this.triggerMsgBox(true, "Registro realizado con éxito.");
+          this.user = await this.getUserCopy();
+          this.triggerMsgBox(true, "Registro realizado con exito.");
         } else {
           await this.$store.dispatch("clients/updateClient", this.user);
-          this.triggerMsgBox(true, "Registro actualizado con éxito.");
+          this.triggerMsgBox(true, "Registro actualizado con exito.");
         }
+        this.selectedFile = null;
       } catch (error) {
-        this.triggerMsgBox(
-          true,
-          "No se pudo grabar el registro. Verifica la conexión e inténtalo de nuevo."
-        );
+        console.error("Client profile save failed", { stage, status: error.response?.status || null, code: error.code || "PROFILE_SAVE" });
+        this.triggerMsgBox(true, profileSaveError(error));
+      } finally {
+        this.isSaving = false;
       }
-    
- } finally { this.isSaving = false; }
-},
+    },
     async onDelete() {
       if (this.user.id) {
         if (confirm("Estas seguro que quieres eliminar este registro?")) {
@@ -433,13 +429,13 @@ export default {
     resetFormData: function () {
       this.user = {};
     },
-    async getUserCopy() {
+    getUserCopy() {
       // opcion #1
       // return JSON.parse(JSON.stringify(this.client));
 
       // opcion #1
       // console.log("client #455", this.client);
-      const obj = await Object.assign({}, this.client);
+      const obj = Object.assign({}, this.client);
 
       // TODO: Investigate it
       // ATTENTION: if I remove this console.log, the obj does not

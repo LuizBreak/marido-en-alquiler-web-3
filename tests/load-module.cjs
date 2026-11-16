@@ -6,7 +6,9 @@ const babel = require("@babel/core");
 // Load a source module without booting the browser, Cognito, or network clients.
 module.exports = function loadModule(file, mocks = {}, globals = {}) {
   const filename = path.resolve(__dirname, "..", file);
-  const code = babel.transformSync(fs.readFileSync(filename, "utf8"), {
+  let source = fs.readFileSync(filename, "utf8");
+  if (file.endsWith(".vue")) source = source.match(/<script>([\s\S]*?)<\/script>/)[1];
+  const code = babel.transformSync(source, {
     filename, babelrc: false, configFile: false,
     plugins: ["@babel/plugin-transform-modules-commonjs"],
   }).code;
