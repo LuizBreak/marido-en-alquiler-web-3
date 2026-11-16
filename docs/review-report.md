@@ -1,5 +1,7 @@
 # FE/BE discrepancies, suggestions and improvements
 
+This report preserves the original findings. Current implementation status, commits and remaining acceptance work are in [the ticket ledger](asana-tickets.md) and [repair log](repair-log.md).
+
 Assessment date: November 15, 2026. Scope and verification limits: [documentation index](README.md). FE paths refer to this repository; BE paths refer to `../marido-en-alquiler-backend`.
 
 ## Overall assessment

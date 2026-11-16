@@ -2,6 +2,8 @@
 
 Reviewed November 15, 2026. Read [the P0 findings](review-report.md#p0-security-and-data-boundaries) before starting backend handlers or testing accounts/payment methods.
 
+**Subsequent repairs:** this document records the original assessment. See [the repair log](repair-log.md) for the November 16 implementation, updated configuration, passing tests/lint and commit references. The forced-production configuration described below has been replaced; remaining findings are tracked in [the ticket ledger](asana-tickets.md).
+
 ## Current baseline
 
 - FE: Vue 3, Vue Router 4, Vuex 4, JavaScript single-file components, Vue CLI 4/Webpack, Bootstrap/theme assets, Axios, Amplify/Cognito and AWS SDK v2.

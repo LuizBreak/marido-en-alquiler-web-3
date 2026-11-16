@@ -1,5 +1,7 @@
 # Purpose and architecture
 
+This is the November 15, 2026 architecture assessment. Subsequent source repairs and current limitations are recorded in [the repair log](repair-log.md) and [ticket ledger](asana-tickets.md).
+
 ## Product purpose
 
 Marido en Alquiler is a Spanish-language services marketplace connecting homeowners/clients with handyman and service professionals. The existing FE README identifies the Dominican Republic as the initial market. Other country imagery exists, but it does not establish a completed multi-country product.

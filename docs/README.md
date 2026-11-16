@@ -8,6 +8,8 @@ Reviewed: November 15, 2026. This documentation covers the current working copie
 | [API and data reference](api-and-data.md) | Declared backend routes, response behavior, entity relationships, and FE/BE contract mismatches |
 | [Discrepancies and improvements](review-report.md) | Prioritized findings, evidence, recommended fixes, and completion criteria |
 | [Development restart guide](development.md) | Configuration, local commands, verification results, and a suggested order for resuming development |
+| [Repair and commit log](repair-log.md) | Implemented changes, companion commits, validation, configuration changes and rollback |
+| [Asana ticket ledger](asana-tickets.md) | Current status and remaining work for all 21 review findings; includes a CSV for later import |
 
 ## Repository scope
 

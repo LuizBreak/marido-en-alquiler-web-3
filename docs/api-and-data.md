@@ -1,5 +1,7 @@
 # API and data reference
 
+This is the original assessment. [Subsequent repairs](repair-log.md) introduce canonical decoded `data`, retain serialized `body` for compatibility, correct IDs, return creation IDs and add an explicit composite favorite DELETE route. Refer to current source and the repair log when implementing new calls.
+
 Reviewed November 15, 2026. **BE paths below are relative to the backend repository.** This describes checked-in contracts, including defects; it is not an approved future API specification.
 
 ## Base URL and execution modes
