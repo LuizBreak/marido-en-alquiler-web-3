@@ -4,7 +4,7 @@ export class Quote {
   constructor(projectId, contractorId, bidPrice, bidDescription, updatedAt) {
     this.projectId = projectId || "";
     this.contractorId = contractorId || "";
-    this.bidPrice = bidPrice || "";
+    this.bidPrice = bidPrice ?? "";
     this.bidDescription = bidDescription || "";
     this.updatedAt = updatedAt || "";
 

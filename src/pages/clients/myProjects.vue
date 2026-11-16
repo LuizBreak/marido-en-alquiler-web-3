@@ -12,9 +12,8 @@
     </div>
 
     <div v-if="hasProjects && !isLoading">
+      <div v-for="project in projects" :key="project.projectId">
       <ProjectTile
-        v-for="project in projects"
-        :key="project.projectId"
         :id="project.projectId"
         :contractorId="project.contractorId"
         :title="project.title"
@@ -25,6 +24,8 @@
         :services="project.services"
         :ShowProvideReview="true"
       />
+      <ProjectOffers :project="project" />
+      </div>
     </div>
 
     <h3 v-else-if="!isLoading">No hay proyectos registrados.</h3>
@@ -35,11 +36,13 @@
 import { mapGetters } from "vuex";
 import * as types from "../../utils/types.js";
 import ProjectTile from "../../components/ui/BaseProjectTile.vue";
+import ProjectOffers from "../../components/ui/ProjectOffers.vue";
 
 export default {
   name: "Proyectos",
   components: {
     ProjectTile,
+    ProjectOffers,
   },
   data() {
     return {
