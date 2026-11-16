@@ -388,9 +388,10 @@ export default {
         const client = { ...this.user, id: clientId };
         if (this.selectedFile) {
           stage = "image-upload";
-          await this.onUploadImage();
+          const uploaded = await this.onUploadImage();
+          client.avatar = uploaded.Key;
           stage = "avatar-update";
-          await this.setUserAvatar(clientId, this.selectedFile.name);
+          await this.setUserAvatar(clientId, client.avatar);
         }
         stage = "profile-update";
         await this.$store.dispatch("clients/updateClient", client);
@@ -445,7 +446,7 @@ export default {
     },
     onEmitFileSelected(file) {
       this.selectedFile = file;
-      this.user.avatar = this.selectedFile.name || "";
+
     },
     onUploadImage() {
       return s3Svc.uploadFile(this.selectedFile);

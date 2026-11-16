@@ -596,12 +596,12 @@ export default {
         }
 
         if (this.selectedFile) {
-          await this.onUploadImage();
-          contractor.avatar = this.selectedFile.name;
+          const uploaded = await this.onUploadImage();
+          contractor.avatar = uploaded.Key;
           await this.setUserAvatar(contractor.id, contractor.avatar);
         }
 
-        console.log("onSubmit", contractor);
+
         await this.$store.dispatch("contractors/updateContractor", contractor);
         this.triggerMsgBox(true, "Registro actualizado con éxito.");
         this.user = {
@@ -703,9 +703,9 @@ export default {
       return obj;
     },
     onEmitFileSelected(file) {
-      console.log("onEmitFileSelected.selectedFile", file);
+
       this.selectedFile = file;
-      this.user.avatar = this.selectedFile.name || "";
+
     },
     onUploadImage() {
       return s3Svc.uploadFile(this.selectedFile);

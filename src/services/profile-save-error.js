@@ -1,4 +1,6 @@
 export function profileSaveError(error) {
+  if (error.code === "INVALID_IMAGE") return "Selecciona una foto JPEG o PNG de hasta 8 MB.";
+  if (error.code === "IMAGE_UPLOAD_FAILED") return "No se pudo subir la foto. Tus cambios siguen en el formulario; int�ntalo de nuevo.";
   if (error.code === "CLIENT_ID_MISSING" || error.code === "CLIENT_ID_MISMATCH") {
     return "No se pudo identificar tu perfil activo. Cierra sesion e inicia sesion de nuevo antes de guardar.";
   }

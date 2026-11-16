@@ -522,7 +522,10 @@ export default {
 
   if (!(await this.v$.$validate())) return;
   try {
-    if (this.selectedFile) await this.onUploadImage();
+    if (this.selectedFile) {
+      const uploaded = await this.onUploadImage();
+      this.newProject.avatar = uploaded.Key;
+    }
     const project = {
       clientId: this.loggedUser.id,
       title: this.newProject.title,
@@ -564,13 +567,13 @@ export default {
     },
     onEmitFileSelected(file) {
       this.selectedFile = file;
-      this.newProject.avatar = this.selectedFile.name || "";
+
     },
 
     // When using <input> trigger it by onChnage (event)
     onFileSelected(event) {
       this.selectedFile = event.target.files[0];
-      this.newProject.avatar = this.selectedFile.name || "";
+
     },
     onUploadImage() {
       return s3Svc.uploadFile(this.selectedFile);
