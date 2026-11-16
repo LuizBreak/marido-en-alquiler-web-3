@@ -1,170 +1,89 @@
-// import store from "../store/index";
-
-// Article Reference: https://deepinder.me/creating-a-real-time-chat-app-with-vue-socket-io-and-nodejs
-
+// Historical class name retained for callers; this uses native WebSocket.
 export class SocketioService {
-  websocketServerLocation = null;
-  socket = null;
-  loggedUserId = null;
-  reconnectInterval = 5000;
-  maxReconnectInterval = 3000;
-  pulseInterval = 120000;
-  options;
-
   constructor(loggedUserId) {
-    // console.log("constructor.Enter", loggedUserId);
     this.loggedUserId = loggedUserId;
+    this.socket = null;
+    this.options = null;
+    this.listeners = [];
+    this.pulseTimer = null;
+    this.reconnectTimer = null;
+    this.generation = 0;
+    this.stopped = true;
   }
-
-  async connect(options) {
-    // Article Reference: https://stackoverflow.com/questions/42304996/javascript-using-promises-on-websocket
-    return new Promise(function (resolve, reject) {
-      var socket = new WebSocket(options.url);
-
-      socket.onopen = function () {
-        // console.log("onopen.Enter");
-
-        const rightNow = new Date().toLocaleTimeString();
+  connect(options) {
+    return new Promise((resolve, reject) => {
+      const socket = new WebSocket(options.url);
+      const generation = this.generation;
+      this.socket = socket;
+      let opened = false;
+      socket.onopen = () => {
+        if (this.stopped || generation !== this.generation) { socket.close(1000); reject(new Error("Connection cancelled.")); return; }
+        opened = true;
         this.reconnectInterval = options.reconnectInterval || 1000;
-        this.websocketServerLocation = options.url;
-
-        console.log(
-          "[class-> open] Connection established at " +
-            rightNow +
-            " to: " +
-            process.env.VUE_APP_WEB_SOCKET +
-            " for user: " +
-            this.activeUser
-        );
-
-        socket.onmessage = (event) => {
-          // console.log("onmessage.Enter");
-          console.log(`[message] Data received from server: ${event.data} `);
-          // this.handleNotification(event);
-        };
-
+        for (const [name, callback, option] of this.listeners) socket.addEventListener(name, callback, option);
+        this.clearPulse();
+        this.pulseTimer = setInterval(() => this.pulse(), options.pulseInterval || 60000);
+        this.sendMessage({ action: "setName", id: this.loggedUserId });
         resolve(socket);
       };
-
-      socket.onerror = function (err) {
-        reject(err);
+      socket.onerror = () => {
+        if (!opened) reject(new Error("WebSocket connection failed."));
+        socket.close();
+      };
+      socket.onclose = event => {
+        if (generation !== this.generation) return;
+        this.clearPulse();
+        if (!opened) reject(new Error("WebSocket closed before opening."));
+        if (!this.stopped && event.code !== 1000) this.scheduleReconnect();
       };
     });
   }
   async setupSocketConnection(options) {
-    console.log("setupSocketConnection.Enter");
-
-    await this.connect(options)
-      .then((socket) => {
-        this.socket = socket;
-        this.options = options;
-        this.reconnectInterval = options.reconnectInterval || 1000;
-        this.pulseInterval = options.pulseInterval;
-        this.loggedUserId = options.loggedUserId;
-
-        socket.onclose = (event) => {
-          if (event) {
-            // Event.code 1000 is our normal close event
-            if (event.code !== 1000) {
-              let maxReconnectInterval = options.maxReconnectInterval || 3000;
-              setTimeout(() => {
-                if (this.reconnectInterval < maxReconnectInterval) {
-                  // Reconnect interval can't be > x seconds
-                  this.reconnectInterval += 1000;
-                }
-                this.reconnect(process.env.VUE_APP_WEB_SOCKET);
-              }, this.reconnectInterval);
-            }
-          }
-        };
-
-        this.socket.onerror = (error) => {
-          // console.log("socket.onerror.Enter");
-          console.log(`[error] ${error.message}`);
-          this.socket.close();
-        };
-
-        // pulse websocket every 30 seconds
-        var t = this;
-        setInterval(function () {
-          t.pulse();
-        }, this.pulseInterval || 60000);
-
-        // log the user in
-        const action = { action: "setName", id: this.loggedUserId };
-        this.sendMessage(action);
-      })
-      .catch(function (err) {
-        console.log(err);
-      });
+    this.disconnect();
+    this.stopped = false;
+    this.options = options;
+    this.loggedUserId = options.loggedUserId ?? this.loggedUserId;
+    this.reconnectInterval = options.reconnectInterval || 1000;
+    return this.connect(options);
   }
-  async sendMessage(payload) {
-    // console.log("sendMessage.Enter", [payload, this.socket.readyState]);
-    try {
-      await this.socket.send(JSON.stringify(payload));
-    } catch (error) {
-      console.log(error);
+  scheduleReconnect() {
+    if (this.stopped || this.reconnectTimer !== null) return;
+    const delay = this.reconnectInterval;
+    this.reconnectInterval = Math.min(delay * 2, this.options.maxReconnectInterval || 30000);
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null;
+      if (!this.stopped) this.connect(this.options).catch(() => this.scheduleReconnect());
+    }, delay);
+  }
+  sendMessage(payload) {
+    if (!this.socket || this.socket.readyState !== 1) return false;
+    this.socket.send(JSON.stringify(payload));
+    return true;
+  }
+  addEventListener(name, callback, option = false) {
+    if (!this.listeners.some(entry => entry[0] === name && entry[1] === callback && entry[2] === option)) {
+      this.listeners.push([name, callback, option]);
+      if (this.socket) this.socket.addEventListener(name, callback, option);
     }
   }
-
-  async addEventListener(eventName, callBack, option) {
-    await this.socket.addEventListener(eventName, callBack, option);
+  clearPulse() {
+    if (this.pulseTimer !== null) clearInterval(this.pulseTimer);
+    this.pulseTimer = null;
   }
   disconnect() {
+    this.stopped = true;
+    this.generation++;
+    this.clearPulse();
+    if (this.reconnectTimer !== null) clearTimeout(this.reconnectTimer);
+    this.reconnectTimer = null;
     if (this.socket) {
-      this.socket.close();
+      for (const [name, callback, option] of this.listeners) this.socket.removeEventListener(name, callback, option);
+      this.socket.close(1000);
     }
+    this.socket = null;
   }
-  async pulse() {
-    console.log("this.pulseInterval", this.pulseInterval);
-    const payload = {
-      action: "keepItAlive",
-      to: this.loggedUserId,
-      message: "keepItAlive from " + this.loggedUserId,
-    };
-    this.sendMessage(payload);
+  pulse() {
+    return this.sendMessage({ action: "keepItAlive", to: this.loggedUserId, message: "keepItAlive" });
   }
-  reconnect(websocketServerLocation) {
-    // console.log("reconnect.Enter");
-
-    this.setupSocketConnection(this.options);
-    // console.log("new socket", this.socket);
-
-    this.socket.onclose = function () {
-      // Try to reconnect in 5 seconds
-      setTimeout(function () {
-        this.restart(websocketServerLocation);
-      }, 5000);
-    };
-  }
-  // Make the function wait until the connection is made...
-  waitForSocketConnection(socket, callback) {
-    setTimeout(function () {
-      if (socket.readyState === 1) {
-        console.log("Connection is made");
-        if (callback != null) {
-          callback();
-        }
-      } else {
-        console.log("wait for connection...");
-        this.waitForSocketConnection(socket, callback);
-      }
-    }, 5); // wait 5 milisecond for the connection...
-  }
-  handleNotification(params) {
-    console.log(params);
-    // store.dispatch("notifications/setNotifications", params.data);
-  }
-  async sendWithConnectionVerificationXXX(payload) {
-    // Wait until the state of the socket is not ready and send the message when it is...
-    // this.waitForSocketConnection(this.socket, this.sendItNow(payload));
-    this.sendItNow(payload);
-    // TODO: Implement the queue approach may be a good one
-    /// interesting approach: https://stackoverflow.com/questions/13546424/how-to-wait-for-a-websockets-readystate-to-change
-    // if (this.socket.readyState !== 1) {
-    //   this.queuedMsgs.push(payload);
-    // } else {
-    //   this.socket.send(payload);
-    // }
-  }
+  reconnect() { this.scheduleReconnect(); }
 }

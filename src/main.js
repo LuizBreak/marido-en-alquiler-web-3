@@ -11,7 +11,7 @@ import DismissModal from "./mixins/dissmissModal.js";
 import msgBoxDialog from "./mixins/msgBoxDialog.js";
 
 import BaseBadge from "./components/ui/BaseBadge.vue";
-import BaseDialog from "./components/ui/BaseBadge.vue";
+import BaseDialog from "./components/ui/BaseDialog.vue";
 import BaseSpinner from "./components/ui/BaseSpinner.vue";
 
 // Styling for the entire application

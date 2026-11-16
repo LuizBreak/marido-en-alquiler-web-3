@@ -4,7 +4,7 @@ const vm = require("node:vm");
 const babel = require("@babel/core");
 
 // Load a source module without booting the browser, Cognito, or network clients.
-module.exports = function loadModule(file, mocks = {}) {
+module.exports = function loadModule(file, mocks = {}, globals = {}) {
   const filename = path.resolve(__dirname, "..", file);
   const code = babel.transformSync(fs.readFileSync(filename, "utf8"), {
     filename, babelrc: false, configFile: false,
@@ -13,6 +13,7 @@ module.exports = function loadModule(file, mocks = {}) {
   const module = { exports: {} };
   vm.runInNewContext(code, {
     module, exports: module.exports, console, setTimeout, clearTimeout,
+    ...globals,
     require(name) {
       if (Object.prototype.hasOwnProperty.call(mocks, name)) return mocks[name];
       throw new Error(`Unexpected import in isolated test: ${name}`);
