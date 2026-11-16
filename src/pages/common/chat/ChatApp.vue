@@ -141,6 +141,7 @@ import { DateTime } from "luxon";
 
 import getUserAvatar from "../../../mixins/getUserAvatar";
 import { SocketioService } from "../../../services/socketio.service.js";
+import { chatSessionToken } from "../../../services/cognito";
 
 export default {
   name: "chat-app",
@@ -411,11 +412,33 @@ export default {
     };
   },
   methods: {
+    async refreshAfterReconnect() {
+      if (!this.messagingSvc) return;
+      await this.messagingSvc.getMyContactList(this.loggedUser.id);
+      if (this.activeChat?.id) await this.messagingSvc.getConversationByContactId({ myself: this.loggedUser.id, contactId: this.activeChat.id });
+      await this.loadAsyncData();
+      await this.refreshStatusForContactList();
+    },
     /*
      * chat emit listener methods
      */
     async onProcessIncomingMsg(event) {
-      const msg = JSON.parse(event.data);
+      let msg;
+      try { msg = JSON.parse(event.data); } catch (_) { return; }
+      if (!msg || typeof msg !== 'object') return;
+      if (msg.action === 'chat.message') {
+        const actor = String(this.loggedUser.id);
+        if (![String(msg.participantId), String(msg.toId)].includes(actor) || !msg.messageId) return;
+        const peer = String(msg.participantId) === actor ? msg.toId : msg.participantId;
+        if (String(this.activeChat?.id) === String(peer)) {
+          this.$store.commit('receiveChatMessage', msg);
+          if (String(msg.toId) === actor && !document.hidden) await this.messagingSvc.SetMessagesAsRead(msg.participantId, this.loggedUser.id);
+        }
+        await this.messagingSvc.getMyContactList(this.loggedUser.id);
+        await this.loadAsyncData();
+        return;
+      }
+      if (msg.action === 'error') { this.realtimeUnavailable = true; return; }
       // console.log("onProcessIncomingMsg.msg:", msg);
 
       const msgFromId = msg?.participantId || 0;
@@ -477,10 +500,14 @@ export default {
        */
       // console.log("message1", message);
       this.chatSendError = "";
+      const recipient = this.activeChat?.id;
+      if (!recipient) { this.chatSendError = 'Selecciona una conversación antes de enviar un mensaje.'; return; }
+      message.toId = recipient;
+      message.participantId = this.loggedUser.id;
       try {
         const saved = await this.persistMsgToDb(message);
         this.$store.commit("setMessageDelivery", { clientMessageId: message.clientMessageId, messageId: saved.messageId, uploaded: true });
-        this.BroadcastToWebsocket(message);
+        if (saved.liveDelivery === 'unavailable') this.realtimeUnavailable = true;
       } catch (_) {
         this.$store.commit("setMessageDelivery", { clientMessageId: message.clientMessageId, uploaded: false, failed: true });
         this.chatSendError = "No se pudo guardar este mensaje. Puedes copiarlo e intentarlo de nuevo: " + message.content;
@@ -549,11 +576,11 @@ export default {
         // console.log("id / FromId", [id, chatFromId]);
 
         if (id !== chatFromId) {
+          this.messagingSvc.setActiveChat(id);
           await this.messagingSvc.getConversationByContactId({
             myself: this.loggedUser.id,
             contactId: id,
           });
-          this.messagingSvc.setActiveChat(id);
           this.messagingSvc.SetMessagesAsRead(id, this.loggedUser.id);
         }
 
@@ -592,23 +619,12 @@ export default {
       });
       */
     },
-    BroadcastToWebsocket(message) {
-      // brodcasting msg to subscribers
-      const payload = {
-        action: "sendPrivate",
-        message: message.content,
-        fromId: message.participantId,
-        toId: this.activeChat.id,
-        ...message,
-      };
-      this.socketSvc.sendMessage(payload);
-    },
     async persistMsgToDb(message) {
       // persist message into the db
       // eslint-disable-next-line no-unused-vars
       const dbMessage = {
         fromId: message.participantId,
-        toId: this.activeChat.id,
+        toId: message.toId,
         quoteId: "0",
         subject: message.timestamp,
         messageBody: message.content,
@@ -787,6 +803,11 @@ export default {
       };
     },
   },
+  watch: {
+    'loggedUser.id'(value, previous) {
+      if (!value || String(value) !== String(previous)) this.socketSvc?.disconnect();
+    },
+  },
   beforeUnmount() {
     this.socketSvc.disconnect();
   },
@@ -797,12 +818,13 @@ export default {
     this.socketSvc.addEventListener("close", () => { this.realtimeUnavailable = true; }, false);
     this.socketSvc.setupSocketConnection({
       url: process.env.VUE_APP_WEB_SOCKET,
+      getToken: chatSessionToken,
+      onConnected: () => { this.realtimeUnavailable = false; this.refreshAfterReconnect().catch(() => { this.realtimeUnavailable = true; }); },
       reconnectInterval: 2000,
       maxReconnectInterval: 3000,
       pulseInterval: 120000,
       loggedUserId: this.loggedUser.id,
-    }).then(() => { this.realtimeUnavailable = false; })
-      .catch(() => { this.realtimeUnavailable = true; });
+    }).catch(() => { this.realtimeUnavailable = true; });
 
     // set Listener for incoming messages
     // this.$socket.addEventListener("message", this.onProcessIncomingMsg, false);

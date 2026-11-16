@@ -31,6 +31,7 @@ export default {
       });
 
       const { body } = response.data;
+      if (String(this.getters.userId) !== String(myself.myself)) return;
       commit("SET_CONTACT_LIST", body);
 
       // mutatting direct into the Chat Store
@@ -45,15 +46,15 @@ export default {
       url: "messages/getConversationByContactId",
       data: participants,
     };
-    apiSvc
+    return apiSvc
       .customRequest(requestData)
       .then((response) => {
         commit("SET_MESSAGES", response.data.body);
 
         // mutatting direct into the Chat Store
-        this.commit("setMessages", JSON.parse(response.data.body), {
-          root: true,
-        });
+        if (String(this.getters.userId) === String(participants.myself) && String(this.getters.activeChat?.id) === String(participants.contactId)) {
+          this.commit("mergeConversation", { messages: response.data.data, ...participants }, { root: true });
+        }
         // this.dispatch("addMessages", JSON.parse(response.data.body), {
         //   root: true,
         // });

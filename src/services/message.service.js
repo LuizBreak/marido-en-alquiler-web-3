@@ -36,6 +36,7 @@ export class Message {
       msgType: msgAttributes.msgType,
       msgAsset: msgAttributes.msgAsset,
       updatedAt: msgAttributes.updatedAt,
+      clientMessageKey: msgAttributes.clientMessageId,
     };
     const saved = await store.dispatch("messages/createMessage", ds, { root: true });
     if (notifyTarget) {

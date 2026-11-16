@@ -35,6 +35,7 @@ export default {
     context.commit("setCognitoUser", null);
     context.commit("clients/RESET_CLIENT", null, { root: true });
     context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
+    context.commit("resetChat", null, { root: true });
     context.commit(types.SET_USER, {
       token: null,
       userId: null,

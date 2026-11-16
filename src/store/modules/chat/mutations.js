@@ -1,6 +1,28 @@
 import { DateTime } from "luxon";
 
 export default {
+  resetChat(state) {
+    state.messages = []; state.participants = []; state.myself = {}; state.activeChat = null; state.nrOfNewMessages = 0;
+  },
+  receiveChatMessage(state, incoming) {
+    incoming = { ...incoming, myself: String(incoming.participantId) === String(state.myself.id) };
+    const existing = state.messages.find(message =>
+      (incoming.messageId && String(message.messageId) === String(incoming.messageId)) ||
+      (incoming.clientMessageId && message.clientMessageId === incoming.clientMessageId && String(message.participantId) === String(incoming.participantId)));
+    if (existing) Object.assign(existing, incoming);
+    else state.messages.push(incoming);
+  },
+  mergeConversation(state, { messages, myself, contactId }) {
+    const belongs = message => (String(message.participantId) === String(myself) && String(message.toId) === String(contactId)) ||
+      (String(message.participantId) === String(contactId) && String(message.toId) === String(myself));
+    const newest = Math.max(0, ...messages.map(message => Number(message.messageId) || 0));
+    const pending = state.messages.filter(message => belongs(message) && (!message.messageId || Number(message.messageId) > newest));
+    state.messages = messages.map(message => ({ ...message, myself: String(message.participantId) === String(myself) }));
+    for (const message of pending) {
+      const found = state.messages.some(item => item.messageId && String(item.messageId) === String(message.messageId));
+      if (!found) state.messages.push(message);
+    }
+  },
   setMessageDelivery(state, delivery) {
     const message = state.messages.find(item => item.clientMessageId === delivery.clientMessageId);
     if (message) Object.assign(message, delivery);
