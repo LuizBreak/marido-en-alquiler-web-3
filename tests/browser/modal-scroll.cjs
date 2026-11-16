@@ -43,8 +43,12 @@ async function main() {
   }
   try {
     await send("Network.enable");
-    await send("Network.setBlockedURLs", { urls: ["https://*"] });
-    await send("Page.navigate", { url: "http://127.0.0.1:8080/" });
+    const target = process.env.FRONTEND_TEST_URL || "http://127.0.0.1:8080/";
+    const blocked = target.startsWith("https://")
+      ? ["*execute-api*", "*cognito-idp*", "*cognito-identity*", "https://connect.facebook.net/*", "https://unpkg.com/*"]
+      : ["https://*"];
+    await send("Network.setBlockedURLs", { urls: blocked });
+    await send("Page.navigate", { url: target });
     let mounted = false;
     for (let attempt = 0; attempt < 100; attempt++) {
       mounted = await evaluate('!!document.querySelector("#signin-modal")');
@@ -53,7 +57,7 @@ async function main() {
     }
     assert.ok(mounted, "Local Vue application did not mount");
     const openSignin = () => evaluate(`document.querySelector('[href="#signin-modal"][data-bs-toggle="modal"]').click()`);
-    const dismiss = () => evaluate('document.getElementById("app").__vue_app__._instance.proxy.dismissModal("#signin-modal").then(() => true)');
+    const dismiss = () => evaluate('document.querySelector("#signin-modal button[aria-label=Close]").click()');
 
     await openSignin(); await pause(700);
     assert.equal((await state()).backdrops, 1, "Opening one dialog must create one backdrop");

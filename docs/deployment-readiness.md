@@ -2,6 +2,8 @@
 
 Assessed November 16, 2026. **The current backend batch is not ready for a direct replacement of the working AWS service.** No deployment, cloud configuration change or schema migration was performed by this assessment.
 
+**Subsequent update:** AWS CLI `default` authentication was verified outside the restricted shell. The FE-only release has now been deployed and verified; see [the release record](releases/2026-11-16-frontend.md). No backend deployment occurred. The backend prerequisites below remain applicable; the earlier credential observation is historical and is no longer a blocker in the verified execution context.
+
 ## Verified local facts
 
 | Item | Finding |

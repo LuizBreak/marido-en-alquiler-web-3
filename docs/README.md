@@ -11,6 +11,7 @@ Reviewed: November 15, 2026. This documentation covers the current working copie
 | [Repair and commit log](repair-log.md) | Implemented changes, companion commits, validation, configuration changes and rollback |
 | [Asana ticket ledger](asana-tickets.md) | Current status and remaining work for all 21 review findings; includes a CSV for later import |
 | [AWS deployment readiness](deployment-readiness.md) | Current deployment blockers and proposed staging/rollback sequence |
+| [November 16 frontend release](releases/2026-11-16-frontend.md) | Published frontend, validation, remaining limitations and rollback |
 
 ## Repository scope
 

@@ -2,6 +2,8 @@
 
 Saved November 16, 2026 (America/New_York). Read this file first when resuming work, then inspect Git status in both repositories before changing anything.
 
+**Latest completed action: FE deployed to AWS.** The user explicitly requested frontend deployment. The release is live at `https://www.marido-en-alquiler.com/`, from application source commit `1016467`, with CloudFront invalidation completed and public-page modal/scroll checks passing. The backend, IAM, Cognito and database were not deployed or changed. Full details, verification, local backup and rollback commands are in [the frontend release record](releases/2026-11-16-frontend.md). AWS CLI `default` authentication was verified through the permitted execution context; earlier restricted-shell `NoCredentials` observations were misleading. Do not ask the user to log in again without checking that context. The user should now validate their signed-in workflows on the public site. Photo uploads remain unavailable pending secure cloud permission/configuration work.
+
 ## Where we stopped
 
 The user resumed development after a long pause. We reviewed both repositories, documented the product/architecture, prepared 21 review findings, and implemented an authorized repair batch with separate local commits. The user then asked to run **the FE locally against the existing AWS BE** for now.
@@ -26,14 +28,14 @@ The user confirmed the client text-profile save now works. No next feature reque
 - BE branch at handoff: `main`; latest commit: `b2b03cb`.
 - Both tracked working trees were clean before creating this handoff. FE has pre-existing untracked `dist-build-check/` and `dist-build-check-2/`; preserve them.
 - Existing user edits were checkpointed first: FE `65174fc`, BE `3a4ccc4`. Detailed fix/companion commits: [repair-log.md](repair-log.md).
-- **Nothing has been pushed or deployed. Local BE repairs are not active on AWS.** Do not assume local FE/local BE integration checks apply to the old deployed backend.
+- **FE has now been deployed; Git commits have not been pushed. Local BE repairs are not active on AWS.** The released FE explicitly retains compatibility with the deployed legacy API; consult the release record before changing contracts.
 
 ## User instructions and preferences
 
 - Continue collaborating until the requested work is complete; avoid repeated permission questions for already authorized routine work.
 - The user explicitly authorized commits between fixes. Keep each fix independently reviewable and reversible, with the problem/change/verification recorded in its commit.
 - Preserve existing work and generated directories. Do not rewrite history.
-- Current runtime preference: local FE using AWS BE. Do not switch to a local backend or deploy repairs merely because the next session starts.
+- Current setup: the FE is published on AWS and also available locally; both use the existing AWS BE. Do not switch to a local backend or deploy backend repairs merely because the next session starts.
 - Asana publishing is **deferred at the user's request**. Keep tickets locally for later import. No Asana tasks were created.
 - Production data changes, credential rotation, cloud configuration and deployment were not performed by this batch. Do not perform incidental live writes as part of a smoke check.
 

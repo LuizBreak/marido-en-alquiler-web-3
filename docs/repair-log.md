@@ -1,6 +1,6 @@
 # Restart repairs and commit ledger
 
-Updated November 16, 2026. Both repositories have local commits; nothing was pushed or deployed. Original review documents remain historical snapshots. Current ticket status is in [asana-tickets.md](asana-tickets.md), with all 21 records prepared in [asana-tickets.csv](asana-tickets.csv).
+Updated November 16, 2026. Both repositories have local commits; nothing was pushed to Git remotes. **The FE was subsequently deployed to AWS; the BE remains undeployed.** See [the FE release record](releases/2026-11-16-frontend.md) for the release, verification and rollback. Original review documents remain historical snapshots. Current ticket status is in [asana-tickets.md](asana-tickets.md), with all 21 records prepared in [asana-tickets.csv](asana-tickets.csv).
 
 ## Checkpoints
 
