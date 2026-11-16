@@ -5,7 +5,6 @@ import * as types from "../../../utils/types";
 import store from "../../../store/index";
 
 let timer;
-let lastUserId;
 
 function normalizeAccountInfo(accountInfo) {
   const account = Array.isArray(accountInfo) ? accountInfo[0] || {} : accountInfo || {};
@@ -79,35 +78,15 @@ export default {
     }
   },
   async signup(context, payload) {
-    // aws user creation
-    return await Auth.signUp({
-      username: payload.email,
-      password: payload.password,
-      attributes: {
-        email: payload.email,
-      },
-      validationData: [], // optional
-    })
-      .then((data) => {
-        let idToken = "signup-token";
-
-        // db account creation
-        this.dispatch("createDbAccountInfo", {
-          ...payload,
-          idToken,
-          username: data.user.username,
-        }).then(() => {
-          // db client/contractor creation
-          payload.id = lastUserId;
-          return this.dispatch("createDbClientInfo", payload, data.user);
-        });
-      })
-      .catch((err) => {
-        console.log(err);
-        this.error = err.message || "Failed to register, try again later.";
-        throw new AuthenticationError(err.code, this.error);
-      });
-  },
+  const registration = await Auth.signUp({ username: payload.email, password: payload.password, attributes: { email: payload.email }, validationData: [] });
+  try {
+    const account = await context.dispatch("createDbAccountInfo", { ...payload, username: registration.user.username });
+    await context.dispatch("createDbClientInfo", { ...payload, id: account.id });
+    return registration;
+  } catch (error) {
+    throw new AuthenticationError(error.code, "La identidad fue creada, pero el perfil no pudo completarse. Contacta soporte antes de registrarte otra vez.");
+  }
+},
   async auth(context, payload) {
     let response = null;
     let responseData = null;
@@ -403,39 +382,17 @@ export default {
     }
   },
   async createDbAccountInfo(context, payload) {
-    const account = {
-      // id: pk,
-      userName: payload.email,
-      password: payload.password,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      email: payload.email,
-      userType: payload.userType,
-      comments: payload.username,
-      returnSecureToken: "",
-      statusText: "",
-      expiresIn: "",
-      idToken: "",
-      expirationDate: "",
-      imgPath: "",
-    };
-
-    // db user creation
-    await apiSvc
-      .post(`accounts`, account)
-      .then((response) => {
-        const { body } = response.data;
-        const userId = JSON.parse(body);
-
-        if (response.status == 200 || response.status == 201) {
-          lastUserId = userId[0].LAST_INSERT_ID;
-          return lastUserId;
-        } else {
-          return false;
-        }
-      })
-      .catch((err) => {
-        throw new AuthenticationError(err.code, err.message);
-      });
-  },
+  const account = {
+    userName: payload.email,
+    firstName: payload.firstName,
+    lastName: payload.lastName,
+    email: payload.email,
+    userType: payload.userType,
+    comments: payload.username,
+    returnSecureToken: "", statusText: "", expiresIn: "", idToken: "", expirationDate: "", avatar: "",
+  };
+  const response = await apiSvc.post("accounts", account);
+  if (!response.data.data?.id) throw new Error("The account was not assigned an ID.");
+  return response.data.data;
+},
 };
