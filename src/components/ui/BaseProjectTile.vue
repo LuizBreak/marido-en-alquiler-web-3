@@ -18,7 +18,7 @@
   <div class="card card-hover card-horizontal border-0 shadow-sm mb-4">
     <div
       class="card-img-top position-relative"
-      v-bind:style="requiredImage(tileImage)"
+      :style="projectImage"
     >
       <a class="stretched-link" href="#signin-modal" data-bs-toggle="modal"></a>
       <div class="position-absolute end-0 top-0 pt-3 pe-3 zindex-5">
@@ -82,6 +82,8 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { apiSvc } from "../../services/api.service";
+import { uploadedImageUrl } from "../../services/image-url";
 import DateFormatter from "../../mixins/dateFormatter.js";
 import BaseReviewMsg from "./BaseReviewMsg.vue";
 import BaseProjectBid from "./baseProjectBid.vue";
@@ -107,15 +109,16 @@ export default {
     BaseProjectBid,
   },
   data() {
-    return {};
+    return { partner: null };
   },
   methods: {
-    async retrieveContractorName() {
-      await this.$store
-        .dispatch("contractors/fetchContractor", { id: this.contractorId })
-        .catch(() => {
-          console.log("Error refreshing contractor name");
-        });
+    async retrieveContractorName(id) {
+      this.partner = null;
+      if (!/^[1-9]\d*$/.test(String(id))) return;
+      try {
+        const response = await apiSvc.getById('contractors', id);
+        if (String(this.contractorId) === String(id)) this.partner = response.data.data;
+      } catch (_) { this.partner = null; }
     },
   },
   computed: {
@@ -150,12 +153,14 @@ export default {
       }
     },
     companyName() {
-      return this.$store.getters["contractors/companyName"];
+      return this.partner?.companyName || [this.partner?.firstName, this.partner?.lastName].filter(Boolean).join(' ');
+    },
+    projectImage() {
+      const url = uploadedImageUrl(this.tileImage);
+      return url ? { backgroundImage: 'url("' + url + '")' } : this.requiredImage(this.tileImage);
     },
   },
-  async created() {
-    await this.retrieveContractorName();
-  },
+  watch: { contractorId: { immediate: true, handler(id) { this.retrieveContractorName(id); } } },
   mounted() {},
 };
 </script>
