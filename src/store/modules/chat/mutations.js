@@ -1,6 +1,10 @@
 import { DateTime } from "luxon";
 
 export default {
+  setMessageDelivery(state, delivery) {
+    const message = state.messages.find(item => item.clientMessageId === delivery.clientMessageId);
+    if (message) Object.assign(message, delivery);
+  },
   newMessage: (state, message) => {
     try {
       message.timestamp = message.timestamp.toISO();

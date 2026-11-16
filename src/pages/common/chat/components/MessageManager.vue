@@ -125,6 +125,7 @@ export default {
         contentMatch
       ) {
         let message = {
+          clientMessageId: crypto.randomUUID(),
           content: contentMatch[1],
           // myself: true,
           participantId: this.myself.id,

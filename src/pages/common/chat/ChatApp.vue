@@ -8,6 +8,7 @@
     <p v-if="realtimeUnavailable" class="text-warning" role="status">
       La conexión en tiempo real no está disponible. Puedes consultar tus conversaciones guardadas; actualiza la página para ver mensajes nuevos.
     </p>
+    <p v-if="chatSendError" class="text-danger text-break" role="alert">{{ chatSendError }}</p>
     <div class="row align-items-start">
       <div class="col-sm-6">
         <div class="card card-body shadow-lg pt-4 pb-5">
@@ -151,6 +152,7 @@ export default {
     return {
       socketSvc: null,
       realtimeUnavailable: false,
+      chatSendError: "",
       MultiAsyncDataHolder: [],
       newMessages: 0,
       rating: 3.7,
@@ -474,21 +476,21 @@ export default {
        * yet to the server you have to add the message into the array
        */
       // console.log("message1", message);
-      await this.addMessageToStore([message]);
-
-      this.BroadcastToWebsocket(message);
-
-      await this.persistMsgToDb(message);
+      this.chatSendError = "";
+      try {
+        const saved = await this.persistMsgToDb(message);
+        this.$store.commit("setMessageDelivery", { clientMessageId: message.clientMessageId, messageId: saved.messageId, uploaded: true });
+        this.BroadcastToWebsocket(message);
+      } catch (_) {
+        this.$store.commit("setMessageDelivery", { clientMessageId: message.clientMessageId, uploaded: false, failed: true });
+        this.chatSendError = "No se pudo guardar este mensaje. Puedes copiarlo e intentarlo de nuevo: " + message.content;
+      }
 
       /*
        * you can update message state after the server response
        */
       // timeout simulating the request
       // TODO: Implemente message view functionality
-      setTimeout(() => {
-        message.uploaded = true;
-        message.viewed = true;
-      }, 2000);
     },
     // eslint-disable-next-line
     onType: function (e) {
@@ -617,7 +619,7 @@ export default {
         ...message,
       };
 
-      await this.messagingSvc.add(false, dbMessage);
+      return this.messagingSvc.add(false, dbMessage);
     },
     isMsgForThisChat(msgFromId, msgToId, chatFromId, chatToId) {
       // console.log("Same Participant? msg for me?", [
