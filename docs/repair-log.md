@@ -1,27 +1,29 @@
 # Restart repairs and commit ledger
 
-Updated November 16, 2026. Both repositories have local commits; nothing was pushed to Git remotes. **The FE was subsequently deployed to AWS; the BE remains undeployed.** See [the FE release record](releases/2026-11-16-frontend.md) for the release, verification and rollback. Original review documents remain historical snapshots. Current ticket status is in [asana-tickets.md](asana-tickets.md), with all 21 records prepared in [asana-tickets.csv](asana-tickets.csv).
+Updated November 16, 2026. Both repositories have separate local commits; nothing was pushed. The user confirmed the whole AWS system is development and authorized backend repairs/deployment. See [the backend release record](releases/2026-11-16-backend.md) for the authoritative current deployment/acceptance status and rollback.
 
-## Current acceptance and next authorized phase
+## Backend release repairs
 
-The user confirmed that the deployed FE seems to be working and explicitly requested this log/handoff update so the necessary backend changes and deployment can proceed. **Backend preparation, implementation, staging validation and deployment are now the next authorized objective.** Keep each fix in its own documented, reversible commit. No backend release has happened yet; the local candidate remains `b2b03cb`.
+| Repair | Commit |
+| --- | --- |
+| Reconcile required fields/casing with actual MySQL schema | BE `8a40dff` |
+| Add Cognito JWT and Secrets Manager runtime clients | BE `4832219` |
+| Verify identity, scope resource access, filter private fields, provision transactionally | BE `39106f9` |
+| Retrieve DB secret at runtime; require verified RDS TLS; reduce pool size | BE `de696e1` |
+| Declare dev environment and missing routes; add allowlisted packaging/native release preparation | BE `40f9782` |
+| Add disposable Cognito/MySQL route, contact and messaging verification | BE `67fb927` |
+| Preserve required public inquiry defaults | BE `4ef1331` |
+| Use Cognito subject within legacy username length | BE `4dd8f90` |
+| Permit browser access to health response | BE `fde6af4` |
+| Replace the Lambda-incompatible dot-prefixed health filename; isolate compiler output | BE `f14cb8b`, `e6cb890` |
+| Accept valid reflected CORS origins; document executable fixture workflow | BE `1e40f9e`, `aab9e41` |
+| Attach verified bearer token before SQL login; defer new SQL accounts until verified login | FE `e0474ba` |
+| Remove raw card entry; show only masked stored-card metadata and owner deletion | FE `f9f284b` |
+| Explicit local FE/AWS API v2 development command | FE `fb84127` |
 
-FE application commit `1016467` is live at <https://www.marido-en-alquiler.com/>; release documentation checkpoint is `7ef12dd`. Production uses the existing API at `https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend` with the explicit legacy contract. The frontend release passed 24 isolated tests, source lint, build, artifact/checksum verification and three public modal/scroll browser checks. User confirmation is additional acceptance of observed live behavior, not a claim that every workflow was tested.
+Validation: 45 BE unit checks, TypeScript, 25 FE tests, changed-source lint and build passed. Real SRP/Cognito/MySQL disposable fixtures passed locally and against AWS, including extended routes, contacts and message read state. The final health-only package preserves every other accepted file; its real public endpoint passed. Both API and paired FE are deployed, all 75 Lambda hashes matched, 187 FE assets were checked and CDN invalidation completed. Details are in the release file. No schema migration was required. Secrets moved out of the artifact, but were not rotated. Node 18/toolchain upgrades, provider payments, photo permissions and remaining product/operations work stay open in the ticket ledger. Legacy payment/milestone writes and coordinated account deletion intentionally return 501.
 
-AWS CLI access is already verified with profile `default`, account `907823072924`, region `us-east-1`, identity `luiz.break` through the permitted execution context. Earlier restricted-shell credential failures were misleading. Reuse/check that context before requesting another login. No Git push, backend deployment, IAM change, credential rotation or database migration was performed during the FE release.
-
-### Backend continuation sequence
-
-1. Inventory the actual API, CloudFormation stack, Lambda code/versions/configuration, logs and DB networking using read-only commands. Establish which resources serve the current endpoint; `/dev/` does not establish data isolation.
-2. Preserve the known-good backend deployment/configuration and establish rollback. Verify database backup/restore before any data/schema changes. The existing FE snapshot covers only static frontend hosting.
-3. Reconcile the live schema with source snapshots, especially account/profile required columns, ID shapes and casing. Build ordered migrations only where needed; mock-based tests do not establish MySQL compatibility.
-4. Fix deployment configuration: explicit target/stage, supported runtime, secret-backed DB environment settings and inspected packages. Current source requires DB environment variables that `serverless.yml` does not declare, and still specifies Node 18.
-5. Complete necessary authentication/ownership, contract, validation, provisioning and CORS/error work in separate commits. Maintain compatibility with the released FE; switch its legacy contract only after the companion BE paths are tested and available.
-6. Test against an isolated staging API and separate sanitized database. Cover registration, login/reload, profile writes, projects/quotes, favorites, messages/read flags and failures. Do not use real user records for incidental diagnostic writes.
-7. Prepare the concrete release artifact/target/change summary and rollback instructions, then deploy the authorized backend release when prerequisites pass. Record acceptance results, remaining limitations and rollback references here and in the handoff.
-
-This authorization permits progress on the agreed backend work without repeated generic permission requests. It does not supply a missing payment business model or remove the need to resolve material destructive/data decisions with a concrete plan. Photo-upload role permissions, payment tokenization and exposed-credential rotation remain explicitly open until implemented and verified. Do not repeat or indirectly bypass the previously rejected diagnostic PUT.
-
+Run FE locally with `npm.cmd run serve:aws`. Keep `.deployments/be-20261116T080605Z/` and the earlier FE snapshot outside Git. The sections below are historical repair records; references there to an undeployed backend, unknown AWS access or a potentially production database are superseded by this release and the user's explicit development clarification.
 ## Checkpoints
 
 | Repository | Commit | Contents |
@@ -38,19 +40,19 @@ Each implementation commit records the defect, change, verification and material
 | Repair | FE commits | BE commits |
 | --- | --- | --- |
 | Remove long-lived browser AWS credentials; sanitize ping; stop tracking local secrets | `69b1b07` | `12c420c` |
-| Consolidate validated database configuration and isolate development | — | `850cb3f` |
+| Consolidate validated database configuration and isolate development | â€” | `850cb3f` |
 | Correct domain primary keys, route parameters and log table names | `5ef6f89` | `f6f7e4b` |
 | Normalize API responses and retain a serialized compatibility field | `7fc74b0` | `d960407` |
-| Return actual generated IDs from successful resource creation | — | `16e846e` |
-| Await persistence/uploads; propagate errors; keep forms on failure | `9ba4971` | — |
+| Return actual generated IDs from successful resource creation | â€” | `16e846e` |
+| Await persistence/uploads; propagate errors; keep forms on failure | `9ba4971` | â€” |
 | Repair sparse-ID collection updates and current-user favorites | `35e6736` | `12aa5d3` |
-| Fix session expiry units, cached-session refresh, bearer headers and route metadata | `11a17ea` | — |
+| Fix session expiry units, cached-session refresh, bearer headers and route metadata | `11a17ea` | â€” |
 | Await signup steps, remove shared ID state, stop sending/storing signup passwords | `9428969` | `43bdb7a` |
-| Validate JSON/IDs, allowlist writes, parameterize chat SQL and control Lambda errors | — | `b2b03cb` |
-| Clean up socket timers/listeners/reconnect and correct dialog registration | `33423f5` | — |
-| Preserve inquiry text and distinguish notification failure after a saved inquiry | `7d2a8df` | — |
-| Add reproducible read-only changed-source lint | `be12098` | — |
-| Replace JWT log session IDs with event IDs and remove environment/store dumps | `22ba93b` | — |
+| Validate JSON/IDs, allowlist writes, parameterize chat SQL and control Lambda errors | â€” | `b2b03cb` |
+| Clean up socket timers/listeners/reconnect and correct dialog registration | `33423f5` | â€” |
+| Preserve inquiry text and distinguish notification failure after a saved inquiry | `7d2a8df` | â€” |
+| Add reproducible read-only changed-source lint | `be12098` | â€” |
+| Replace JWT log session IDs with event IDs and remove environment/store dumps | `22ba93b` | â€” |
 | Allowlist public browser variables to exclude secrets embedded by build tooling | `c2facd0` | - |
 
 ## Verification

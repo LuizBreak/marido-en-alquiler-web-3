@@ -1,3 +1,10 @@
+# Current local FE / AWS development setup
+
+The paired FE/BE release is deployed (November 16, 2026). From the FE repository run `npm.cmd run serve:aws` and open http://127.0.0.1:8080. The command selects the existing AWS API and API contract v2 explicitly, overriding older ignored environment values. Stop an existing process on port 8080 before starting another. Do not assume a server persists after the session closes.
+
+All AWS resources/data were confirmed development by the user. Backend access/secret/TLS/provisioning and current verification commands are in [HANDOFF.md](HANDOFF.md) and [the release record](releases/2026-11-16-backend.md). The older setup notes below are historical where their deployment/authentication assumptions differ.
+
+---
 # Development restart guide
 
 Reviewed November 15, 2026. Read [the P0 findings](review-report.md#p0-security-and-data-boundaries) before starting backend handlers or testing accounts/payment methods.
@@ -37,7 +44,7 @@ FE `.env` uses JavaScript-style block comments and blank lines that produce dote
 ## Safe restart sequence
 
 1. Record which existing working-tree changes are intentional. Preserve them before broad modernization.
-2. Rotate exposed credentials and remove sensitive browser/SQL/logging paths (R01–R05). The BE `/ping` handler currently returns DB host, user **and password**; it must be sanitized before exposure.
+2. Rotate exposed credentials and remove sensitive browser/SQL/logging paths (R01â€“R05). The BE `/ping` handler currently returns DB host, user **and password**; it must be sanitized before exposure.
 3. Fix the forced-production database selection, create an isolated MySQL database, and reconcile SQL snapshots into migrations. Do not load repository data dumps into production or assume fixtures are sanitized.
 4. Inventory/recover Cognito configuration, email service, WebSocket service, image storage and frontend hosting. Record resource owners and environment separation.
 5. Select a supported runtime/package manager, restore dependencies reproducibly from the chosen lockfile, and record actual versions. No dependency installation/upgrades were performed by this review.
@@ -93,7 +100,7 @@ No deployment command is recommended as a restart step. First identify the autho
 | BE Jest `--listTests --runInBand` | Exit 0, empty list | No discoverable tests; not a passing functional suite |
 | Git status before/after | Existing modifications preserved | Review output is documentation plus FE README link; backend source untouched |
 
-Build entrypoint was approximately **6.68 MiB uncompressed**. Vendor JS: **5910.88 KiB / 1173.71 KiB gzip**; app JS: **608.66 KiB / 173.04 KiB gzip**. Build output also reported 2–4 MiB image assets, outdated browser-data warnings and a sass-loader upgrade notice. Temporary review build output was removed after recording results.
+Build entrypoint was approximately **6.68 MiB uncompressed**. Vendor JS: **5910.88 KiB / 1173.71 KiB gzip**; app JS: **608.66 KiB / 173.04 KiB gzip**. Build output also reported 2â€“4 MiB image assets, outdated browser-data warnings and a sass-loader upgrade notice. Temporary review build output was removed after recording results.
 
 No browser automation, production requests, database introspection/migrations, provider calls, real signup, email sending, payment processing, deployed-authorizer inspection or current dependency advisory lookup was performed. Dependency versions/support and cloud state must be verified separately when choosing upgrades or deploying.
 

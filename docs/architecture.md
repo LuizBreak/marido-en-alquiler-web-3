@@ -1,3 +1,14 @@
+# Deployed architecture update — November 16, 2026
+
+The user confirmed all AWS resources/data are development. The Vue/Vuex/Amplify frontend still calls API Gateway/Lambda/MySQL, now with server-side Cognito JWT verification, account-to-subject binding, owner/participant checks and public/private field filtering. Verified sign-in transactionally creates/reconciles SQL account/profile; the frontend no longer provisions SQL rows before email confirmation.
+
+Lambda loads its DB password from one resource-scoped Secrets Manager secret, caches a two-connection pool per execution environment and verifies the RDS TLS certificate. A shared HTTP/resource layer consolidates validation, safe errors, access scopes and response projection. All 75 existing Lambda identities and the API/database were retained. Native CloudFormation plus allowlisted runtime packaging was used for this release; no schema migration or framework upgrade occurred.
+
+Unsafe card collection is disabled pending a payment model/provider. The existing upload role still lacks write permission; secure image ownership/key/permission design remains open. Node 18, legacy interfaces/prototypes, complete pagination/business transitions, external service delivery and operational modernization remain tracked improvements. See [handoff](HANDOFF.md), [release/rollback](releases/2026-11-16-backend.md) and [tickets](asana-tickets.md).
+
+The purpose/domain assessment below remains useful context; implementation statements dated November 15 are historical where they conflict with this update.
+
+---
 # Purpose and architecture
 
 This is the November 15, 2026 architecture assessment. Subsequent source repairs and current limitations are recorded in [the repair log](repair-log.md) and [ticket ledger](asana-tickets.md).
@@ -54,7 +65,7 @@ The application has two repositories, one browser application, and one domain AP
 | `src/css`, `src/js`, `public`, `src/img` | Theme styling/scripts, vendor assets and template/demo imagery |
 | `amplify` | Amplify project metadata; generated `src/aws-exports.js` is ignored by Git |
 
-Typical flow is component → domain helper and/or Vuex action → Axios/API → mutation → reactive UI. The paths are inconsistent: some screens use classes, some dispatch directly, booking uses `src/assets/js/contactUsEngine.js`, email uses `fetch`, and uploads call S3 directly. Generic project actions are nested beneath `subStore` but not all parent modules are namespaced; call sites use `projects/...`.
+Typical flow is component â†’ domain helper and/or Vuex action â†’ Axios/API â†’ mutation â†’ reactive UI. The paths are inconsistent: some screens use classes, some dispatch directly, booking uses `src/assets/js/contactUsEngine.js`, email uses `fetch`, and uploads call S3 directly. Generic project actions are nested beneath `subStore` but not all parent modules are namespaced; call sites use `projects/...`.
 
 Most screens use Vue's Options API. Vuex auth and generic API actions share the root namespace; domain modules such as clients are namespaced. Service barrel exports and services importing the store create tight coupling and circular dependencies. These choices matter when extracting or testing a workflow.
 
@@ -80,7 +91,7 @@ Route presence is not proof of feature completion. `/perfil` is guarded by `requ
 5. Cached login reads local storage and retrieves `accounts/{id}`; it does not establish a freshly validated Cognito session before marking the UI signed in.
 6. Signup attempts Cognito creation, then SQL account creation, then a client/contractor profile using the account ID. These operations are not atomic and some promise chains are not returned.
 
-The SQL account is the shared identity record: clients and contractors reuse its numeric ID. A durable, unique Cognito `sub` association is not established by the inspected signup flow. BE `authenticate` is an email lookup, not password/JWT validation. Neither server-side JWT validation nor a gateway authorizer is declared in the reviewed API source. FE `apiSvc.setHeader` exists, but the main Cognito login flow does not call it. See R01–R06 in the review before expanding account features.
+The SQL account is the shared identity record: clients and contractors reuse its numeric ID. A durable, unique Cognito `sub` association is not established by the inspected signup flow. BE `authenticate` is an email lookup, not password/JWT validation. Neither server-side JWT validation nor a gateway authorizer is declared in the reviewed API source. FE `apiSvc.setHeader` exists, but the main Cognito login flow does not call it. See R01â€“R06 in the review before expanding account features.
 
 ## Backend structure
 

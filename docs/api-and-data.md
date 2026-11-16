@@ -1,3 +1,19 @@
+# Current API contract — November 16, 2026
+
+The AWS development release is deployed. See [release evidence](releases/2026-11-16-backend.md) and [handoff](HANDOFF.md). Base URL remains `https://0011dt1689.execute-api.us-east-1.amazonaws.com/dev/marido-backend`; local FE uses `npm.cmd run serve:aws` and API contract v2.
+
+- Private routes require a verified Cognito ID bearer token. Server resolves identity from verified claims and checks resource ownership/participants. Caller-supplied email/IDs do not establish access. Admin access requires the Cognito `admins` group.
+- `POST /authenticate` performs locked transactional SQL account/profile provisioning after verified login; it returns safe account fields as an array. New `POST /accounts` is unavailable (410 after authenticated access). Registration uses Cognito attributes; existing identities/profile recovery are handled on verified sign-in.
+- Public reads include contractor/project search and approved reviews. Contractor public fields omit banking/license/private address values. Account responses omit stored credentials/tokens; payment reads return only last4/expiry.
+- `GET /quotes/clients/{clientId}`, `GET /quotes/projects/{projectId}` and `DELETE /favorites/clients/{clientId}/contractors/{contractorId}` are now available and scoped. Legacy composite favorite deletion remains accepted for compatibility with the former FE.
+- Lists default to 100 records, maximum 200 through `limit`; complete pagination is future work. Message conversation returns newest 100 ordered chronologically, and recipient ownership governs read flags/counts.
+- Canonical `data` and serialized `body` compatibility envelopes are deployed. Missing records return 404; invalid/missing identity 401, forbidden access 403, bad input 400, unexpected failures a redacted 500, with CORS.
+- Raw payment/milestone creation/update returns 501 pending a provider decision. Coordinated account deletion returns 501. Existing payment entries can be listed safely and deleted by their owner.
+- Public inquiry defaults match the actual development schema. `GET /ping` uses `src/controllers/ping.ts` and returns safe liveness with CORS. The prototype `/clientes` delegates to the secured client handler.
+
+The original contract assessment below is historical. Its descriptions of unauthenticated access, absent routes, unordered/unscoped messages and the dot-prefixed health module are superseded by this section and current source.
+
+---
 # API and data reference
 
 This is the original assessment. [Subsequent repairs](repair-log.md) introduce canonical decoded `data`, retain serialized `body` for compatibility, correct IDs, return creation IDs and add an explicit composite favorite DELETE route. Refer to current source and the repair log when implementing new calls.
@@ -29,7 +45,7 @@ All entries come from BE `serverless.yml`. `CRUD` below means `GET /resource`, `
 | `paymethods` | `GET /paymethods/clients/{clientId}` | `paymethodId` | `payMethodsController.ts` |
 | `logtrail` | `GET /logtrail/clients/{clientId}` | `logtrailId` | `logTrailController.ts` |
 
-Additional routes: `GET /ping` → `src/controllers/.ping.ts:handler`; `GET /clientes` → `src/sequelizer/controllers/clientSqlController.ts:getClientFromController`.
+Additional routes: `GET /ping` â†’ `src/controllers/.ping.ts:handler`; `GET /clientes` â†’ `src/sequelizer/controllers/clientSqlController.ts:getClientFromController`.
 
 ### Message operations
 

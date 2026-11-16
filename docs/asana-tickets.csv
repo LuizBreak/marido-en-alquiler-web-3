@@ -21,13 +21,13 @@ ORIGINAL ASSESSMENT
 Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Partial","","Security and data boundaries"
 "[R02] — API authentication and resource ownership are not enforced in reviewed code","Review ID: R02
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Open
-Implementation commits: None
+Status: Partial; deployed and verified
+Implementation commits: BE 39106f9; FE e0474ba
 Dependencies for closure: R01, R04
 
-REMAINING ACCEPTANCE WORK
-Implement verified Cognito subject mapping, API JWT validation, role/ownership enforcement and public/private DTO separation. No production gateway was inspected.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+JWT/verified-email/subject checks and resource ownership are deployed. Public contractor/account/payment projections filter sensitive fields. Disposable AWS client/contractor fixtures verify denied private and cross-account calls. Remaining: exhaustive admin/resource denial matrix, account lifecycle and moderation/business-state rules.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** BE `serverless.yml` has no authorizer declarations. CRUD controllers do not validate Cognito JWTs or account ownership. `accountsController.authenticate` performs an email/user-type SQL lookup. Chat operations trust caller-supplied account IDs. `getContractors`/account reads use `SELECT *`, including sensitive account/profile columns. Main FE Cognito login does not call `apiSvc.setHeader`.
@@ -38,16 +38,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Unauthenticated private calls return 401; cross-account access returns 403/404; client, contractor and admin permissions are tested; public responses omit bank, credential and private contact fields as appropriate.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Open","R01, R04","Security and data boundaries"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Partial; deployed and verified","R01, R04","Security and data boundaries"
 "[R03] — Raw card and security-code persistence path","Review ID: R03
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Open
-Implementation commits: None
+Status: Partial; unsafe flow disabled
+Implementation commits: BE 39106f9; FE f9f284b
 Dependencies for closure: R02
 
-REMAINING ACCEPTANCE WORK
-Disable raw card/CVC collection and persistence before real use; select a tokenized provider flow and plan existing-data cleanup. No payment provider or production data changed.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Raw-card UI collection is removed. API payment/milestone writes return 501 and payment reads contain only last4/expiry. Remaining: choose provider/payment model, implement provider references and decide cleanup of any legacy stored PAN/CVC; existing rows were not inspected or purged.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `src/services/payMethod.service.js:add` sends `cardNumber` and `cvc`; `store/modules/payMethods/actions.js` posts these. BE `payMethodsController.addPayMethod` inserts the submitted object and echoes it in the response message. BE `src/sql/paymethods.sql` includes both columns and list handlers select all fields.
@@ -58,16 +58,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** FE/BE/DB/logs contain no card security codes or raw card-number persistence path, and payment flows use verified provider references.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Open","R02","Security and data boundaries"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Partial; unsafe flow disabled","R02","Security and data boundaries"
 "[R04] — Local/offline backend can connect to production","Review ID: R04
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Code implemented; integration verification pending
-Implementation commits: BE 850cb3f
-Dependencies for closure: None
+Status: Verified development guard
+Implementation commits: BE 850cb3f, de696e1
+Dependencies for closure:
 
-REMAINING ACCEPTANCE WORK
-Configure an isolated local database, reconcile migrations and exercise offline handlers. Local remote hosts are rejected unless ALLOW_REMOTE_DB=true; production requires explicit environment values.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Local remote-DB guard is covered by unit tests. AWS resources were inventoried and the user confirmed the entire system is development. Explicit disposable fixture tests use that development database. Retain safe defaults and separate configuration if a real production environment is introduced.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** BE `src/db.js`, `src/database.ts` and `src/db.query.js` select configuration `[""production""]` rather than `[env]`. `src/db.js` creates a pool and calls `getConnection` at module initialization. BE env files do not override this JSON selection.
@@ -78,16 +78,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Local development demonstrably selects only the test database, and missing/mismatched configuration fails before accepting requests.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Code implemented; integration verification pending","","Security and data boundaries"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Verified development guard","","Security and data boundaries"
 "[R05] — Passwords, tokens and private payloads can reach storage/logging/responses","Review ID: R05
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: BE 12c420c, d960407, 43bdb7a, b2b03cb; FE 9428969, 22ba93b
+Status: Partial; sensitive paths repaired
+Implementation commits: BE 39106f9, de696e1; FE e0474ba, f9f284b
 Dependencies for closure: R01, R02
 
-REMAINING ACCEPTANCE WORK
-Public ping and payload echoes are sanitized; new SQL signup passwords are blank. Activity-log JWT session IDs and environment dumps are now removed. Restrict sensitive account reads and clean existing stored passwords/tokens.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Deployed account/private response filtering, owner-scoped endpoints, credential-free packaging, verified-login empty legacy password placeholder, random activity IDs and redacted Lambda errors. Remaining: credential rotation and review/cleanup of historical stored values, logs and artifacts; existing sensitive rows were not broadly inspected.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `auth/actions.js:createDbAccountInfo` sends the signup password to SQL; BE `accountsController.addAccount` inserts and echoes the account object. `src/sql/accounts.sql` has a plain password column. BE `src/controllers/.ping.ts:handler` returns database host, username and password in its response and is routed by `serverless.yml`. FE bid/contact/sign-in components pass Cognito JWTs as the `sessionId` argument to `logIt`; `LogTrail.add` persists it when `VUE_APP_SYS_LOG_LEVEL` enables logging. Vuex debug logger also exposes state in development.
@@ -98,7 +98,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Signup stores no SQL password, API responses exclude secrets, and logging tests verify token/password redaction.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P0","Partial","R01, R02","Security and data boundaries"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P0","Partial; sensitive paths repaired","R01, R02","Security and data boundaries"
 "[R06] — Session lifetime, restoration and navigation checks disagree","Review ID: R06
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -121,13 +121,13 @@ ORIGINAL ASSESSMENT
 Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Code implemented; integration verification pending","R02, R07","Core workflows and contracts"
 "[R07] — Response helper changes data shape and discards results","Review ID: R07
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Code implemented; integration verification pending
-Implementation commits: BE d960407; FE 7fc74b0
-Dependencies for closure: None
+Status: Deployed; API verified
+Implementation commits: BE d960407, 39106f9; FE 7fc74b0
+Dependencies for closure:
 
-REMAINING ACCEPTANCE WORK
-Exercise every active FE/BE path with zero/one/multiple records. The decoded data field is canonical; serialized body remains for compatibility. Missing items currently return null with HTTP 200; complete 404/error semantics remain a follow-up.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Canonical data plus serialized compatibility body is deployed and checked through actual AWS account/profile/project/quote/favorite/message workflows. Continue consumer-specific browser acceptance as features are completed.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** BE `src/models/responseDataSet.ts` stringifies `data[0]` inside another JSON envelope. Controllers alternate `ds`, `ds[0]`, `[ds[0]]` and `[]`. `getAccounts` passes rows and returns only the first row; empty mutations omit inner `body`. FE actions/mutations decode different shapes. See [response examples](api-and-data.md#actual-response-serialization).
@@ -138,7 +138,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Contract checks cover zero/one/multiple rows, missing records, creates, updates, deletes and malformed requests across resource families.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Code implemented; integration verification pending","","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Deployed; API verified","","Core workflows and contracts"
 "[R08] — Missing promise propagation produces premature success and lost errors","Review ID: R08
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -161,13 +161,13 @@ ORIGINAL ASSESSMENT
 Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R07, R10","Core workflows and contracts"
 "[R09] — Signup and generated-ID handling are not reliable","Review ID: R09
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: BE 43bdb7a; FE 9428969
+Status: Partial; provisioning deployed
+Implementation commits: BE 39106f9, 4dd8f90; FE e0474ba
 Dependencies for closure: R02, R04, R07, R12
 
-REMAINING ACCEPTANCE WORK
-Insert IDs and sequential awaited signup are fixed. Add atomic SQL account/profile provisioning, a unique verified Cognito-sub mapping, idempotent retries and partial-account recovery. Confirm live schema requirements in isolation.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Cognito registration supplies names/role; SQL provisioning follows verified login, runs in a locked transaction and retries idempotently. Real SRP fixtures verify both profile roles and long-email compatibility. Remaining: user-driven signup/email confirmation, interruption/concurrency edge cases and duplicate historical email reconciliation.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE `auth/actions.js:signup` does not return/await the nested account/profile creation chain; it shares module-level `lastUserId`. BE `accountsController.addAccount` inserts via `pool.query`, then separately runs `SELECT LAST_INSERT_ID()`. That value is connection-specific and a pool does not guarantee the same connection for both queries. SQL snapshots require profile/account fields absent from the minimal registration payload.
@@ -178,16 +178,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Registration retry/concurrency tests create one identity and its correct profile, with deterministic recovery after partial failure.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R02, R04, R07, R12","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Partial; provisioning deployed","R02, R04, R07, R12","Core workflows and contracts"
 "[R10] — Primary keys, route parameters and SQL names disagree","Review ID: R10
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Code implemented; integration verification pending
-Implementation commits: BE f6f7e4b, 12aa5d3; FE 5ef6f89, 35e6736
-Dependencies for closure: None
+Status: Deployed; principal routes verified
+Implementation commits: BE f6f7e4b, 39106f9, 40f9782
+Dependencies for closure:
 
-REMAINING ACCEPTANCE WORK
-Verify actual database primary keys/table case and paired FE/BE deployment. Favorites now have an explicit composite deletion route.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Correct keys/routes are deployed; real fixture creation/update/delete and composite favorite paths are checked. Payment/milestone writes and coordinated account deletion intentionally return 501 pending completion.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** BE quote item handlers use `WHERE id = ?` against snapshot `quoteId`; message GET/PUT use `messagesId` while route declares `messageId`; log GET/PUT use `logtrailsId` while route declares `logtrailId`, and update targets `logtrails` rather than `log_trail`. FE `apiSvc.update/delete` always reads `entity.id`; project mutation `SET_PROJECT` does too. Favorites rely on sending literal `/undefined` to select a composite-key delete branch.
@@ -196,16 +196,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Each item route reads/updates/deletes its intended row and invalid/missing IDs return a controlled error without mutating unrelated records.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Code implemented; integration verification pending","","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Deployed; principal routes verified","","Core workflows and contracts"
 "[R11] — FE invokes undeclared routes/actions","Review ID: R11
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Open
-Implementation commits: None
+Status: Partial; API routes deployed
+Implementation commits: BE 40f9782
 Dependencies for closure: R02, R07, R10
 
-REMAINING ACCEPTANCE WORK
-Reconcile undeclared quote/message filtered routes and missing getByProjectId actions; retire unused OAuth/interceptor paths after call-site checks.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Quote client/project and composite favorite routes are now present in AWS and source configuration. Remaining: audit legacy root action bindings and unused/screens-only consumers rather than marking every historical action path complete.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** `quotes/clients/{clientId}` and `messages/clients/{clientId}` appear in FE store actions but not BE `serverless.yml`. Quote/message services dispatch missing `getByProjectId` actions. Legacy `user.service.js` calls `/o/token/` and missing API interceptor methods; the primary auth path is Cognito.
@@ -214,16 +214,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Every retained service/store call resolves to an intentional action and backend route, with integration coverage for the paths used by the UI.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Open","R02, R07, R10","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Partial; API routes deployed","R02, R07, R10","Core workflows and contracts"
 "[R12] — SQL, TypeScript interfaces and payloads have drifted","Review ID: R12
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: FE 9ba4971; BE b2b03cb
+Status: Partial; live schema reconciled
+Implementation commits: BE 8a40dff, 4ef1331, 4dd8f90
 Dependencies for closure: R04
 
-REMAINING ACCEPTANCE WORK
-Project creation uses null contractor and valid service JSON; write allowlists are based on snapshots. Reconcile actual schema, account/contact required fields, interfaces and ordered migrations.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Schema-only inventory covered actual MySQL columns/constraints. Required defaults/casing and username limits are repaired and real disposable inserts are verified without schema migration. Remaining: ordered migrations, interface/model alignment and stronger field/business validation.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** Review field names differ between BE interface and SQL/controller; payment interface uses `expiration` while FE/SQL use month/year; timestamps alternate `updateAt`/`updatedAt`; contact interface exports a contractor-like type. `src/sql/log_trail.sql` starts with a query concatenated to `CREATE TABLE`. Multiple schema snapshots differ. FE project creation uses contractor 0 despite the declared FK, and creates single-quoted service arrays.
@@ -232,7 +232,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** A blank isolated database can be migrated and seeded reproducibly; UI payloads satisfy the schema; no undocumented manual table changes are needed.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R04","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Partial; live schema reconciled","R04","Core workflows and contracts"
 "[R13] — FE state updates include concrete collection bugs","Review ID: R13
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -253,13 +253,13 @@ ORIGINAL ASSESSMENT
 Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Code implemented; integration verification pending","R07, R10","Core workflows and contracts"
 "[R14] — SQL input handling and Lambda error paths need consolidation","Review ID: R14
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: BE 850cb3f, b2b03cb
+Status: Partial; boundary deployed
+Implementation commits: BE b2b03cb, 39106f9
 Dependencies for closure: R04, R07
 
-REMAINING ACCEPTANCE WORK
-Primary Lambda handlers validate JSON/IDs, filter writable fields, bind chat values and control errors. Add complete required-field/type/business schemas, legacy Express/Sequelize parity if retained, and ownership enforcement (R02).
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+JWT/ownership boundary, allowlisted writes, identifier checks, parameterized SQL and safe CORS errors are deployed and checked. Remaining: fuller length/type/state validation, endpoint-specific rate limits, contact spam controls and resource-wide denial testing.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** BE `messagesController` interpolates `myself`, `contactId`, `fromId`, `toId` and `id` into SQL text. Many controllers parse JSON without schema checks and pass submitted objects to `INSERT/UPDATE ... SET ?`. Several catch blocks call `next(err)` as if running Express. `src/db.js` mixes a callback-style `getConnection` call with the mysql2 promise API.
@@ -270,16 +270,16 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Malformed/injection payloads cannot alter query structure or protected fields; errors return predictable status/data; initialization works against the isolated database.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R04, R07","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Partial; boundary deployed","R04, R07","Core workflows and contracts"
 "[R15] — Chat read state and connection lifecycle are inconsistent","Review ID: R15
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: FE 33423f5; BE b2b03cb
+Status: Partial; API read state verified
+Implementation commits: BE 39106f9; FE 33423f5
 Dependencies for closure: R02, R07, R14
 
-REMAINING ACCEPTANCE WORK
-Socket timers/listeners/reconnect and numeric unread comparisons are fixed. Verify external WebSocket authentication, ordered cursor history, duplicate/delivery semantics and reconnect behavior against its real service.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+Message sender/participant ownership, newest-100 chronological conversation, unread counts and recipient read flags are deployed. Real fixtures cover unread to read transition. Remaining: end-to-end WebSocket delivery/reconnect, stale-session behavior and browser chat acceptance.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** BE unread queries compare `wasRead = 'false'` while schema uses numeric tinyint and read updates set 1. Conversations use `LIMIT 100` without ordering/cursor. FE `socketio.service.js` uses native WebSocket, creates a new interval on setup without clearing it on disconnect, and reconnect handling includes wrong `this`/old-socket patterns. Server implementation is outside the reviewed BE.
@@ -288,7 +288,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** Unread counts are correct; reconnect/unmount creates no duplicate timers/listeners/messages; older/newer messages have stable order; external socket authorization is verified.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R02, R07, R14","Core workflows and contracts"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P1","Partial; API read state verified","R02, R07, R14","Core workflows and contracts"
 "[R16] — Image upload integrity and private ownership are undefined","Review ID: R16
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -309,36 +309,36 @@ ORIGINAL ASSESSMENT
 Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P1","Partial","R01, R02, R08","Core workflows and contracts"
 "[R17] — Multiple backend execution/configuration paths obscure the source of truth","Review ID: R17
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Open
-Implementation commits: None
+Status: Partial; release path documented
+Implementation commits: BE 40f9782, 67fb927
 Dependencies for closure: R04
 
-REMAINING ACCEPTANCE WORK
-Choose the supported backend execution/deployment path, consolidate/archive prototypes and correct metadata.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+A reproducible allowlisted build/native CloudFormation release path is documented and alternative client ORM route delegates to secured handlers. Remaining: retire unused Express/Sequelize/prototype execution paths and unify schema/migrations/local serving.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** Lambda/mysql2, Express/Sequelize and additional DB helpers coexist. `src/index.ts` imports the app before loading dotenv; Sequelize configuration can be read before that setup. `template.yml` describes unrelated datetime/CodeDeploy functions with Node 10, while `serverless.yml` describes the marketplace using Node 18. Package metadata still describes a starter template.
 
 **Proposal:** Choose one supported execution/deployment path, consolidate configuration, retire or clearly archive prototypes, and correct metadata. Add health/readiness checks with safe DB behavior. Actual runtime/provider upgrade compatibility needs separate verification.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P2","Open","R04","Delivery and maintainability"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; release path documented","R04","Delivery and maintainability"
 "[R18] — Dependency and verification baseline is weak","Review ID: R18
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: FE tests/*.test.cjs, be12098; BE tests/*.test.js
+Status: Partial; integration baseline added
+Implementation commits: BE 4832219, 67fb927; FE fb84127
 Dependencies for closure: R04
 
-REMAINING ACCEPTANCE WORK
-Added 14 frontend and 30 backend isolated checks plus changed-source lint. Establish CI, supported runtime/package manager, dependency advisory inventory and safe incremental upgrades.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+45 BE unit tests, TypeScript, 25 FE tests, lint/build, credential scans and actual development Cognito/MySQL/API fixture checks passed. Existing Node 18/framework and dependency audit findings remain; broad toolchain upgrade was rejected by automatic review and was deferred. Plan targeted supported-runtime/dependency upgrades separately.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE mixes Vue 3 with `vue-template-compiler` 2.x, multiple older/alpha plugins, Vue CLI 4 and several overlapping libraries. BE declares Serverless 4 with older offline/TypeScript plugins. Both npm/yarn lockfiles exist in BE. No FE test script is declared; BE Jest discovers no tests and coverage thresholds are zero. Installed versions can differ from manifest ranges.
 
 **Proposal:** Select package manager and supported runtime, inventory actual usage, remove obsolete integrations, then upgrade in small validated steps. Introduce CI for FE build/source lint, BE type check, contract checks and a few critical end-to-end journeys. Run a separate dependency advisory review; this assessment did not establish current CVEs or vendor support dates.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P2","Partial","R04","Delivery and maintainability"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; integration baseline added","R04","Delivery and maintainability"
 "[R19] — Initial browser payload is large","Review ID: R19
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -357,13 +357,13 @@ ORIGINAL ASSESSMENT
 Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P2","Open","R18","Delivery and maintainability"
 "[R20] — Deployment, external services and operational ownership are incomplete","Review ID: R20
 Updated: November 16, 2026
-Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
-Status: Partial
-Implementation commits: BE 850cb3f; FE be12098
+Status: Partial; AWS dev release verified
+Implementation commits: BE de696e1, 40f9782, fde6af4; FE e0474ba, f9f284b
 Dependencies for closure: R01, R02, R04, R17
 
-REMAINING ACCEPTANCE WORK
-Local secrets excluded from backend packaging; reproducible lint added. Inventory services, hosting/deep links, environment promotion, backups, monitoring, deployment and rollback.
+CURRENT DEVELOPMENT RELEASE AND REMAINING ACCEPTANCE
+AWS identity/stack/schema, existing code/config snapshots, RDS backup settings, secret-backed TLS and reviewed deployment were established. Paired release uses API v2. Remaining: actual restore exercise, alarms/CI/environment promotion, photo storage, external email/WebSocket integrations and runtime/version strategy.
+See docs/releases/2026-11-16-backend.md for final deployment evidence and rollback. All AWS resources/data were confirmed development by the user. No remote Asana tickets were created.
 
 ORIGINAL ASSESSMENT
 **Evidence:** FE README suggests direct S3 sync and obsolete JSON-server setup. History routing requires host fallback configuration. FE exposes separate email and WebSocket URLs, but BE does not declare those implementations. No complete infrastructure setup for Cognito, database, site hosting or these integrations was established. CORS configuration is broad/inconsistent. Production source maps are enabled in `vue.config.js` despite its comment about debug use.
@@ -372,7 +372,7 @@ ORIGINAL ASSESSMENT
 
 **Done when:** A new environment can be provisioned from documented configuration and a rollback/restore exercise is demonstrated. External service owners, repositories and authentication are recorded.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.","P2","Partial","R01, R02, R04, R17","Delivery and maintainability"
+This is the original historical assessment. Current development release verification and remaining work are stated above.","P2","Partial; AWS dev release verified","R01, R02, R04, R17","Delivery and maintainability"
 "[R21] — Product completion and component cleanup need explicit scope","Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -381,7 +381,7 @@ Implementation commits: FE 33423f5
 Dependencies for closure: R02, R03, R08
 
 REMAINING ACCEPTANCE WORK
-Dialog registration is fixed. A subsequent modal scrolling fix is implemented locally and verified in an isolated browser; user profile confirmation is pending. Decide launch scope, complete/hide placeholders and legacy test routes, fix remaining helper validation/booking behavior, and perform accessibility/responsive/copy checks.
+Dialog registration is fixed. Modal scrolling and profile-save fixes were deployed and the user previously confirmed them. The paired backend/FE development release now also passed API acceptance; exhaustive browser/product acceptance remains. Decide launch scope, complete/hide placeholders and legacy test routes, fix remaining helper validation/booking behavior, and perform accessibility/responsive/copy checks.
 
 ORIGINAL ASSESSMENT
 **Evidence:** Admin/payment pages are placeholders; guide pages show construction content. `/testpad` and `/helper` are registered. `src/main.js` registers `base-dialog` from `BaseBadge.vue`. `Quote`/`PayMethod` expose unimplemented methods and inconsistent validation (`biddescription`, `.trim` compared without invocation). Booking maps `comments` while the contact SQL snapshot uses `message` and requires other absent fields.

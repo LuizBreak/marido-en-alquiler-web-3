@@ -1,3 +1,7 @@
+# Current deployment note
+
+November 16, 2026: the user confirmed all AWS resources/data are development. AWS access, schema, rollback snapshots, authentication and fixture checks have been established. See [the backend release record](releases/2026-11-16-backend.md) for current status. The assessment below is historical and its initial blockers are superseded where the release records evidence. Node 18/toolchain modernization remains deferred.
+
 # AWS deployment readiness
 
 Assessed November 16, 2026. **The current backend batch is not ready for a direct replacement of the working AWS service.** No deployment, cloud configuration change or schema migration was performed by this assessment.
