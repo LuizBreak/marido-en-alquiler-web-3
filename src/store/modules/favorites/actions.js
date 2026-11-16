@@ -1,5 +1,6 @@
 import { apiSvc } from "../../../services/api.service";
 import { createCrudActions } from "../../crud-actions";
+import { usesLegacyApi } from "../../../services/api-contract";
 export default {
   ...createCrudActions({ resource: "favorites", singular: "Favorite", plural: "Favorites", mutation: "FAVORITE", listMutation: "SET_FAVORITES" }),
   async deleteFavorite({ commit }, favorite) {
@@ -8,7 +9,13 @@ export default {
       await apiSvc.delete("favorites", favorite);
     } else {
       if (!favorite.clientId || !favorite.contractorId) throw new Error("Favorite owner and professional are required.");
-      await apiSvc.customRequest({ method: "delete", url: "/favorites/clients/" + encodeURIComponent(favorite.clientId) + "/contractors/" + encodeURIComponent(favorite.contractorId) });
+      if (usesLegacyApi()) {
+        // The old backend dispatches composite deletes through this sentinel.
+        // Remove this branch after the companion backend contract is deployed.
+        await apiSvc.customRequest({ method: "delete", url: "/favorites/undefined", data: { clientId: favorite.clientId, contractorId: favorite.contractorId } });
+      } else {
+        await apiSvc.customRequest({ method: "delete", url: "/favorites/clients/" + encodeURIComponent(favorite.clientId) + "/contractors/" + encodeURIComponent(favorite.contractorId) });
+      }
     }
     commit("DELETE_FAVORITE", favorite);
     return favorite;

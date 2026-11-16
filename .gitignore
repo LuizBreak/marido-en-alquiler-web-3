@@ -50,3 +50,6 @@ amplifytools.xcconfig
 .env
 .env.*
 !.env.example
+
+# Local deployment artifacts and rollback snapshots may contain old site secrets.
+.deployments/

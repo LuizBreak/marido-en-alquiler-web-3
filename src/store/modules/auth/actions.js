@@ -1,4 +1,5 @@
 import { expirationFromJwt } from "../../../services/session-expiry";
+import { createdAccountId, usesLegacyApi } from "../../../services/api-contract";
 import { apiSvc, TokenService } from "../../../services";
 import { Auth } from "aws-amplify";
 import * as types from "../../../utils/types";
@@ -370,13 +371,17 @@ export default {
       firstName: payload.firstName,
       lastName: payload.lastName,
       email: payload.email,
+      phone: "",
+      address: "",
     };
 
     switch (payload.userType) {
       case "client":
         return await this.dispatch("clients/createClient", client);
       case "contractor":
-        return await this.dispatch("contractors/createContractor", client);
+        return await this.dispatch("contractors/createContractor", {
+          ...client, driversLicense: "", country: "", city: "", postalCode: "", serviceTypes: "[]",
+        });
       default:
         return false;
     }
@@ -391,8 +396,11 @@ export default {
     comments: payload.username,
     returnSecureToken: "", statusText: "", expiresIn: "", idToken: "", expirationDate: "", avatar: "",
   };
+  if (usesLegacyApi()) {
+    // Satisfy legacy NOT NULL columns without sending Cognito credentials.
+    Object.assign(account, { password: "", phone: "", localId: "" });
+  }
   const response = await apiSvc.post("accounts", account);
-  if (!response.data.data?.id) throw new Error("The account was not assigned an ID.");
-  return response.data.data;
+  return { id: createdAccountId(response.data.data) };
 },
 };

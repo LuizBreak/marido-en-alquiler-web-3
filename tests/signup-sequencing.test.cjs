@@ -4,6 +4,10 @@ const load = require("./load-module.cjs");
 function actions(apiSvc = {}) {
   return load("src/store/modules/auth/actions.js", {
     "../../../services/session-expiry": load("src/services/session-expiry.js"),
+    "../../../services/api-contract": {
+      createdAccountId: data => data.id,
+      usesLegacyApi: () => true,
+    },
     "../../../services": { apiSvc, TokenService: {} },
     "aws-amplify": { Auth: { signUp: async () => ({ user: { username: "identity" } }) } },
     "../../../utils/types": {}, "../../../store/index": {},
@@ -26,6 +30,6 @@ test("account payload excludes Cognito password and token fields", async () => {
   let sent;
   const service = { post: async (_resource, data) => { sent = data; return { data: { data: { id: 42 } } }; } };
   await actions(service).createDbAccountInfo({}, { email: "test@example.invalid", password: "do-not-store", userType: "client" });
-  assert.equal(sent.password, undefined);
+  assert.equal(sent.password, "");
   assert.equal(sent.idToken, "");
 });
