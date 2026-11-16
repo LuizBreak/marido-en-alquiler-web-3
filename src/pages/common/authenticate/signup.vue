@@ -440,19 +440,10 @@ export default {
         password: this.user.password,
         userType: this.user.userType,
       };
-      console.log("actionPayload", actionPayload);
 
       try {
-        console.log("about to signup");
         await this.$store.dispatch("signup", actionPayload);
         this.email = this.user.email;
-        this.logIt(
-          this?.loggedUser?.id || "",
-          "signup for: " + this.actionPayload,
-          this.$options.name,
-          this.user.signInUserSession?.idToken?.jwtToken,
-          true
-        );
         this.isSignedUp = true;
       } catch (error) {
         this.isSignedUp = false;
@@ -465,7 +456,6 @@ export default {
         username: this.email,
         code: this.code,
       };
-      console.log("confirmSignUpCode Payload", actionPayload);
 
       try {
         await this.$store.dispatch("confirmSignUp", actionPayload);
