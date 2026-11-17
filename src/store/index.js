@@ -1,4 +1,4 @@
-import { createStore, createLogger } from "vuex";
+import { createStore } from "vuex";
 
 import contactusModule from "./modules/contactus/index.js";
 import clientsModule from "./modules/clients/index.js";
@@ -33,7 +33,8 @@ const store = createStore({
     chat: chatModule,
   },
   strict: debug,
-  plugins: debug ? [createLogger()] : [],
+  // Vuex's full-state/action logger exposes sign-in passwords and cached tokens.
+  // Keep strict development checks without recording authentication payloads.
   state() {
     return {
       envir: process.env.VUE_APP_ENV || "development",
