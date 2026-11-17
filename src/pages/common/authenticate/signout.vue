@@ -38,15 +38,6 @@ export default {
       this.isLoading = false;
       this.$router.replace("/");
     },
-    timeout(ms) {
-      // Making SetTimeout accept promises
-      // Article reference: https://stackoverflow.com/questions/33289726/combination-of-async-function-await-settimeout
-      return new Promise((resolve) => setTimeout(resolve, ms));
-    },
-    async sleep(fn, ...args) {
-      await this.timeout(3000);
-      return fn(...args);
-    },
   },
   computed: {
     ...mapGetters(["loggedUser", "user"]),
@@ -55,7 +46,7 @@ export default {
   async mounted() {
     this.$emit("child-breadcrumbs-urls", this.urls);
     this.isLoading = true;
-    this.sleep(this.logout);
+    await this.logout();
   },
 };
 </script>

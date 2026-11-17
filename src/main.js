@@ -3,6 +3,8 @@ import App from "./App.vue";
 
 import router from "./router.js";
 import store, { authBootstrap } from "./store/index.js";
+import { installSessionListeners } from "./services/session-events";
+installSessionListeners(store, window);
 // import { socket } from "./services/simpleSocket.service.js";
 
 import sysLogger from "./mixins/sysLogger.js";

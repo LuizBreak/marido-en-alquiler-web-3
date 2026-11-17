@@ -4,8 +4,31 @@ import { apiSvc, TokenService } from "../../../services";
 import { Auth } from "../../../services/cognito";
 import * as types from "../../../utils/types";
 import store from "../../../store/index";
+import { sessionVersion, invalidateSession, requireCurrentSession } from "../../../services/session-state";
 
 let timer;
+let providerOperation = Promise.resolve();
+function withProvider(operation) {
+  const result = providerOperation.then(operation);
+  providerOperation = result.catch(() => {});
+  return result;
+}
+function clearSession(context, preserveStorage = false) {
+  invalidateSession();
+  clearTimeout(timer);
+  apiSvc.removeHeader();
+  context.commit("setSignedIn", false);
+  context.commit("setCognitoUser", null);
+  context.commit("resetUserData", null, { root: true });
+  context.commit("resetChat", null, { root: true });
+  context.commit(types.SET_USER, { token: null, userId: null, loggedUser: {} });
+  if (!preserveStorage) {
+    TokenService.removeToken();
+    TokenService.removeRefreshToken();
+    TokenService.removeTokenExpirationDate();
+    for (const key of ["expirationDate", types.USERID, types.LOGGED_USER]) localStorage.removeItem(key);
+  }
+}
 
 function normalizeAccountInfo(accountInfo) {
   const account = Array.isArray(accountInfo) ? accountInfo[0] || {} : accountInfo || {};
@@ -29,25 +52,12 @@ class AuthenticationError extends Error {
 
 export default {
   async login(context, payload) {
-    clearTimeout(timer);
-    apiSvc.removeHeader();
-    context.commit("setSignedIn", false);
-    context.commit("setCognitoUser", null);
-    context.commit("clients/RESET_CLIENT", null, { root: true });
-    context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
-    context.commit("resetChat", null, { root: true });
-    context.commit(types.SET_USER, {
-      token: null,
-      userId: null,
-      loggedUser: {},
-    });
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("expirationDate");
-    localStorage.removeItem(types.USERID);
-    localStorage.removeItem(types.LOGGED_USER);
+    clearSession(context);
+    const version = sessionVersion();
 
     try {
-      const user = await Auth.signIn(payload.email, payload.password);
+      const user = await withProvider(() => Auth.signIn(payload.email, payload.password));
+      requireCurrentSession(version);
 
       // Helper function to validate ExpiresIn
       // context.dispatch("showExpiresIn", {
@@ -55,27 +65,16 @@ export default {
       //   expiresIn: user.signInUserSession.accessToken.payload.exp,
       // });
 
-      await context.dispatch(types.AUTH, {
+      const authenticated = await context.dispatch(types.AUTH, {
         ...payload,
         idToken: user.signInUserSession.idToken.jwtToken,
         expiresIn: user.signInUserSession.accessToken.payload.exp,
       });
-
+      requireCurrentSession(version);
+      if (!authenticated) throw new Error("No se pudo cargar tu perfil. Inicia sesión de nuevo.");
       context.commit("setCognitoUser", user);
     } catch (error) {
-      context.commit("setSignedIn", false);
-      context.commit("setCognitoUser", null);
-      context.commit("clients/RESET_CLIENT", null, { root: true });
-      context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
-      context.commit(types.SET_USER, {
-        token: null,
-        userId: null,
-        loggedUser: {},
-      });
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("expirationDate");
-      localStorage.removeItem(types.USERID);
-      localStorage.removeItem(types.LOGGED_USER);
+      if (version === sessionVersion()) await context.dispatch(types.LOGOUT);
       throw new AuthenticationError(error.code, error.message);
     }
   },
@@ -96,6 +95,7 @@ export default {
   }
 },
   async auth(context, payload) {
+    const version = sessionVersion();
     let response = null;
     let responseData = null;
 
@@ -107,12 +107,15 @@ export default {
         email: payload.email,
         returnSecureToken: true,
       });
+      requireCurrentSession(version);
       const { body } = response.data;
       responseData = normalizeAccountInfo(JSON.parse(body));
     } catch (e) {
+      requireCurrentSession(version);
       apiSvc.removeHeader();
       localStorage.removeItem("access_token");
-      responseData = {};
+      throw new AuthenticationError(e.response?.data?.code || e.code,
+        e.response?.data?.message || "No se pudo iniciar sesión. Inténtalo de nuevo.");
     }
 
     if (!response || (response.status < 200 || response.status >= 300) || !responseData.id) {
@@ -133,6 +136,7 @@ export default {
     });
   },
   async tryLogin(context, payload) {
+    const version = sessionVersion();
     // TODO: INVESTIGATE why the service does not work
     // let token = TokenService.getToken();
     // let expirationDate = TokenService.getexpirationDateDate();
@@ -171,11 +175,12 @@ export default {
     }
 
     if (!token || !userId || !expirationDate) {
+      if (token || userId || expirationDate) await context.dispatch(types.LOGOUT);
       return false;
     }
 
     if (userId === "undefined" || userId === "null") {
-      context.dispatch(types.LOGOUT);
+      await context.dispatch(types.LOGOUT);
       return false;
     }
 
@@ -183,6 +188,7 @@ export default {
     if (typeof payload === "undefined") {
       try {
         const session = await Auth.currentSession();
+        requireCurrentSession(version);
         const idToken = session.getIdToken();
         token = idToken.getJwtToken();
         expirationDate = expirationFromJwt(idToken.getExpiration());
@@ -190,23 +196,25 @@ export default {
         localStorage.setItem("access_token", token);
         localStorage.setItem("expirationDate", expirationDate);
       } catch (_) {
-        await context.dispatch(types.LOGOUT);
+        if (version === sessionVersion()) await context.dispatch(types.LOGOUT);
         return false;
       }
     }
     apiSvc.setHeader();
     const expiresIn = +expirationDate - new Date().getTime();
-    if (expiresIn < 0) {
-      context.dispatch(types.LOGOUT);
+    if (!Number.isFinite(expiresIn) || expiresIn <= 0) {
+      await context.dispatch(types.LOGOUT);
       return false;
     }
 
     // Load account details only after establishing the Cognito session.
     try {
       const response = await apiSvc.get(`accounts/${userId}`);
+      requireCurrentSession(version);
       const { body } = response.data;
       loggedUserInfo = normalizeAccountInfo(JSON.parse(body));
     } catch (e) {
+      requireCurrentSession(version);
       loggedUserInfo = {};
     }
 
@@ -215,21 +223,27 @@ export default {
       expiresIn: expiresIn,
     });
 
-    if (!loggedUserInfo.id || (sessionEmail && loggedUserInfo.email !== sessionEmail)) {
+    if (!loggedUserInfo.id || (sessionEmail && String(loggedUserInfo.email).trim().toLowerCase() !== String(sessionEmail).trim().toLowerCase())) {
       await context.dispatch(types.LOGOUT);
       return false;
     }
     timer = setTimeout(function () {
-      context.dispatch(types.AUTO_LOGOUT);
+      if (version === sessionVersion()) context.dispatch(types.AUTO_LOGOUT);
     }, expiresIn);
 
     if (token && userId) {
-      await this.dispatch(types.SET_USER_TYPE_INFO, {
-        token: token,
-        userId: userId,
-        userType: userType,
-        loggedUserInfo: loggedUserInfo,
-      });
+      try {
+        await this.dispatch(types.SET_USER_TYPE_INFO, {
+          token: token,
+          userId: userId,
+          userType: userType,
+          loggedUserInfo: loggedUserInfo,
+        });
+      } catch (_) {
+        if (version === sessionVersion()) await context.dispatch(types.LOGOUT);
+        return false;
+      }
+      requireCurrentSession(version);
       return true;
     }
 
@@ -240,40 +254,20 @@ export default {
     let expiryDate = new Date(now.getTime() + payload.expiresIn);
     console.log(payload.source, expiryDate);
   },
-  logout(context) {
-    Auth.signOut()
-      .then(() => {
-        // context.commit("setSignedIn", false);
-      })
-      .catch((err) => console.log(err));
-
-    context.commit("setSignedIn", false);
-
-    apiSvc.removeHeader();
-    TokenService.removeToken();
-    TokenService.removeRefreshToken();
-    TokenService.removeTokenExpirationDate();
-    localStorage.removeItem("expirationDate");
-    localStorage.removeItem(types.USERID);
-    localStorage.removeItem(types.LOGGED_USER);
-
-    clearTimeout(timer);
-
-    context.commit("clients/RESET_CLIENT", null, { root: true });
-    context.commit("contractors/RESET_CONTRACTOR", null, { root: true });
-
-    context.commit(types.SET_USER, {
-      token: null,
-      userId: null,
-      loggedUser: {},
-    });
-    context.commit("setCognitoUser", null);
+  async logout(context, { localOnly = false } = {}) {
+    clearSession(context, localOnly);
+    if (!localOnly) {
+      // Local data is cleared immediately, even if the provider is unreachable.
+      try { await withProvider(() => Auth.signOut()); } catch (_) { /* already signed out locally */ }
+    }
   },
-  autoLogout(context) {
-    context.dispatch(types.LOGOUT);
+  async autoLogout(context, payload) {
+    const completed = context.dispatch(types.LOGOUT, payload);
     context.commit(types.SET_AUTO_LOGOUT);
+    await completed;
   },
   async setUserTypeInfo(context, payload) {
+    const version = sessionVersion();
     const resolvedUserType =
       payload.userType || payload.loggedUserInfo?.userType || null;
 
@@ -323,6 +317,7 @@ export default {
         break;
       default:
     }
+    requireCurrentSession(version);
     context.commit("setSignedIn", true);
   },
   async confirmSignUp(context, payload) {

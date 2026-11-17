@@ -67,6 +67,21 @@ const store = createStore({
     },
   },
   mutations: {
+    resetUserData(state) {
+      const modules = { clients: clientsModule, contractors: contractorsModule,
+        messages: messageModule, favorites: favoritesModule, quotes: quoteModule,
+        reviews: reviewModule, payMethods: payMethodModule, logTrail: logTrailModule,
+        contactus: contactusModule };
+      for (const [name, definition] of Object.entries(modules)) {
+        state[name] = typeof definition.state === "function"
+          ? definition.state() : JSON.parse(JSON.stringify(definition.state));
+      }
+      state.emailContainer = {};
+      if (state.subStore?.projects) {
+        state.subStore.projects.projects = [];
+        state.subStore.projects.project = {};
+      }
+    },
     setShowIt: (state, showIt) => {
       // hard reset it first to avoid
       // any previously open modal
