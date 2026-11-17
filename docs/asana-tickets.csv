@@ -190,7 +190,9 @@ Status: Partial; chat persistence/delivery separated
 SQL save remains authoritative; live callback failures do not turn a saved message into a failed database write. Frontend deduplicates sender echoes and retains live events across history loads. FE 418ec72.
 Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
 
-November 16, 2026 notification release: Notifications now run after SQL persistence, with independent submission status. Saved bids/messages survive SES/state-service failures. Newsletter requests are support requests, not automatic enrollment. Durable outbox/resend remains open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.",P1,Partial; saved records survive notification failures,"R07, R10",Core workflows and contracts
+November 16, 2026 notification release: Notifications now run after SQL persistence, with independent submission status. Saved bids/messages survive SES/state-service failures. Newsletter requests are support requests, not automatic enrollment. Durable outbox/resend remains open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
+
+November 16, 2026 notification-template restoration: Restored stored message/service/contact details with HTML and plain text. Server-validated service project metadata replaces a project ID in quoteId. Save-versus-notification feedback remains separate; durable retries remain open. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P1,Partial; branded notification paths verified,"R07, R10",Core workflows and contracts
 [R09] — Signup and generated-ID handling are not reliable,"Review ID: R09
 Updated: November 16, 2026
 Status: Partial; provisioning deployed
@@ -263,7 +265,9 @@ Status: Partial; authenticated chat routes verified
 All eight existing WebSocket integrations target the new authenticated handler; no new REST routes/resources. Browser publishing routes reject attempts. Existing endpoint URL is retained.
 Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
 
-November 16, 2026 notification release: Browser mailer calls are replaced with existing owned API routes; no new REST routes. Backend derives bid/message destinations and sends public contacts only to hello. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.",P1,Partial; owned notification paths verified,"R02, R07, R10",Core workflows and contracts
+November 16, 2026 notification release: Browser mailer calls are replaced with existing owned API routes; no new REST routes. Backend derives bid/message destinations and sends public contacts only to hello. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
+
+November 16, 2026 notification-template restoration: Added authenticated message links preserving sign-in return, participant denial and correct account messages route. Live browser checks include current message/service content, refresh and unrelated-account denial. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P1,Partial; authenticated notification destinations verified,"R02, R07, R10",Core workflows and contracts
 "[R12] — SQL, TypeScript interfaces and payloads have drifted","Review ID: R12
 Updated: November 16, 2026
 Status: Partial; live schema reconciled
@@ -430,7 +434,9 @@ Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are deve
 
 November 16, 2026 notification release: 94 BE/49 FE tests, TypeScript, lint of 76 changed source files, build, packaged-secret scan, 187 asset hashes, live notifications and the prior core AWS regression passed. Legacy dependencies/toolchain remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
 
-November 16, 2026 CRUD consistency release: 104 BE tests and TypeScript passed, with new compatibility and secret-safety cases. Removed 86 installed packages; whole-repository npm findings changed from 59 to 56, with unrelated findings still open. Artifact comparison found exactly one removed wrapper and no changed runtime dependencies. Frontend application code is unchanged; prior 49-test baseline remains. See docs/releases/2026-11-16-crud-consistency.md. BE cbb9e2f/b185c57/1cf5d6c. No remote Asana tickets created.",P2,Partial; 104 BE tests; FE baseline 49,R04,Delivery and maintainability
+November 16, 2026 CRUD consistency release: 104 BE tests and TypeScript passed, with new compatibility and secret-safety cases. Removed 86 installed packages; whole-repository npm findings changed from 59 to 56, with unrelated findings still open. Artifact comparison found exactly one removed wrapper and no changed runtime dependencies. Frontend application code is unchanged; prior 49-test baseline remains. See docs/releases/2026-11-16-crud-consistency.md. BE cbb9e2f/b185c57/1cf5d6c. No remote Asana tickets created.
+
+November 16, 2026 notification-template restoration: 120 BE and 60 FE tests, TypeScript, lint/build and desktop/mobile visual checks pass. New cases cover template injection, service project ownership/roles, canonical stored metadata and stale responses after logout. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P2,Partial; 120 BE and 60 FE tests,R04,Delivery and maintainability
 [R19] — Initial browser payload is large,"Review ID: R19
 Updated: November 16, 2026
 Status: Partial; browser SDK removed
@@ -476,7 +482,9 @@ Status: Partial; live chat deployed; mailer still open
 77 active functions share the verified artifact; six-resource isolated chat stack, all endpoint integrations, scoped roles, tracing off and legacy quarantine verified. Public FE asset/index/CDN checks passed. Immediate WebSocket delivery/security is accepted; conch-app.com notification mailer DNS remains open.
 Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
 
-November 16, 2026 notification release: SES replaces conch-app.com. All 77 Node 24 function hashes match; current stacks completed; scoped sender config on only three functions. SES DKIM/custom MAIL FROM verified; all prior Zoho/web DNS preserved. User confirmed both app Gmail messages arrived. Support mail was SES-accepted. DMARC, alarm destination, durable retries and broader operations remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.",P2,Partial; notification delivery user-confirmed,"R01, R02, R04, R17",Delivery and maintainability
+November 16, 2026 notification release: SES replaces conch-app.com. All 77 Node 24 function hashes match; current stacks completed; scoped sender config on only three functions. SES DKIM/custom MAIL FROM verified; all prior Zoho/web DNS preserved. User confirmed both app Gmail messages arrived. Support mail was SES-accepted. DMARC, alarm destination, durable retries and broader operations remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
+
+November 16, 2026 notification-template restoration: All 77 backend hashes, 187 frontend assets, both hostnames and completed CDN invalidation verified. Live SES message/service/contact submissions, full API regression and fixture cleanup passed. No schema/DNS change; archived welcome/reference examples remain inactive. Inbox placement and broader delivery monitoring are distinct from SES submission. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P2,Partial; restored templates deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
 [R21] — Product completion and component cleanup need explicit scope,"Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend

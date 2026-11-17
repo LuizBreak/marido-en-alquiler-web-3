@@ -4,6 +4,8 @@ Status: **Zoho domain/mail DNS verified and mailbox setup confirmed by the user.
 
 ## November 16 setup progress
 
+Remaining active application emails are restored through the [notification-template release](releases/2026-11-16-notification-templates.md): saved messages, complete service requests, contact inquiries and labeled newsletter/referral support notices. Current release has 120 BE / 60 FE tests and live SES/browser/API acceptance with fixture cleanup. Gmail appearance confirmation is pending. Original welcome/reference templates remain inactive; no visitor autoresponder, automatic newsletter enrollment, third-party referral email or chat email was enabled. SES/Zoho/DNS settings are unchanged.
+
 Offer email appearance was restored after the SES migration: original banner, saved project/contractor/contact/offer details, Spanish next steps and an authenticated review link. The user confirmed the new test email looks correct. See [the restoration release](releases/2026-11-16-offer-email.md) and [preview](previews/offer-email-2026-11-16.png). Delivery/DNS settings are unchanged; current backend code is `6796958` and frontend offer-link code is `5d732e7`.
 
 - Zoho confirmed domain ownership. User screenshots confirmed a separate hello mailbox, and the existing administrator mailbox now has notifications@marido-en-alquiler.com marked as Mailbox address. luiz.estevo@ remains an alias of the notifications mailbox. The account list still displays Luiz Estevo; changing the mailbox address does not establish that its primary account login has changed. Two licensed users are in use; no additional license was purchased by the assistant.

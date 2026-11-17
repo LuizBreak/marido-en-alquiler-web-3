@@ -1,5 +1,11 @@
 # Restart repairs and commit ledger
 
+## Remaining notification restoration — November 16, 2026
+
+[Release, inventory, previews, evidence and recovery](releases/2026-11-16-notification-templates.md). Restored branded Spanish HTML/plain-text message emails with saved sender/content and authenticated message links (`79a79fe` BE, `100bffb` FE). Service emails include owned project details and client contact information; corrected the form's project-as-quote ID and rendered-HTML submission (`ed97f7a` BE, `ce49595` FE). Restored contact and labeled newsletter/referral support templates, preserving fixed support delivery and manual follow-up (`c47249f` BE, `566a1bd` FE). Sender phone now comes from the current role profile (`c26d68c`); support copy clarified (`bb7aeac`). Inactive welcome/reference examples were not turned into automations.
+
+120 backend / 60 frontend tests, TypeScript, lint/build, secret scans, desktop/mobile visual checks, all 77 deployed function hashes, all 187 asset hashes, both hostnames and completed CDN invalidation passed. Live SES submissions, browser sign-in/message/offer links, outsider denials, service ownership checks and full API regression passed; all temporary fixtures were removed. Gmail appearance confirmation is pending. No schema/DNS changes or Git push. Best-effort delivery limits and broader backlog remain.
+
 ## Branded offer email restoration — November 16, 2026
 
 Deployed and user-confirmed; [release, preview, verification and recovery](releases/2026-11-16-offer-email.md). The generic SES quote notice unnecessarily removed useful existing content. BE `6796958` restores the original banner, project and contractor details, offer price/description, Spanish next steps and matching plain text, using escaped database values and the existing verified-recipient controls. FE `5d732e7` adds a working offer-review link, sign-in return, ownership checks and existing confirmation/version-checked acceptance. The old email Approve/Reject links both pointed to an unrelated homepage; no fictitious rejection workflow or one-click acceptance was added.
