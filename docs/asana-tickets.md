@@ -1,5 +1,7 @@
 # Asana ticket ledger
 
+The user supplied a Zoho Inbox screenshot confirming receipt of both client and contractor registration test notices.
+
 November 17: [registration notification feature](releases/2026-11-17-registration-notifications.md) is deployed to hello@ with an atomic SQL queue, one-minute retry worker and unique per-account event. Automatic first-attempt submissions for both roles, concurrency/repeat-sign-in checks and cleanup passed. 134 BE tests; FE unchanged at 60 tests. There are now 78 active functions; mail stack has twelve resources. General notification-outbox work remains partial because other email types still use their previous best-effort delivery path. No remote tickets were created.
 
 The user confirmed both restored new-message and service-request emails arrived in Gmail and look correct. The contact test remains SES-accepted without separate user confirmation.
