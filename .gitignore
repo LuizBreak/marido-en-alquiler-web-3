@@ -2,6 +2,8 @@
 /node_modules
 /dist
 /dist-build
+# Local build verification output
+/dist-build-check*/
 /src/vendor
 /public/vendor
 
