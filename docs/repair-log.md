@@ -1,5 +1,11 @@
 # Restart repairs and commit ledger
 
+## Session expiry, logout and public contractor signup — November 17, 2026
+
+[Release, commits, acceptance evidence and recovery](releases/2026-11-17-session-signup.md). Separate FE fixes await and isolate logout (`f072f09`), recover interrupted confirmation/login (`76b41a7`), remove credential-bearing development store logging (`4351c00`) and prevent cross-tab bootstrap resurrection (`5224dd5`). BE `f143548` adds the read-only identity audit, three regression tests and a reconciliation runbook; runtime handlers are unchanged. Generated build verification folders are now ignored (`7e0c2cb`); their local contents are preserved.
+
+83 FE / 137 BE tests, TypeScript, changed-source lint and production build passed. Isolated real-AWS browser checks cover valid refresh, expired/invalid refresh, reload and two-tab logout. Public contractor signup rejected an invalid code, confirmed with the user's real email code and automatically opened /profile/info. Actual duplicate-email and subject-conflict fixtures returned 409/403; repeated provisioning created no extra profile/notice. All fixtures were removed. Read-only historical audit found no duplicate email/subject or blank/padded email records; no existing users were merged or deleted. FE checksum/index/CDN verification passed, preserving old assets and the prior index. Backend runtime/schema/Cognito/DNS remain unchanged. User also confirmed hello@ → Gmail forwarding with intact branded registration content. No Git push.
+
 ## New-client / contractor registration notifications — November 17, 2026
 
 Implemented and deployed to the user-selected hello@ inbox; [behavior, schema, preview, verification and recovery](releases/2026-11-17-registration-notifications.md). New verified application account/profile creation commits a durable notice atomically; returning/legacy sign-ins do not notify. A scoped one-minute worker sends branded HTML/plain text with the name, email, type, account ID and owner-timezone registration time, retaining failed submissions for backoff retries. Existing application mail paths are unchanged. Separate commits: `188a788` migration/tool, `4e4e3da` feature/tests, `55fba25` infrastructure generator, `474f307` repeatable live acceptance.

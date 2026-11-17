@@ -113,7 +113,9 @@ Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/da
 AUTHENTICATED LIVE CHAT RELEASE — November 16, 2026
 Status: Partial; chat token paths protected
 WebSocket tokens stay in handshake headers, never URLs or connection records; request tracing is off. Legacy anonymous handler is disabled and unrouted. Broader historical logging review remains.
-Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.",P0,Partial; chat token paths protected,"R01, R02",Security and data boundaries
+Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
+
+November 17 session/signup coverage: Removed Vuex full-state/action logger that could expose auth credentials. Historical logging/provider-secret review remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P0,Partial; development credential logging removed,"R01, R02",Security and data boundaries
 "[R06] — Session lifetime, restoration and navigation checks disagree","Review ID: R06
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -138,7 +140,9 @@ Evidence was reviewed from source and isolated tests. No deployment/live-data va
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; browser refresh verified
 Configure Cognito before restoring cached sessions; authenticated reload passed locally and on the published build. Expired-session/refresh-token and broader navigation cases remain. FE cfe6f4f, 9dce372.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.",P1,Partial; browser refresh verified,"R02, R07",Core workflows and contracts
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+November 17 session/signup coverage: Real refresh, authenticated reload, active expiry, invalid refresh, two-tab logout and reload-after-logout passed. Logout waits for Cognito and clears private caches; stale responses and cross-tab bootstrap cannot restore the old account. No continuous renewal/global-device revocation change. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P1,Verified reviewed expiry/logout/reload/tab flows,"R02, R07",Core workflows and contracts
 [R07] — Response helper changes data shape and discards results,"Review ID: R07
 Updated: November 16, 2026
 Status: Deployed; API verified
@@ -223,7 +227,9 @@ Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/da
 
 November 17 registration notifications: Both client/contractor concurrent provisioning create one account/profile and one notice; later sign-in does not enqueue or resend. Legacy binding/profile repair does not trigger new-registration email. Automatic scheduled SES submissions and fixture cleanup passed. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.
 
-November 17 receipt confirmation: user screenshot shows both new-client and new-contractor registration notices in the hello@ Zoho Inbox. Registration notice inbox receipt is confirmed; broader ticket scope remains partial.",P1,Partial; registration and owner notices verified,"R02, R04, R07, R12",Core workflows and contracts
+November 17 receipt confirmation: user screenshot shows both new-client and new-contractor registration notices in the hello@ Zoho Inbox. Registration notice inbox receipt is confirmed; broader ticket scope remains partial.
+
+November 17 session/signup coverage: Public contractor signup used a real Gmail code, rejected an invalid code, automatically signed in and navigated by verified role. Signup retry/resend and consumed-code recovery tests pass. Historical duplicate-email/subject and blank/padded-email inventory is clear. Live fixture duplicate email 409 and different subject 403 passed; case-only signup denied; fixtures removed. Broader password-reset/abuse coverage remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P1,Partial; public signup and identity conflicts verified,"R02, R04, R07, R12",Core workflows and contracts
 "[R10] — Primary keys, route parameters and SQL names disagree","Review ID: R10
 Updated: November 16, 2026
 Status: Deployed; principal routes verified
@@ -444,7 +450,9 @@ November 16, 2026 CRUD consistency release: 104 BE tests and TypeScript passed, 
 
 November 16, 2026 notification-template restoration: 120 BE and 60 FE tests, TypeScript, lint/build and desktop/mobile visual checks pass. New cases cover template injection, service project ownership/roles, canonical stored metadata and stale responses after logout. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.
 
-November 17 registration notifications: 134 backend tests and TypeScript pass, including transaction rollback, trusted metadata, retries, bursts and acknowledgement ambiguity. Frontend code is unchanged, retaining its 60-test baseline. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.",P2,Partial; 134 BE tests; FE baseline 60,R04,Delivery and maintainability
+November 17 registration notifications: 134 backend tests and TypeScript pass, including transaction rollback, trusted metadata, retries, bursts and acknowledgement ambiguity. Frontend code is unchanged, retaining its 60-test baseline. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.
+
+November 17 session/signup coverage: Session/signup and identity regression coverage added; TypeScript, lint, production build and live browser/API checks passed. Dependency/toolchain modernization remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P2,Partial; 137 BE and 83 FE tests,R04,Delivery and maintainability
 [R19] — Initial browser payload is large,"Review ID: R19
 Updated: November 16, 2026
 Status: Partial; browser SDK removed
@@ -496,7 +504,9 @@ November 16, 2026 notification-template restoration: All 77 backend hashes, 187 
 
 November 17 registration notifications: Mail stack now has twelve resources and an internal one-minute worker, restricted by IAM to hello@ and the application database secret. All 78 active hashes/handlers and three stack updates match. Recipient allow/deny simulation, automatic submission and cleanup passed. Failure metrics feed the existing alarm; alarm destinations and inbox appearance confirmation remain separate. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.
 
-November 17 receipt confirmation: user screenshot shows both new-client and new-contractor registration notices in the hello@ Zoho Inbox. Registration notice inbox receipt is confirmed; broader ticket scope remains partial.",P2,Partial; registration worker deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
+November 17 receipt confirmation: user screenshot shows both new-client and new-contractor registration notices in the hello@ Zoho Inbox. Registration notice inbox receipt is confirmed; broader ticket scope remains partial.
+
+November 17 session/signup coverage: Frontend assets/index and completed CDN invalidation verified on both hostnames; old assets and prior index retained. Backend runtime/schema/Cognito/DNS unchanged. hello@ forwarding to Gmail was user-confirmed. Monitoring/CI/restore drills remain. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P2,Partial; session/signup FE deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
 [R21] — Product completion and component cleanup need explicit scope,"Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
