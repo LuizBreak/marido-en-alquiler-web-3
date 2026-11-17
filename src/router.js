@@ -23,6 +23,7 @@ import ClientInfo from "./pages/clients/profile-info.vue";
 import Security from "./pages/clients/profile-security.vue";
 import Projects from "./pages/clients/myProjects.vue";
 import OfferReview from "./pages/clients/offerReview.vue";
+import MessageReview from "./pages/common/messageReview.vue";
 import Favorities from "./pages/clients/myfavorites.vue";
 import Messages from "./pages/common/chat/ChatApp.vue";
 import Reviews from "./pages/clients/myReviews.vue";
@@ -74,6 +75,7 @@ const router = createRouter({
     { path: "/projectlist", component: ProjectSearch },
     { path: "/login", component: Login },
     { path: "/oferta/:quoteId", component: OfferReview, meta: { requiresAuth: false } },
+    { path: "/mensaje/:messageId", component: MessageReview, meta: { requiresAuth: false } },
     { path: "/privacidad", component: PrivacyPolicy },
     { path: "/terminos", component: TermsOfUse },
     { path: "/olvide", component: ForgotPwd },
