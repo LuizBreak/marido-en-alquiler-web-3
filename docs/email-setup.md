@@ -4,6 +4,8 @@ Status: **Zoho domain/mail DNS verified and mailbox setup confirmed by the user.
 
 ## November 16 setup progress
 
+Offer email appearance was restored after the SES migration: original banner, saved project/contractor/contact/offer details, Spanish next steps and an authenticated review link. The user confirmed the new test email looks correct. See [the restoration release](releases/2026-11-16-offer-email.md) and [preview](previews/offer-email-2026-11-16.png). Delivery/DNS settings are unchanged; current backend code is `6796958` and frontend offer-link code is `5d732e7`.
+
 - Zoho confirmed domain ownership. User screenshots confirmed a separate hello mailbox, and the existing administrator mailbox now has notifications@marido-en-alquiler.com marked as Mailbox address. luiz.estevo@ remains an alias of the notifications mailbox. The account list still displays Luiz Estevo; changing the mailbox address does not establish that its primary account login has changed. Two licensed users are in use; no additional license was purchased by the assistant.
 - Published account-provided Canada MX records: priority 10 mx.zohocloud.ca, 20 mx2.zohocloud.ca, and 50 mx3.zohocloud.ca, with TTL 300. Added `v=spf1 include:zohocloud.ca ~all` to apex TXT while retaining the ownership value. Route 53 change `C05850993GYU233OVHJXS`; Google public DNS returned all three MX values and both TXT values.
 - Private artifacts: `.deployments/mail-20261116/previous/before-routing.json`, `zoho-routing.json`, and `rollback-zoho-routing.json`. Review current records before applying rollback so later TXT changes are preserved. Website/certificate/name-server records were not altered.

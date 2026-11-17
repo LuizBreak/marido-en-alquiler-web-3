@@ -1,5 +1,11 @@
 # Restart repairs and commit ledger
 
+## Branded offer email restoration — November 16, 2026
+
+Deployed and user-confirmed; [release, preview, verification and recovery](releases/2026-11-16-offer-email.md). The generic SES quote notice unnecessarily removed useful existing content. BE `6796958` restores the original banner, project and contractor details, offer price/description, Spanish next steps and matching plain text, using escaped database values and the existing verified-recipient controls. FE `5d732e7` adds a working offer-review link, sign-in return, ownership checks and existing confirmation/version-checked acceptance. The old email Approve/Reject links both pointed to an unrelated homepage; no fictitious rejection workflow or one-click acceptance was added.
+
+108 backend / 53 frontend tests, TypeScript, lint, production build, secret scans, visual preview, all 77 deployed hashes, all 187 frontend asset hashes, both hostnames, completed CDN invalidation and live AWS/browser regression passed. The user confirmed the restored Gmail email looks correct. Disposable SQL/Cognito/S3 fixtures were removed. No schema/DNS changes or Git push. Durable notification retries, DMARC and the broader backlog remain open; the HomeStars pilot plan remains a proposal.
+
 ## Backend CRUD consistency — November 16, 2026
 
 Deployed and verified; [release, evidence and compatible recovery](releases/2026-11-16-crud-consistency.md). Both client-list URLs use the shared mysql2 handler directly. Unused Sequelize wrapper/models, Express app/entry point and nodemon config are removed, with corresponding direct dependencies/lockfile cleanup. Verification scripts now validate the development AWS account and read the existing administrator secret through a shared helper; ignored legacy config and private historical releases remain protected.
