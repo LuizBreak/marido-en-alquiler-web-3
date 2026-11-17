@@ -47,11 +47,11 @@ test('request/session boundaries reject stale responses, expired writes and curr
  storage.delete('access_token');assert.equal(request({headers:{Authorization:'Bearer old'}}).headers.Authorization,undefined);
 });
 test('storage changes and suspended-tab expiry clear the tab without provider logout loops',async()=>{
- const {installSessionListeners}=load('src/services/session-events.js');const handlers={},calls=[],storage=new Map([['access_token','jwt'],['expirationDate',String(Date.now()+60000)]]);
+ const session=load('src/services/session-state.js');const {installSessionListeners}=load('src/services/session-events.js',{'./session-state':session});const handlers={},calls=[],storage=new Map([['access_token','jwt'],['expirationDate',String(Date.now()+60000)]]);
  const browser={localStorage:{getItem:k=>storage.get(k)??null},addEventListener:(key,fn)=>handlers[key]=fn,removeEventListener:key=>delete handlers[key],document:{addEventListener:(key,fn)=>handlers[key]=fn,removeEventListener:key=>delete handlers[key]}};
- const dispose=installSessionListeners({getters:{isAuthenticated:true,token:'jwt'},dispatch:(...args)=>calls.push(args)},browser);
+ const getters={isAuthenticated:true,token:'jwt'};const dispose=installSessionListeners({getters,dispatch:(...args)=>calls.push(args)},browser);
  handlers.storage({key:'unrelated'});assert.equal(calls.length,0);
  storage.set('access_token','another');handlers.storage({key:'access_token'});assert.equal(calls[0][1].localOnly,true);
  storage.set('access_token','jwt');storage.set('expirationDate','1');handlers.focus();assert.equal(calls[1][0],'autoLogout');
- handlers['mea:session-expired']();assert.equal(calls[2][0],'autoLogout');dispose();assert.equal(Object.keys(handlers).length,0);
+ handlers['mea:session-expired']();assert.equal(calls[2][0],'autoLogout');getters.isAuthenticated=false;getters.token=null;const version=session.sessionVersion();storage.delete('access_token');handlers.storage({key:'access_token',newValue:null});assert.ok(session.sessionVersion()>version);dispose();assert.equal(Object.keys(handlers).length,0);
 });

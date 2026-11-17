@@ -1,3 +1,5 @@
+import { invalidateSession } from "./session-state";
+
 export function installSessionListeners(store, browser) {
   const expire = payload => {
     if (store.getters.isAuthenticated || store.getters.token) {
@@ -6,8 +8,13 @@ export function installSessionListeners(store, browser) {
   };
   const changed = event => {
     if ((event.key === null || event.key === "access_token") &&
-        browser.localStorage.getItem("access_token") !== store.getters.token) {
+        (event.key === null || event.newValue === null || browser.localStorage.getItem("access_token") !== store.getters.token)) {
       // Another tab owns the shared Cognito/storage change. Clear only this tab.
+      if (!store.getters.isAuthenticated && !store.getters.token) {
+        // Also cancel an initial cached-session restore that has not committed yet.
+        invalidateSession();
+        return;
+      }
       expire({ localOnly: true });
     }
   };
