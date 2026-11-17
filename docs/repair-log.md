@@ -1,5 +1,9 @@
 # Restart repairs and commit ledger
 
+## Dominican Republic / Colombia competitor research — November 17, 2026
+
+Created the requested [Excel workbook](research/DR-Colombia-Home-Services-Comparison-2026-11-17.xlsx) with eight worksheets covering 10 core comparisons, six watchlist candidates, business models, 23 pricing rows, MEA pilot considerations and 33 source records. Public tariffs and evidence limitations are explicit; no country-operation assumption is made from historical pages or failed fetches. Native-currency amounts distinguish lead/proposal fees from diagnostic visits and retail labour packages. [Findings, methods and reproducible data](research/DR-Colombia-Home-Services-Comparison-2026-11-17.md) are alongside it. Workbook integrity/counts/numeric cells/source references were validated. No application/database/infrastructure changes or new business-model approval.
+
 ## Remaining notification restoration — November 16, 2026
 
 [Release, inventory, previews, evidence and recovery](releases/2026-11-16-notification-templates.md). Restored branded Spanish HTML/plain-text message emails with saved sender/content and authenticated message links (`79a79fe` BE, `100bffb` FE). Service emails include owned project details and client contact information; corrected the form's project-as-quote ID and rendered-HTML submission (`ed97f7a` BE, `ce49595` FE). Restored contact and labeled newsletter/referral support templates, preserving fixed support delivery and manual follow-up (`c47249f` BE, `566a1bd` FE). Sender phone now comes from the current role profile (`c26d68c`); support copy clarified (`bb7aeac`). Inactive welcome/reference examples were not turned into automations.

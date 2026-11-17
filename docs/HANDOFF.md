@@ -1,8 +1,10 @@
 # Session handoff
 
-Updated November 16, 2026 (America/New_York). Read this, repair-log.md and the latest release record; inspect both working trees before edits.
+Updated November 17, 2026 (America/New_York). Read this, repair-log.md and the latest release record; inspect both working trees before edits.
 
 ## Current outcome
+
+New research deliverable (November 17): [Dominican Republic / Colombia competitor Excel](research/DR-Colombia-Home-Services-Comparison-2026-11-17.xlsx), with [findings and limitations](research/DR-Colombia-Home-Services-Comparison-2026-11-17.md), source data and reproducible builder alongside it. Ten core comparisons, six watchlist candidates, 23 pricing rows and 33 source records. Distinguishes public offers, prelaunch services and unverified current operations; retains native currencies and separates platform charges from retail/diagnostic prices. Suggested Santo Domingo lessons remain proposals. No application, database or deployment changes.
 
 Current release: [remaining notification templates](releases/2026-11-16-notification-templates.md). Branded message, service-request and contact emails are restored, including labeled newsletter/referral support notices. New `/mensaje/{messageId}` links preserve sign-in return and restrict access to participants. The service form now saves plain text and a server-validated owned-project reference in existing msgAsset metadata, with quoteId=null; it no longer submits an HTML email or a project ID as a quote ID. Archived welcome/marketing examples were not enabled as automations. BE `79a79fe`/`ed97f7a`/`c47249f`/`c26d68c`/`bb7aeac`; FE `100bffb`/`ce49595`/`566a1bd`. 120 BE / 60 FE tests, TypeScript, lint/build, desktop/mobile previews, live SES/browser/API checks and fixture cleanup passed. Both stack updates and CDN invalidation completed; all 77 function hashes, 187 asset hashes and both frontend hostnames match. Use this release's artifact/recovery record. No schema/DNS change or Git push. The user confirmed both restored new-message and service-request emails arrived in Gmail and look correct. The prior offer email was also user-confirmed.
 
