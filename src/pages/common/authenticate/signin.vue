@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Signup />
+    <Signup ref="signupForm" />
 
     <!-- Sign In Modal-->
     <div class="modal fade" id="signin-modal" tabindex="-1" aria-hidden="true">
@@ -115,7 +115,7 @@
                     </div>
                   </div>
                   <div>
-                    <button class="btn btn-primary btn-lg w-100" type="submit">
+                    <button class="btn btn-primary btn-lg w-100" type="submit" :disabled="isLoading">
                       <span v-if="!isLoading">Ingresar</span>
                       <span v-if="isLoading" class="px-2">Ingresando...</span>
                       <div
@@ -132,6 +132,9 @@
                     >
                       {{ error || "Por favor, entra un correo y contraseña válida." }}<br />
                     </p>
+                    <button v-if="needsConfirmation" class="btn btn-link" type="button" :disabled="isLoading" @click="resumeSignup">
+                      Confirmar mi correo / reenviar código
+                    </button>
                   </div>
                 </form>
               </div>
@@ -167,6 +170,7 @@ export default {
       mode: "login",
       isLoading: false,
       error: null,
+      needsConfirmation: false,
     };
   },
   computed: {
@@ -183,9 +187,24 @@ export default {
       await this.dismissModal("#signin-modal");
       showdModal("#signup-modal");
     },
+    async resumeSignup() {
+      if (this.isLoading) return;
+      this.isLoading = true;
+      try {
+        await this.$store.dispatch("resendSignUpCode", this.email);
+        this.$refs.signupForm.resumeConfirmation(this.email, this.password);
+        await this.dismissModal("#signin-modal");
+        showdModal("#signup-modal");
+      } catch (error) {
+        this.error = error.message;
+        this.formIsValid = false;
+      } finally { this.isLoading = false; }
+    },
     async submitForm() {
+      if (this.isLoading) return;
       this.formIsValid = true;
       this.error = null;
+      this.needsConfirmation = false;
       if (
         this.email === "" ||
         !this.email.includes("@") ||
@@ -216,6 +235,7 @@ export default {
         this.$router.replace(redirectUrl);
         this.isLoading = false;
       } catch (error) {
+        this.needsConfirmation = (error.errorCode || error.code) === "UserNotConfirmedException";
         console.error("Cognito login error", {
           code: error?.errorCode || error?.code,
           message: error?.message,

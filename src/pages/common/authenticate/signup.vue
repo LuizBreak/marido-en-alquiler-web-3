@@ -271,7 +271,7 @@
                     {{ errorMessage }} <br />
                   </p>
                   <br />
-                  <button class="btn btn-primary btn-lg w-100" type="submit">
+                  <button class="btn btn-primary btn-lg w-100" type="submit" :disabled="isSubmitting">
                     Regístrate</button
                   ><br />
                 </form>
@@ -292,6 +292,7 @@
                       placeholder="Entra tu correo"
                       required
                       v-model.trim="email"
+                      readonly
                     />
                   </div>
                   <div class="mb-4">
@@ -307,7 +308,8 @@
                       v-model="code"
                       type="text"
                       placeholder="Entra el código"
-                      required
+                      :required="!isConfirmed"
+                      :disabled="isConfirmed"
                     /><br />
                     <p
                       class="input-errors blink"
@@ -316,9 +318,13 @@
                     >
                       {{ confirmationErrorMessage }} <br />
                     </p>
-                    <button class="btn btn-primary btn-lg w-100">
-                      Confirmar registro
+                    <button class="btn btn-primary btn-lg w-100" :disabled="isSubmitting">
+                      {{ isConfirmed ? "Iniciar sesión" : "Confirmar registro" }}
                     </button>
+                    <button v-if="!isConfirmed" class="btn btn-link" type="button" :disabled="isSubmitting" @click="resendCode">
+                      Reenviar código
+                    </button>
+                    <p v-if="confirmationNotice" role="status">{{ confirmationNotice }}</p>
                   </div>
                 </form>
               </div>
@@ -365,6 +371,9 @@ export default {
       email: "",
       code: "",
       isSignedUp: false,
+      isConfirmed: false,
+      isSubmitting: false,
+      confirmationNotice: "",
       urls: [],
     };
   },
@@ -374,7 +383,7 @@ export default {
     const invalidEmailMsg = "Correo inválido";
     const notAcceptedMsg = "Debes aceptar los términos de uso.";
     const pwdsDontMatch = "Contraseña y confirmar contraseña no coinciden.";
-    const minLengthMsg = "Contraseña debe tener al menos 6 caracteres.";
+    const minLengthMsg = "Contraseña debe tener al menos 8 caracteres.";
 
     return {
       user: {
@@ -392,7 +401,7 @@ export default {
         },
         password: {
           required: helpers.withMessage(requiedMsg, required),
-          minLength: helpers.withMessage(minLengthMsg, minLength(6)),
+          minLength: helpers.withMessage(minLengthMsg, minLength(8)),
         },
         confirmPassword: {
           required: helpers.withMessage(requiedMsg, required),
@@ -427,30 +436,61 @@ export default {
       showdModal("#signin-modal");
     },
     async submitForm() {
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
       this.errorMessage = "";
-      const result = await this.v$.$validate();
-      if (!result) {
-        return;
-      }
-
-      const actionPayload = {
-        firstName: this.user.firstName,
-        lastName: this.user.lastName,
-        email: this.user.email,
-        password: this.user.password,
-        userType: this.user.userType,
-      };
-
       try {
+        const result = await this.v$.$validate();
+        if (!result) return;
+
+        const actionPayload = {
+          firstName: this.user.firstName,
+          lastName: this.user.lastName,
+          email: this.user.email,
+          password: this.user.password,
+          userType: this.user.userType,
+        };
+
         await this.$store.dispatch("signup", actionPayload);
         this.email = this.user.email;
         this.isSignedUp = true;
+        this.isConfirmed = false;
+        this.code = "";
+        this.confirmationNotice = "";
       } catch (error) {
         this.isSignedUp = false;
-        this.errorMessage = error.message;
+        this.errorMessage = error.code === "UsernameExistsException" || error.errorCode === "UsernameExistsException"
+          ? "Este correo ya está registrado. Inicia sesión o recupera tu contraseña."
+          : error.message;
+      } finally {
+        this.isSubmitting = false;
       }
     },
+    resumeConfirmation(email, password) {
+      this.email = email;
+      this.user.email = email;
+      this.user.password = password;
+      this.isSignedUp = true;
+      this.isConfirmed = false;
+      this.code = "";
+      this.confirmationErrorMessage = "";
+      this.confirmationNotice = "Enviamos un nuevo código a tu correo.";
+    },
+    async resendCode() {
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
+      this.confirmationErrorMessage = "";
+      this.confirmationNotice = "";
+      try {
+        await this.$store.dispatch("resendSignUpCode", this.email);
+        this.confirmationNotice = "Enviamos un nuevo código a tu correo.";
+      } catch (error) {
+        this.confirmationErrorMessage = error.message;
+      } finally { this.isSubmitting = false; }
+    },
     async confirmSignUpCode() {
+      if (this.isSubmitting) return;
+      this.isSubmitting = true;
       this.confirmationErrorMessage = "";
       const actionPayload = {
         username: this.email,
@@ -458,7 +498,10 @@ export default {
       };
 
       try {
-        await this.$store.dispatch("confirmSignUp", actionPayload);
+        if (!this.isConfirmed) {
+          await this.$store.dispatch("confirmSignUp", actionPayload);
+          this.isConfirmed = true;
+        }
         await this.$store.dispatch("logout");
         await this.$store.dispatch("login", {
           email: this.email,
@@ -467,14 +510,17 @@ export default {
         this.isSignedUp = false;
         await this.dismissModal("#signup-modal");
         const redirectUrl =
-          this.user.userType === "contractor"
+          this.$store.getters.loggedUser.userType === "contractor"
             ? "/profile/info"
             : "/perfil/info";
         this.$router.replace(redirectUrl);
+        this.user.password = "";
+        this.user.confirmPassword = "";
+        this.code = "";
       } catch (error) {
         this.isSignedUp = true;
         this.confirmationErrorMessage = error.message;
-      }
+      } finally { this.isSubmitting = false; }
     },
   },
   mounted() {

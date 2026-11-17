@@ -330,6 +330,10 @@ export default {
         throw new AuthenticationError(err.code, err.message);
       });
   },
+  async resendSignUpCode(context, email) {
+    try { return await Auth.resendSignUp(email); }
+    catch (error) { throw new AuthenticationError(error.code, error.message); }
+  },
   async changePassword(context, payload) {
     // Article Reference: https://docs.amplify.aws/lib/auth/manageusers/q/platform/js/#password-operations
 
