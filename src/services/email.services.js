@@ -8,14 +8,14 @@ export const EmailService = {
       firstName: String(payload.name || "Visitante").slice(0, 50),
       email: payload.email,
       phone: String(payload.mobile || "").slice(0, 15),
-      MessageType: "website",
+      MessageType: ["subscription", "referral"].includes(payload.messageType) ? payload.messageType : "website",
       message: String(payload.message || payload.messageBody || "")
         .replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 500),
     });
     return response.data.data;
   },
   subscribe(subscriberEmail) {
-    return this.send({ name: "Solicitud de suscripción", email: subscriberEmail,
+    return this.send({ name: "Solicitud de suscripción", email: subscriberEmail, messageType: "subscription",
       message: "Solicitud de suscripción al boletín. Requiere gestión por el equipo; no se ha añadido automáticamente a una lista." });
   },
   sendToContactUs(payload) {

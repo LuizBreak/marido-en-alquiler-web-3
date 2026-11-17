@@ -153,18 +153,15 @@
       </div>
     </div>
   </section>
-  <tell-a-friend ref="mytellafriendemailtemplate" v-show="false" />
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 import * as types from "../../../utils/types.js";
 import { EmailService } from "../../../services/email.services";
-import TellAFriend from "../../../components/email/tellaFriend.vue";
 
 export default {
   name: "how-it-works-ferreteria",
-  components: { TellAFriend },
   emits: ["child-breadcrumbs-urls"],
   data() {
     return {
@@ -186,11 +183,10 @@ export default {
     async notify() {
       try {
         const msgData = {
-          subject: "Marido-en-alquiler: Referral Program for ",
-          name: `Marido-en-alquiler`,
+          name: this.name || "Visitante",
           email: this.phoneOemail,
-          mobile: this.phoneOemail,
-          messageBody: this.emailContent,
+          messageType: "referral",
+          message: `Recomendación recibida para ${this.name || "un contacto"}. Correo proporcionado: ${this.phoneOemail}. Requiere seguimiento por el equipo.`,
         };
 
         const saved = await EmailService.send(msgData);
@@ -223,12 +219,6 @@ export default {
   },
   computed: {
     ...mapGetters([types.LOGGED_USER]),
-    emailContent: {
-      get() {
-        let childEl = this.$refs.mytellafriendemailtemplate.$el.innerHTML;
-        return childEl;
-      },
-    },
   },
   created() {
     document.body.scrollTop = document.documentElement.scrollTop = 0;
