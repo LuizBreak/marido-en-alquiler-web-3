@@ -145,6 +145,7 @@
 
 <script>
 import { cleanupModalArtifacts } from "../../../services/modal-state";
+import { signinDestination } from "../../../services/signin-destination";
 import { mapGetters } from "vuex";
 import Signup from "./signup.vue";
 import PwdVisibility from "../../../mixins/passwordVisibility.js";
@@ -211,11 +212,7 @@ export default {
           this.user?.signInUserSession?.idToken?.jwtToken,
           true
         );
-        const redirectUrl = this.$route.query.redirect
-          ? `/${this.$route.query.redirect}`
-          : this.$store.getters.loggedUser.userType === "client"
-            ? "/perfil/info"
-            : "/profile/info";
+        const redirectUrl = signinDestination(this.$route, this.$store.getters.loggedUser.userType);
         this.$router.replace(redirectUrl);
         this.isLoading = false;
       } catch (error) {

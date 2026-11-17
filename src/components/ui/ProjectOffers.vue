@@ -24,26 +24,27 @@
 import { apiSvc } from '../../services/api.service';
 export default {
   name: 'project-offers',
-  props: { project: { type: Object, required: true } },
-  data() { return { quotes: [], expanded: false, loading: false, busy: false, error: '', message: '' }; },
+  props: { project: { type: Object, required: true }, initialQuote: { type: Object, default: null } },
+  emits: ['project-updated'],
+  data() { return { quotes: this.initialQuote ? [this.initialQuote] : [], expanded: !!this.initialQuote, loading: false, busy: false, error: '', message: '' }; },
   computed: { canAccept() { return this.project.status === 'created' && !Number(this.project.contractorId); } },
   methods: {
     price(value) { return Number(value).toFixed(2); },
     contractorName(quote) { return quote.contractorCompanyName || [quote.contractorFirstName, quote.contractorLastName].filter(Boolean).join(' ') || `Contratista ${quote.contractorId}`; },
     failure(error) { return error.response?.status === 409 ? 'La oferta o el proyecto cambió. Revisa los datos actuales antes de continuar.' : error.response?.status === 403 ? 'No tienes permiso para realizar esta acción.' : 'No se pudo guardar el cambio. Inténtalo de nuevo.'; },
-    async load() { this.loading = true; try { this.quotes = await this.$store.dispatch('quotes/getQuotesByProject', { projectId: this.project.projectId }); } finally { this.loading = false; } },
+    async load() { this.loading = true; try { this.quotes = this.initialQuote ? [(await apiSvc.getById('quotes', this.initialQuote.quoteId)).data.data] : await this.$store.dispatch('quotes/getQuotesByProject', { projectId: this.project.projectId }); } finally { this.loading = false; } },
     async toggle() { this.expanded = !this.expanded; if (this.expanded) { this.error = ''; try { await this.load(); } catch (error) { this.error = this.failure(error); } } },
     async accept(quote) {
       if (this.busy || !window.confirm(`¿Aceptar la oferta de ${this.contractorName(quote)} por $${this.price(quote.bidPrice)}?`)) return;
       this.busy = true; this.error = ''; this.message = '';
-      try { await this.$store.dispatch('quotes/acceptQuote', quote); await this.load(); this.message = 'Oferta aceptada. El contratista fue asignado al proyecto.'; }
+      try { const saved = await this.$store.dispatch('quotes/acceptQuote', quote); this.$emit('project-updated', saved.project); await this.load(); this.message = 'Oferta aceptada. El contratista fue asignado al proyecto.'; }
       catch (error) { this.error = this.failure(error); if (error.response?.status === 409) { try { await this.load(); const response = await apiSvc.getById('projects', this.project.projectId); this.$store.commit('projects/SET_PROJECT', response.data.data); } catch (_) { /* Retain the original conflict message. */ } } }
       finally { this.busy = false; }
     },
     async complete() {
       if (this.busy || !window.confirm('¿Marcar este proyecto como completado?')) return;
       this.busy = true; this.error = ''; this.message = '';
-      try { const response = await apiSvc.update('projects', this.project, { status: 'completado' }); this.$store.commit('projects/SET_PROJECT', response.data.data); this.message = 'Proyecto completado. Ya puedes compartir tu experiencia.'; }
+      try { const response = await apiSvc.update('projects', this.project, { status: 'completado' }); this.$store.commit('projects/SET_PROJECT', response.data.data); this.$emit('project-updated', response.data.data); this.message = 'Proyecto completado. Ya puedes compartir tu experiencia.'; }
       catch (error) { this.error = this.failure(error); }
       finally { this.busy = false; }
     },
