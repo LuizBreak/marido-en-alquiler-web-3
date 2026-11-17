@@ -192,7 +192,9 @@ Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are deve
 
 November 16, 2026 notification release: Notifications now run after SQL persistence, with independent submission status. Saved bids/messages survive SES/state-service failures. Newsletter requests are support requests, not automatic enrollment. Durable outbox/resend remains open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
 
-November 16, 2026 notification-template restoration: Restored stored message/service/contact details with HTML and plain text. Server-validated service project metadata replaces a project ID in quoteId. Save-versus-notification feedback remains separate; durable retries remain open. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P1,Partial; branded notification paths verified,"R07, R10",Core workflows and contracts
+November 16, 2026 notification-template restoration: Restored stored message/service/contact details with HTML and plain text. Server-validated service project metadata replaces a project ID in quoteId. Save-versus-notification feedback remains separate; durable retries remain open. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.
+
+November 17 registration notifications: New registrations now insert an internal email event atomically with account/profile creation. A one-minute scheduled worker retries failures with leases/backoff. Existing other email paths remain best effort; general outbox work is not complete. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.",P1,Partial; durable registration notices verified,"R07, R10",Core workflows and contracts
 [R09] — Signup and generated-ID handling are not reliable,"Review ID: R09
 Updated: November 16, 2026
 Status: Partial; provisioning deployed
@@ -217,7 +219,9 @@ This is the original historical assessment. Current development release verifica
 JOURNEY RELEASE UPDATE — November 16, 2026
 Status: Partial; real email confirmation verified
 Client signup, invalid-code feedback, Gmail code receipt, valid confirmation and automatic verified sign-in passed in Chrome. Contractor test accounts used administrator creation; their public email signup flow remains acceptance scope.
-Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.",P1,Partial; real email confirmation verified,"R02, R04, R07, R12",Core workflows and contracts
+Evidence and rollback: docs/releases/2026-11-16-journey.md. All AWS resources/data are development; no remote Asana ticket was created.
+
+November 17 registration notifications: Both client/contractor concurrent provisioning create one account/profile and one notice; later sign-in does not enqueue or resend. Legacy binding/profile repair does not trigger new-registration email. Automatic scheduled SES submissions and fixture cleanup passed. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.",P1,Partial; registration and owner notices verified,"R02, R04, R07, R12",Core workflows and contracts
 "[R10] — Primary keys, route parameters and SQL names disagree","Review ID: R10
 Updated: November 16, 2026
 Status: Deployed; principal routes verified
@@ -436,7 +440,9 @@ November 16, 2026 notification release: 94 BE/49 FE tests, TypeScript, lint of 7
 
 November 16, 2026 CRUD consistency release: 104 BE tests and TypeScript passed, with new compatibility and secret-safety cases. Removed 86 installed packages; whole-repository npm findings changed from 59 to 56, with unrelated findings still open. Artifact comparison found exactly one removed wrapper and no changed runtime dependencies. Frontend application code is unchanged; prior 49-test baseline remains. See docs/releases/2026-11-16-crud-consistency.md. BE cbb9e2f/b185c57/1cf5d6c. No remote Asana tickets created.
 
-November 16, 2026 notification-template restoration: 120 BE and 60 FE tests, TypeScript, lint/build and desktop/mobile visual checks pass. New cases cover template injection, service project ownership/roles, canonical stored metadata and stale responses after logout. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P2,Partial; 120 BE and 60 FE tests,R04,Delivery and maintainability
+November 16, 2026 notification-template restoration: 120 BE and 60 FE tests, TypeScript, lint/build and desktop/mobile visual checks pass. New cases cover template injection, service project ownership/roles, canonical stored metadata and stale responses after logout. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.
+
+November 17 registration notifications: 134 backend tests and TypeScript pass, including transaction rollback, trusted metadata, retries, bursts and acknowledgement ambiguity. Frontend code is unchanged, retaining its 60-test baseline. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.",P2,Partial; 134 BE tests; FE baseline 60,R04,Delivery and maintainability
 [R19] — Initial browser payload is large,"Review ID: R19
 Updated: November 16, 2026
 Status: Partial; browser SDK removed
@@ -484,7 +490,9 @@ Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are deve
 
 November 16, 2026 notification release: SES replaces conch-app.com. All 77 Node 24 function hashes match; current stacks completed; scoped sender config on only three functions. SES DKIM/custom MAIL FROM verified; all prior Zoho/web DNS preserved. User confirmed both app Gmail messages arrived. Support mail was SES-accepted. DMARC, alarm destination, durable retries and broader operations remain open. See docs/releases/2026-11-16-notifications.md. Separate local commits; no remote Asana tickets created.
 
-November 16, 2026 notification-template restoration: All 77 backend hashes, 187 frontend assets, both hostnames and completed CDN invalidation verified. Live SES message/service/contact submissions, full API regression and fixture cleanup passed. No schema/DNS change; archived welcome/reference examples remain inactive. Inbox placement and broader delivery monitoring are distinct from SES submission. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.",P2,Partial; restored templates deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
+November 16, 2026 notification-template restoration: All 77 backend hashes, 187 frontend assets, both hostnames and completed CDN invalidation verified. Live SES message/service/contact submissions, full API regression and fixture cleanup passed. No schema/DNS change; archived welcome/reference examples remain inactive. Inbox placement and broader delivery monitoring are distinct from SES submission. See docs/releases/2026-11-16-notification-templates.md. No remote Asana tasks created.
+
+November 17 registration notifications: Mail stack now has twelve resources and an internal one-minute worker, restricted by IAM to hello@ and the application database secret. All 78 active hashes/handlers and three stack updates match. Recipient allow/deny simulation, automatic submission and cleanup passed. Failure metrics feed the existing alarm; alarm destinations and inbox appearance confirmation remain separate. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.",P2,Partial; registration worker deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
 [R21] — Product completion and component cleanup need explicit scope,"Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend

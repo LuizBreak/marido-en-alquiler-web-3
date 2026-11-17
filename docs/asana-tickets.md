@@ -1,5 +1,7 @@
 # Asana ticket ledger
 
+November 17: [registration notification feature](releases/2026-11-17-registration-notifications.md) is deployed to hello@ with an atomic SQL queue, one-minute retry worker and unique per-account event. Automatic first-attempt submissions for both roles, concurrency/repeat-sign-in checks and cleanup passed. 134 BE tests; FE unchanged at 60 tests. There are now 78 active functions; mail stack has twelve resources. General notification-outbox work remains partial because other email types still use their previous best-effort delivery path. No remote tickets were created.
+
 The user confirmed both restored new-message and service-request emails arrived in Gmail and look correct. The contact test remains SES-accepted without separate user confirmation.
 
 Latest acceptance: [remaining notification templates](releases/2026-11-16-notification-templates.md). Branded message/service/contact notices, labeled newsletter/referral support mail, authenticated message links and server-validated service-project context are deployed. 120 BE / 60 FE tests, all 77 deployed hashes, 187 frontend asset hashes and live SES/browser/API regression passed; disposable fixtures were removed. Existing tickets remain partial where broader acceptance is outstanding. No remote tickets were created.
@@ -17,8 +19,8 @@ No remote tickets were created. [CSV](asana-tickets.csv) contains all 21 import-
 | [R05](#r05) | P0 | Partial; chat token paths protected | Passwords, tokens and private payloads can reach storage/logging/responses |
 | [R06](#r06) | P1 | Partial; browser refresh verified | Session lifetime, restoration and navigation checks disagree |
 | [R07](#r07) | P1 | Deployed; API verified | Response helper changes data shape and discards results |
-| [R08](#r08) | P1 | Partial; saved records survive notification failures | Missing promise propagation produces premature success and lost errors |
-| [R09](#r09) | P1 | Partial; real email confirmation verified | Signup and generated-ID handling are not reliable |
+| [R08](#r08) | P1 | Partial; durable registration notices verified | Missing promise propagation produces premature success and lost errors |
+| [R09](#r09) | P1 | Partial; registration and owner notices verified | Signup and generated-ID handling are not reliable |
 | [R10](#r10) | P1 | Deployed; principal routes verified | Primary keys, route parameters and SQL names disagree |
 | [R11](#r11) | P1 | Partial; owned notification paths verified | FE invokes undeclared routes/actions |
 | [R12](#r12) | P1 | Partial; live schema reconciled | SQL, TypeScript interfaces and payloads have drifted |
@@ -27,9 +29,9 @@ No remote tickets were created. [CSV](asana-tickets.csv) contains all 21 import-
 | [R15](#r15) | P1 | Partial; live delivery and authorization verified | Chat read state and connection lifecycle are inconsistent |
 | [R16](#r16) | P1 | Partial; photo display browser-verified | Image upload integrity and private ownership are undefined |
 | [R17](#r17) | P2 | Partial; active CRUD consolidated on mysql2 | Multiple backend execution/configuration paths obscure the source of truth |
-| [R18](#r18) | P2 | Partial; 104 BE tests; FE baseline 49 | Dependency and verification baseline is weak |
+| [R18](#r18) | P2 | Partial; 134 BE tests; FE baseline 60 | Dependency and verification baseline is weak |
 | [R19](#r19) | P2 | Partial; browser SDK removed | Initial browser payload is large |
-| [R20](#r20) | P2 | Partial; notification delivery user-confirmed | Deployment, external services and operational ownership are incomplete |
+| [R20](#r20) | P2 | Partial; registration worker deployed and verified | Deployment, external services and operational ownership are incomplete |
 | [R21](#r21) | P2 | Partial; workflow and support feedback repaired | Product completion and component cleanup need explicit scope |
 
 ## Authenticated live chat acceptance
