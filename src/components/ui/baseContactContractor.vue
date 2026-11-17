@@ -181,11 +181,6 @@
 
             <!-- Contactar Contractor Form -->
             <div class="col-md-6 px-4 pt-2 pb-4 px-sm-5 pb-sm-5 pt-md-5">
-              <svc-request-email-template
-                ref="mybidemailtemplate"
-                :projectId="project.id"
-                :projectTitle="project.title"
-              ></svc-request-email-template>
 
               <div class="card shadow-sm mb-1 mt-0">
                 <div class="d-flex align-items-center mt-4">
@@ -235,7 +230,6 @@
                         placeholder="Describir los detalles de como el contratista te puede contactar"
                         style="height: 150px"
                         v-model="v$.message.$model"
-                        @change="SetEmailContent"
                       />
                       <div
                         class="input-errors text-danger"
@@ -278,7 +272,6 @@ import DismissModal from "../../mixins/dissmissModal.js";
 import msgBoxDialog from "../../mixins/msgBoxDialog.js";
 
 import { Message } from "../../services/message.service.js";
-import SvcRequestEmailTemplate from "../email/serviceRequestEmail.vue";
 
 export default {
   name: "base-contact-contractor",
@@ -302,7 +295,6 @@ export default {
     "email",
   ],
   components: {
-    SvcRequestEmailTemplate,
     StarRating,
   },
   setup() {
@@ -311,6 +303,7 @@ export default {
   data() {
     return {
       message: null,
+      isSaving: false,
     };
   },
   validations() {
@@ -338,6 +331,10 @@ export default {
       if (!result) {
         return;
       }
+      if (!this.project?.projectId) {
+        this.triggerMsgBox(true, "Crea un proyecto antes de solicitar este servicio.");
+        return;
+      }
 
       try {
         const messageService = new Message();
@@ -345,14 +342,13 @@ export default {
         const saved = await messageService.add(true, {
           fromId: this.loggedUser.id,
           toId: this.id,
-          quoteId: this.project.projectId,
+          quoteId: null,
+          msgType: "service_request",
+          msgAsset: JSON.stringify({ kind: "service_request", projectId: this.project.projectId }),
           subject: `Marido-en-alquiler: Nueva Solicitud de Servicio`,
-          messageBody: this.emailContent,
+          messageBody: this.message,
           wasRead: false,
 
-          name: `Marido-en-alquiler`,
-          email: this.email,
-          mobile: this.phone,
         });
 
         this.resetForm();
@@ -371,7 +367,7 @@ export default {
  } finally { this.isSaving = false; }
 },
     resetForm() {
-      this.mensaje = null;
+      this.message = null;
     },
     async getProjectInfoClientId(clientId) {
       try {
@@ -381,17 +377,6 @@ export default {
       } catch (e) {
         console.error(e);
       }
-    },
-    SetEmailContent() {
-      this.$store.dispatch("setEmailAttributes", {
-        projectTitle: this.project.title,
-        projectDescription: this.project.description,
-        projectStartDate: this.project.startDate,
-        firstName: this.loggedUser.firstName,
-        phone: this.loggedUser.phone,
-        email: this.loggedUser.email,
-        description: this.message,
-      });
     },
     sysLogIt() {
       this.logIt(
@@ -424,12 +409,6 @@ export default {
     },
     hasProjects() {
       return this.$store.getters["projects/hasProjects"];
-    },
-    emailContent: {
-      get() {
-        let childEl = this.$refs.mybidemailtemplate.$el.innerHTML;
-        return childEl;
-      },
     },
     serviceTypes() {
       /*
