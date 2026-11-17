@@ -1,5 +1,7 @@
 # Asana ticket ledger
 
+The user confirmed both restored new-message and service-request emails arrived in Gmail and look correct. The contact test remains SES-accepted without separate user confirmation.
+
 Latest acceptance: [remaining notification templates](releases/2026-11-16-notification-templates.md). Branded message/service/contact notices, labeled newsletter/referral support mail, authenticated message links and server-validated service-project context are deployed. 120 BE / 60 FE tests, all 77 deployed hashes, 187 frontend asset hashes and live SES/browser/API regression passed; disposable fixtures were removed. Existing tickets remain partial where broader acceptance is outstanding. No remote tickets were created.
 
 Updated November 16, 2026. Target: [Marido en Alquiler](https://app.asana.com/1/1200400511518349/project/1201474712395202/board/1205115801994358).

@@ -48,7 +48,7 @@ Both development stack updates completed, all 77 active function hashes/handlers
 
 Live SES accepted the restored message and service-request emails to the authorized Gmail inbox and the contact notification to hello. Quote/message deduplication, opt-outs, anonymous-message denial, sender derivation, service-project ownership and role checks passed. In Chrome using the production build against live AWS, verified sign-in return to the exact offer/message, current saved content, service-request display, refresh, correct account reply route and outsider denial. The published `/mensaje/{id}` route displays the signed-out prompt without private data. The full deployed API regression passed accounts/profiles, uploads and ownership denials, projects/quotes/messages, simultaneous quote acceptance, stale terms, completion and reviews. All disposable SQL/Cognito/S3 fixtures were removed.
 
-Inbox appearance confirmation for this release is pending; SES acceptance alone is not proof of inbox placement. Test messages refer to removed fixtures and their links intentionally no longer resolve to live test records.
+The user confirmed both restored new-message and service-request emails arrived in Gmail and look correct. Contact delivery was SES-accepted; its inbox appearance was not separately confirmed. Test messages refer to removed fixtures and their links intentionally no longer resolve to live test records.
 
 Artifact: `repairs/notification-templates-20261116/backend.zip`; SHA-256 `ebea2d3e41f5d2cda59d9879fcbe06e066be14de4eaa790d16eecee51127200e`. Package comparison with the previous release finds only new notification-templates.js/service-request.js and changed notifications.js/resources.js. The offer template and dependencies are unchanged.
 
