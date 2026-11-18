@@ -45,7 +45,6 @@ import "../node_modules/smooth-scroll/dist/smooth-scroll.polyfills.min.js";
 import "../node_modules/leaflet/dist/leaflet.js";
 import "../node_modules/jarallax/dist/jarallax.min.js";
 
-import AmplifyVue from "@aws-amplify/ui-vue";
 import VueSocialSharing from "vue-social-sharing";
 
 
@@ -64,7 +63,6 @@ const app = createApp({
 
 app.use(router);
 app.use(store);
-app.use(AmplifyVue);
 app.use(VueSocialSharing);
 
 // https://github.com/viktorlarsson/vue-tiny-slider
