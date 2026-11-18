@@ -1,5 +1,9 @@
 # Restart repairs and commit ledger
 
+## Machine restart checkpoint - November 18, 2026
+
+Saved the precise resume instructions at the top of [HANDOFF.md](HANDOFF.md). Dependency fixes and documentation were pushed through FE `bf3db27`; BE remains `f143548`. The candidate is not deployed. Only the upgraded SDK's successful public contractor email-code confirmation remains before deployment; other recorded acceptance passed. Private test fixture/evidence and the exact candidate survive on disk, but preview/browser processes and their IDs will not survive reboot. Recreate the confirmation context, resend a code if needed, finish automatic contractor login, clean the exact fixture, publish/verify, then update and push the release record. No additional application change or deployment was made for this checkpoint.
+
 ## Frontend dependency security — November 18, 2026
 
 November 18: [frontend dependency repairs](releases/2026-11-18-dependency-security.md) pass 94 tests, clean installation/build and real AWS profile/photo/chat/session checks. Production audit has zero findings; the full audit retains 14 high entries from one unpatched development Picomatch advisory. See the [security review](security/dependency-review-2026-11-18.md). The upgraded SDK public contractor confirmation is waiting for the user-held verification code, so this candidate has not been deployed. The live site remains the November 17 frontend; backend runtime is unchanged. Earlier FE `59bc5ec` and BE `f143548` were pushed successfully. New fixes are separate commits; no remote Asana tickets were created.
