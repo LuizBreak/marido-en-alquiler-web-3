@@ -6,14 +6,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
     <title><%= htmlWebpackPlugin.options.title %></title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/filepond/dist/filepond.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css"
-    />
+    <!-- Vue and FilePond scripts/styles are bundled from the reviewed lockfile. -->
     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.1/tiny-slider.css">    [if (lt IE 9)]><script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/min/tiny-slider.helper.ie8.js"></script><![endif] -->
     <!-- NOTE: prior to v2.2.1 tiny-slider.js need to be in <body> -->
 
@@ -33,14 +26,6 @@
     <meta name="theme-color" content="#ffffff"> -->
   </head>
   <body>
-    <div id="fb-root"></div>
-    <script
-      async
-      defer
-      crossorigin="anonymous"
-      src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v13.0&appId=1027522518161758&autoLogAppEvents=1"
-      nonce="xkWA6dWo"
-    ></script>
     <noscript>
       <strong
         >We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work
@@ -50,11 +35,5 @@
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-    <script src="https://unpkg.com/filepond-plugin-image-preview"></script>
-    <script src="https://unpkg.com/filepond"></script>
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://unpkg.com/vue-filepond@6"></script>
   </body>
 </html>
