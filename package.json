@@ -57,17 +57,18 @@
     "vuex": "^4.0.2"
   },
   "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@babel/eslint-parser": "7.29.13",
+    "@babel/plugin-transform-private-methods": "7.29.7",
+    "@vue/cli-plugin-babel": "5.0.9",
+    "@vue/cli-plugin-eslint": "5.0.9",
+    "@vue/cli-service": "5.0.9",
     "@vue/compiler-sfc": "3.5.45",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^6.7.2",
-    "eslint-plugin-vue": "^7.0.0",
+    "eslint": "8.57.1",
+    "eslint-plugin-vue": "9.33.0",
     "less": "^4.1.2",
-    "less-loader": "^5.0.0",
+    "less-loader": "12.3.3",
     "sass": "^1.85.1",
-    "sass-loader": "^7.0.1"
+    "sass-loader": "16.0.8"
   },
   "eslintConfig": {
     "root": true,
@@ -79,9 +80,12 @@
       "eslint:recommended"
     ],
     "parserOptions": {
-      "parser": "babel-eslint"
+      "parser": "@babel/eslint-parser"
     },
-    "rules": {}
+    "rules": {
+      "vue/multi-word-component-names": "warn",
+      "vue/no-reserved-component-names": "warn"
+    }
   },
   "browserslist": [
     "> 1%",
