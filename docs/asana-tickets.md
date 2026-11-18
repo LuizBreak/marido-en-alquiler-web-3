@@ -1,5 +1,9 @@
 # Asana ticket ledger
 
+November 18: [frontend dependency repairs](releases/2026-11-18-dependency-security.md) pass 94 tests, clean installation/build and real AWS profile/photo/chat/session checks. Production audit has zero findings; the full audit retains 14 high entries from one unpatched development Picomatch advisory. See the [security review](security/dependency-review-2026-11-18.md). The upgraded SDK public contractor confirmation is waiting for the user-held verification code, so this candidate has not been deployed. The live site remains the November 17 frontend; backend runtime is unchanged. Earlier FE `59bc5ec` and BE `f143548` were pushed successfully. New fixes are separate commits; no remote Asana tickets were created.
+
+Current dependency update: **R18 remains partial** solely for broader repository maintenance and the unpatched development advisory, rather than the original four critical FE alerts. **R19 remains partial** for bundle splitting/mobile measurement, despite removing unused package trees and duplicate external scripts. **R05** now uses the modular SDK adapter without copying refresh tokens or AWS credentials into Vuex. **R20** records repeatable clean-install/build and scoped browser acceptance; CI, monitoring and restore exercises remain open. These update the same 21 tickets.
+
 November 17: [session/signup coverage](releases/2026-11-17-session-signup.md) is deployed. Expiry/logout/reload, real refresh and tab isolation passed; public contractor confirmation used a real Gmail code. Historical identity audit is clear, conflict denials passed and all fixtures were removed. 83 FE / 137 BE tests pass. No backend runtime/schema change or remote Asana creation.
 
 The user supplied a Zoho Inbox screenshot confirming receipt of both client and contractor registration test notices.
@@ -276,6 +280,8 @@ Dependencies: R04. Original evidence remains in the CSV and [review report](revi
 
 
 ## R18
+
+November 18 update: the frontend candidate passes 94 tests, clean install/build and real AWS browser checks. Production audit is clear; all 14 remaining full-audit entries derive from one unpatched Picomatch development advisory. SDK public signup success awaits the real email code before deployment. See the current dependency release/security review above.
 
 **[R18] — Dependency and verification baseline is weak**
 

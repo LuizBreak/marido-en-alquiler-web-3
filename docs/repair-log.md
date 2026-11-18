@@ -1,5 +1,11 @@
 # Restart repairs and commit ledger
 
+## Frontend dependency security — November 18, 2026
+
+November 18: [frontend dependency repairs](releases/2026-11-18-dependency-security.md) pass 94 tests, clean installation/build and real AWS profile/photo/chat/session checks. Production audit has zero findings; the full audit retains 14 high entries from one unpatched development Picomatch advisory. See the [security review](security/dependency-review-2026-11-18.md). The upgraded SDK public contractor confirmation is waiting for the user-held verification code, so this candidate has not been deployed. The live site remains the November 17 frontend; backend runtime is unchanged. Earlier FE `59bc5ec` and BE `f143548` were pushed successfully. New fixes are separate commits; no remote Asana tickets were created.
+
+Twelve separate repair commits cover critical transitive fixes, unused dependency removal, Axios/Vue, Vue CLI/Webpack/Babel/lint, modular Amplify 6, compatible patches, development server, serialization, PostCSS, process spawning, UUID and unused external runtime injection removal. The release lists exact commits and compatibility evidence. Existing cached authentication, refresh/logout/expiry, both-role login, profile text/photo saves and live/reconnected/reloaded chat pass. Completed fixtures are removed; only the public signup confirmation fixture remains pending its real code. No backend runtime/schema/DNS change.
+
 ## Session expiry, logout and public contractor signup — November 17, 2026
 
 [Release, commits, acceptance evidence and recovery](releases/2026-11-17-session-signup.md). Separate FE fixes await and isolate logout (`f072f09`), recover interrupted confirmation/login (`76b41a7`), remove credential-bearing development store logging (`4351c00`) and prevent cross-tab bootstrap resurrection (`5224dd5`). BE `f143548` adds the read-only identity audit, three regression tests and a reconciliation runbook; runtime handlers are unchanged. Generated build verification folders are now ignored (`7e0c2cb`); their local contents are preserved.

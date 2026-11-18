@@ -1,8 +1,14 @@
 # Session handoff
 
-Updated November 17, 2026 (America/New_York). Read this, repair-log.md and the latest release record; inspect both working trees before edits.
+Updated November 18, 2026 (America/New_York). Read this, repair-log.md and the latest release record; inspect both working trees before edits.
 
 ## Current outcome
+
+November 18: [frontend dependency repairs](releases/2026-11-18-dependency-security.md) pass 94 tests, clean installation/build and real AWS profile/photo/chat/session checks. Production audit has zero findings; the full audit retains 14 high entries from one unpatched development Picomatch advisory. See the [security review](security/dependency-review-2026-11-18.md). The upgraded SDK public contractor confirmation is waiting for the user-held verification code, so this candidate has not been deployed. The live site remains the November 17 frontend; backend runtime is unchanged. Earlier FE `59bc5ec` and BE `f143548` were pushed successfully. New fixes are separate commits; no remote Asana tickets were created.
+
+Current task: finish the pending SDK-upgrade signup confirmation using the existing isolated browser/private fixture, remove that fixture, then publish and verify the tested frontend candidate. Read the new release for exact evidence, remaining advisory and recovery. Older release paragraphs below retain their historical commit/push/test counts; the new release takes precedence for the dependency candidate.
+
+### Previously deployed releases
 
 Current frontend release: [session/signup coverage](releases/2026-11-17-session-signup.md). FE `f072f09`/`76b41a7`/`4351c00`/`5224dd5`; BE `f143548` adds audit/tests/docs only. Expiry, real refresh, reload, logout, cross-tab isolation and failed-refresh browser checks passed. Public contractor email signup rejected an invalid code, then confirmed with the user-supplied code and automatically opened the contractor profile. Live duplicate-email 409/subject-conflict 403, case-only repeat signup denial and idempotent provisioning passed. No historical duplicate email/subject/blank/padded-email groups were found; no existing accounts were reconciled. 83 FE / 137 BE tests, TypeScript, lint/build and fixture cleanup pass. FE assets/index/CDN verified; backend runtime/schema/Cognito/DNS are unchanged. Use this release for current frontend recovery; the registration release below remains the backend artifact source. Published browser repeat is recorded in the release receipt. User also confirmed hello@ → Gmail forwarding and branded registration-email appearance. All fixes remain separate local commits; no Git push.
 
@@ -54,9 +60,9 @@ The conch-app.com mailer has been replaced by backend-owned SES delivery. Cognit
 
 ## Validation and local commands
 
-Current backend: 137 tests and TypeScript pass, including the new identity-conflict regressions; the unchanged runtime retains its prior package/secret/hash/IAM verification. Live concurrent first registration, scheduled SES submissions for both roles and later sign-in deduplication passed; disposable account/profile/queue/Cognito rows were removed. Registration worker reports complete normally in milliseconds. Frontend now passes 83 tests, lint/build and local/published expiry/refresh/logout browser acceptance. All temporary signup/session fixtures were removed. Prior broader application/browser acceptance is documented in the preceding releases.
+Current backend: 137 tests and TypeScript pass, including the new identity-conflict regressions; the unchanged runtime retains its prior package/secret/hash/IAM verification. Live concurrent first registration, scheduled SES submissions for both roles and later sign-in deduplication passed; disposable account/profile/queue/Cognito rows were removed. Registration worker reports complete normally in milliseconds. The deployed November 17 frontend passes 83 tests, lint/build and local/published expiry/refresh/logout browser acceptance. All temporary signup/session fixtures were removed. Prior broader application/browser acceptance is documented in the preceding releases.
 
-Backend production audit findings went 36 to 8; no reported vulnerable dependency path is included in the allowlisted Lambda artifact. Unused prototype/development and FE dependency findings remain open. Framework/plugin versions were preserved. Browser AWS SDK removal reduced the raw initial entry point from roughly 6.64 MiB to 3.10 MiB; large images/bundle warnings remain.
+Backend production audit findings went 36 to 8; no reported vulnerable dependency path is included in the allowlisted Lambda artifact. The new frontend dependency review supersedes the old FE findings: the candidate passes a zero-finding production audit, with one unpatched Picomatch advisory remaining in development tooling. The candidate updates framework/toolchain versions and has not yet been deployed. Browser AWS SDK removal reduced the raw initial entry point from roughly 6.64 MiB to 3.10 MiB; large images/bundle warnings remain.
 
 Run FE against AWS with `npm.cmd run serve:aws` at http://127.0.0.1:8080. This overrides older ignored env values with API v2. Check port 8080 before starting a duplicate process. No process is guaranteed to survive closing the app/session.
 

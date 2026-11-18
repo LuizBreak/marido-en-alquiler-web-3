@@ -115,7 +115,9 @@ Status: Partial; chat token paths protected
 WebSocket tokens stay in handshake headers, never URLs or connection records; request tracing is off. Legacy anonymous handler is disabled and unrouted. Broader historical logging review remains.
 Evidence/recovery: docs/releases/2026-11-16-chat.md. All resources/data are development. No remote Asana tickets were created.
 
-November 17 session/signup coverage: Removed Vuex full-state/action logger that could expose auth credentials. Historical logging/provider-secret review remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P0,Partial; development credential logging removed,"R01, R02",Security and data boundaries
+November 17 session/signup coverage: Removed Vuex full-state/action logger that could expose auth credentials. Historical logging/provider-secret review remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.
+
+November 18 dependency update: Modular Amplify 6 adapter preserves session flows without copying refresh tokens or AWS credentials to Vuex. Existing v4 cache migration, real refresh, expiry, logout and failed-refresh browser checks passed. See docs/releases/2026-11-18-dependency-security.md and docs/security/dependency-review-2026-11-18.md. No remote Asana ticket created.",P0,Partial; development credential logging removed,"R01, R02",Security and data boundaries
 "[R06] — Session lifetime, restoration and navigation checks disagree","Review ID: R06
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
@@ -452,7 +454,9 @@ November 16, 2026 notification-template restoration: 120 BE and 60 FE tests, Typ
 
 November 17 registration notifications: 134 backend tests and TypeScript pass, including transaction rollback, trusted metadata, retries, bursts and acknowledgement ambiguity. Frontend code is unchanged, retaining its 60-test baseline. See docs/releases/2026-11-17-registration-notifications.md. No remote Asana tasks created.
 
-November 17 session/signup coverage: Session/signup and identity regression coverage added; TypeScript, lint, production build and live browser/API checks passed. Dependency/toolchain modernization remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P2,Partial; 137 BE and 83 FE tests,R04,Delivery and maintainability
+November 17 session/signup coverage: Session/signup and identity regression coverage added; TypeScript, lint, production build and live browser/API checks passed. Dependency/toolchain modernization remains. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.
+
+November 18 dependency update: Frontend candidate: 94 tests, clean install/build, real AWS session/profile/photo/chat acceptance. Production npm audit has zero findings; full audit has 14 high package entries from one unpatched Picomatch advisory (GHSA-fc5q-39xc-vjpf), no critical/moderate/low entries. SDK public contractor successful confirmation awaits user-held code before deployment. Keep maintenance/advisory work open. See docs/releases/2026-11-18-dependency-security.md and docs/security/dependency-review-2026-11-18.md. No remote Asana ticket created.",P2,"Partial; FE production audit clear, upstream dev advisory open",R04,Delivery and maintainability
 [R19] — Initial browser payload is large,"Review ID: R19
 Updated: November 16, 2026
 Status: Partial; browser SDK removed
@@ -468,7 +472,9 @@ ORIGINAL ASSESSMENT
 
 **Proposal:** Lazy-load routed screens, resize/compress images, remove unused theme/demo assets and dependencies, replace full browser AWS SDK usage through R01/R16, and establish mobile performance budgets. Measure before/after in a browser; compilation warnings do not measure user latency.
 
-Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.",P2,Partial; browser SDK removed,R18,Delivery and maintainability
+Evidence was reviewed from source and isolated tests. No deployment/live-data validation was performed. Do not mark complete until remaining acceptance work is satisfied.
+
+November 18 dependency update: Removed unused package trees and redundant external browser scripts. Real photo/chat/profile acceptance passed. Bundle splitting, image optimization and mobile measurements remain. See docs/releases/2026-11-18-dependency-security.md and docs/security/dependency-review-2026-11-18.md. No remote Asana ticket created.",P2,Partial; browser SDK removed,R18,Delivery and maintainability
 "[R20] — Deployment, external services and operational ownership are incomplete","Review ID: R20
 Updated: November 16, 2026
 Status: Partial; hardened AWS dev release verified
@@ -506,7 +512,9 @@ November 17 registration notifications: Mail stack now has twelve resources and 
 
 November 17 receipt confirmation: user screenshot shows both new-client and new-contractor registration notices in the hello@ Zoho Inbox. Registration notice inbox receipt is confirmed; broader ticket scope remains partial.
 
-November 17 session/signup coverage: Frontend assets/index and completed CDN invalidation verified on both hostnames; old assets and prior index retained. Backend runtime/schema/Cognito/DNS unchanged. hello@ forwarding to Gmail was user-confirmed. Monitoring/CI/restore drills remain. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.",P2,Partial; session/signup FE deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
+November 17 session/signup coverage: Frontend assets/index and completed CDN invalidation verified on both hostnames; old assets and prior index retained. Backend runtime/schema/Cognito/DNS unchanged. hello@ forwarding to Gmail was user-confirmed. Monitoring/CI/restore drills remain. See docs/releases/2026-11-17-session-signup.md. No remote Asana tasks created.
+
+November 18 dependency update: Clean lockfile installation, lint, production build and disposable AWS browser regression passed. Dependency candidate has not been published pending real signup confirmation. Earlier FE 59bc5ec / BE f143548 successfully pushed. CI, monitoring and recovery drills remain open. See docs/releases/2026-11-18-dependency-security.md and docs/security/dependency-review-2026-11-18.md. No remote Asana ticket created.",P2,Partial; session/signup FE deployed and verified,"R01, R02, R04, R17",Delivery and maintainability
 [R21] — Product completion and component cleanup need explicit scope,"Review ID: R21
 Updated: November 16, 2026
 Repositories: FE Target - marido-en-alquiler-web-3; BE marido-en-alquiler-backend
