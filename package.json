@@ -95,6 +95,7 @@
   ],
   "overrides": {
     "webpack-dev-server": "5.2.6",
-    "webpack-dev-middleware": "7.4.5"
+    "webpack-dev-middleware": "7.4.5",
+    "serialize-javascript": "7.1.4"
   }
 }
