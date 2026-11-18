@@ -97,6 +97,7 @@
     "webpack-dev-server": "5.2.6",
     "webpack-dev-middleware": "7.4.5",
     "serialize-javascript": "7.1.4",
-    "postcss": "8.5.33"
+    "postcss": "8.5.33",
+    "cross-spawn@<6.0.6": "6.0.6"
   }
 }
