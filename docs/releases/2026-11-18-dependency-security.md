@@ -4,6 +4,8 @@ Status: code repairs committed separately; production-build acceptance and clean
 
 The user authorized autonomous dependency cleanup, separate reversible commits and Git pushes. AWS resources and data remain development. The earlier frontend `59bc5ec` and backend `f143548` were successfully pushed before this batch; older release records saying “no Git push” describe their state at that time.
 
+All twelve repair commits and the review/ledger commit were pushed to `origin/master` through `5003a3b`; the remote SHA was verified. Both repository working trees were clean at that check; backend HEAD remains `f143548`. GitHub's immediately refreshed API still returned the older 127-alert snapshot (including four critical alerts), so closure of GitHub alerts is **not yet verified**. No alert was manually dismissed. The final local registry audits and inspected lockfile are the evidence for the repaired package versions.
+
 ## Changes and commits
 
 | Commit | Repair |
@@ -36,6 +38,8 @@ No history was rewritten. Individual commits contain their validation notes. The
 ## Evidence and deployment gate
 
 Private evidence: `.deployments/dependency-security-20261117/`. See `clean-tests.log`, `clean-lint.log`, `clean-build.log`, `npm-audit-final.json`, `npm-audit-production.json`, `auth-session-acceptance.json`, `browser-regression.json`, `dev-server-acceptance.json`, `hook-runner-acceptance.json` and `frontend-manifest.json`. Temporary browser credentials and private profiles are ignored, not committed. Source maps remain local and must not be published.
+
+At handoff, 127.0.0.1:8080 serves the exact candidate through the private static preview (`static-server.cjs`, observed PID 18092). The regular Vue development server was stopped for the clean installation. The isolated verification browser listens on loopback port 9223; `signup-target.private.json` identifies the existing confirmation context and `signup-fixture.private.json` holds only this temporary test account. `signup-status.cjs` confirmed that its form remains available. Processes may not survive closing the session. Inspect actual command lines/ports before restarting or stopping anything; do not assume a recorded PID still belongs to this task. After acceptance, close only the task's preview/browser, clean the fixture and restart `npm.cmd run serve:aws` on port 8080 if wanted.
 
 The tested candidate is `frontend-release/`. Run `finish-signup.cjs` with the user-supplied code, check confirmation/automatic-login/cleanup receipts, then publish only the validated candidate. If the code expired, use the form's resend action and request the new inbox code. Public signup's credential lifetime and navigation are exercised by real forms, not administrator shortcuts.
 
